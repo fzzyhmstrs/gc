@@ -1,6 +1,8 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
+import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
+import me.fzzyhmstrs.amethyst_core.misc_util.SyncedConfigHelper.readOrCreate
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity
@@ -101,4 +103,20 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
     }
 
     abstract fun augmentStat(imbueLevel: Int = 1): AugmentDatapoint
+
+    companion object{
+
+        const val augmentVersion = "_v0"
+
+        class AugmentStats {
+            var id: String = AbstractScepterItem.defaultId.toString()
+            var cooldown: Int = 20
+            var manaCost: Int = 2
+            var minLvl: Int = 1
+        }
+
+        fun configAugment(file: String, configClass: AugmentStats): AugmentStats{
+            return readOrCreate(file,"augments") {configClass}
+        }
+    }
 }

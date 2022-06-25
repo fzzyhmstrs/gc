@@ -3,10 +3,13 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
 import me.fzzyhmstrs.amethyst_core.coding_util.Dustbin
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
+import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
+import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentDamage
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -32,12 +35,16 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
+import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.math.max
+import kotlin.random.Random
+import kotlin.random.asKotlinRandom
 
 object ScepterHelper: AugmentDamage {
 
     private val scepters: MutableMap<Int,MutableMap<String,Long>> = mutableMapOf()
-    private val augmentStats: MutableMap<String, AugmentDatapoint> = mutableMapOf()
+    private val augmentStats: MutableMap<String, me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint> = mutableMapOf()
     private val activeAugment: MutableMap<Int,String> = mutableMapOf()
     private val augmentApplied: MutableMap<Int,Int> = mutableMapOf()
     private val augmentModifiers: MutableMap<Int,MutableList<Identifier>> = mutableMapOf()
@@ -388,7 +395,7 @@ object ScepterHelper: AugmentDamage {
         return list[rndIndex]
     }
 
-    fun registerAugmentStat(id: String, dataPoint: AugmentDatapoint, overwrite: Boolean = false){
+    fun registerAugmentStat(id: String, dataPoint: me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint, overwrite: Boolean = false){
         if(!augmentStats.containsKey(id) || overwrite){
             augmentStats[id] = dataPoint
             dataPoint.bookOfLoreTier.addToList(id)
@@ -404,9 +411,9 @@ object ScepterHelper: AugmentDamage {
         registerAugmentStat(id,configAugmentStat(augment,id,imbueLevel),true)
     }
 
-    private fun configAugmentStat(augment: ScepterAugment,id: String,imbueLevel: Int = 1): AugmentDatapoint{
+    private fun configAugmentStat(augment: ScepterAugment,id: String,imbueLevel: Int = 1): me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint{
         val stat = augment.augmentStat(imbueLevel)
-        val augmentConfig = AiConfig.AugmentStats()
+        val augmentConfig = ScepterAugment.Companion.AugmentStats()
         val type = stat.type
         augmentConfig.id = id
         augmentConfig.cooldown = stat.cooldown
@@ -414,8 +421,8 @@ object ScepterHelper: AugmentDamage {
         augmentConfig.minLvl = stat.minLvl
         val tier = stat.bookOfLoreTier
         val item = stat.keyItem
-        val augmentAfterConfig = AiConfig.configAugment(this.javaClass.simpleName + AiConfig.augmentVersion +".json",augmentConfig)
-        return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
+        val augmentAfterConfig = ScepterAugment.configAugment(this.javaClass.simpleName + ScepterAugment.augmentVersion +".json",augmentConfig)
+        return me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
     }
 
     fun checkAugmentStat(id: String): Boolean{
@@ -465,11 +472,6 @@ object ScepterHelper: AugmentDamage {
         return (xpNext - xp + 1)
     }
 
-    @Deprecated("moving to amethyst_core")
-    data class AugmentDatapoint(val type: SpellType = SpellType.NULL, val cooldown: Int = 20,
-                                val manaCost: Int = 20, val minLvl: Int = 1, val imbueLevel: Int = 1,
-                                val bookOfLoreTier: LoreTier = LoreTier.NO_TIER, val keyItem: Item = Items.AIR)
-
     fun addModifier(modifier: Identifier, stack: ItemStack): Boolean{
         val nbt = stack.orCreateNbt
         val id: Int = nbtChecker(nbt)
@@ -485,7 +487,7 @@ object ScepterHelper: AugmentDamage {
         }
         val highestModifier = checkDescendant(modifier,scepter)
         if (highestModifier != null){
-            val mod = RegisterModifier.ENTRIES.get(modifier)
+            val mod = ModifierRegistry.get(modifier)
             return if (mod?.hasDescendant() == true){
                 val highestDescendantPresent = checkModifierLineage(mod,scepter)
                 if (highestDescendantPresent < 0){
@@ -547,20 +549,25 @@ object ScepterHelper: AugmentDamage {
                 addModifier(Identifier(modifier),id)
             }
         }
+        initializeForAttunedEnchant(stack, id, nbt)
+    }
+
+    @Deprecated("Removing after modifiers are released for long enough. Target end of 2022.")
+    private fun initializeForAttunedEnchant(stack: ItemStack, id: Int, nbt: NbtCompound){
         if (stack.hasEnchantments()){
             val enchants = stack.enchantments
             var attunedLevel = 0
             var nbtEl: NbtCompound
             for (el in enchants) {
                 nbtEl = el as NbtCompound
-                if (EnchantmentHelper.getIdFromNbt(nbtEl) == Identifier(AI.MOD_ID,"attuned")){
+                if (EnchantmentHelper.getIdFromNbt(nbtEl) == Identifier("amethyst_imbuement","attuned")){
                     attunedLevel = EnchantmentHelper.getLevelFromNbt(nbtEl)
                     break
                 }
             }
             if (attunedLevel > 0) {
                 for (i in 1..attunedLevel) {
-                    addModifier(RegisterModifier.LESSER_ATTUNED.modifierId, id, nbt)
+                    addModifier(ModifierRegistry.LESSER_ATTUNED.modifierId, id, nbt)
                 }
                 val newEnchants = EnchantmentHelper.fromNbt(enchants)
                 EnchantmentHelper.set(newEnchants,stack)
@@ -583,11 +590,11 @@ object ScepterHelper: AugmentDamage {
     fun getActiveModifiers(stack: ItemStack): CompiledAugmentModifier.CompiledModifiers {
         val nbt = stack.orCreateNbt
         val id: Int = nbtChecker(nbt)
-        return activeScepterModifiers[id] ?: AugmentModifierDefaults.BLANK_COMPILED_DATA
+        return activeScepterModifiers[id] ?: ModifierDefaults.BLANK_COMPILED_DATA
     }
 
     private fun checkDescendant(modifier: Identifier, scepter: Int): Identifier?{
-        val mod = RegisterModifier.ENTRIES.get(modifier)
+        val mod = ModifierRegistry.get(modifier)
         val lineage = mod?.getModLineage() ?: return modifier
         var highestModifier: Identifier? = null
         lineage.forEach { identifier ->
@@ -598,7 +605,7 @@ object ScepterHelper: AugmentDamage {
         return highestModifier
     }
     fun checkModifierLineage(modifier:Identifier, stack: ItemStack): Boolean{
-        val mod = RegisterModifier.ENTRIES.get(modifier)
+        val mod = ModifierRegistry.get(modifier)
         return if (mod != null){
             checkModifierLineage(mod, stack)
         } else {
@@ -631,7 +638,7 @@ object ScepterHelper: AugmentDamage {
         val list : MutableList<AugmentModifier> = mutableListOf()
         val compiledModifier = CompiledAugmentModifier()
         augmentModifiers[scepter]?.forEach { identifier ->
-            val modifier = RegisterModifier.ENTRIES.get(identifier)
+            val modifier = ModifierRegistry.get(identifier)
             if (modifier != null){
                 if (!modifier.hasSpellToAffect()){
                     list.add(modifier)
@@ -674,12 +681,12 @@ object ScepterHelper: AugmentDamage {
         return nbt.getString(key)
     }
     private fun World.getNewId():Int{
-        return (random.nextFloat() * 2000000000.0F).toInt()
+        return getNewId(random.asKotlinRandom())
     }
-    private fun getNewId(): Int{
-        var newId = (AI.aiRandom().nextFloat() * 2000000000.0F).toInt()
+    private fun getNewId(random: Random = AC.acRandom): Int{
+        var newId = (random.nextFloat() * Int.MAX_VALUE).toInt()
         while (scepters.containsKey(newId)){
-            newId = (AI.aiRandom().nextFloat() * 2000000000.0F).toInt()
+            newId = (random.nextFloat() * Int.MAX_VALUE).toInt()
         }
         return newId
     }

@@ -25,6 +25,8 @@ object ModifierDefaults{
     val BLANK_ID = Identifier(AC.MOD_ID,"blank_modifier")
     val BLANK_EFFECT = AugmentEffect()
     val BLANK_XP_MOD = XpModifiers()
+    val EMPTY_COMPILED = CompiledAugmentModifier(BLANK_ID)
+    val BLANK_COMPILED_DATA = CompiledAugmentModifier.CompiledModifiers(listOf(), EMPTY_COMPILED)
 }
 
 open class AbstractModifier(val modifierId: Identifier){
