@@ -9,6 +9,8 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults.BLANK_EF
 import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults.BLANK_XP_MOD
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -75,6 +77,10 @@ open class AugmentModifier(
 
     fun getXpModifiers(): XpModifiers {
         return xpModifier
+    }
+
+    fun getName(): Text {
+        return TranslatableText("scepter.modifiers.$modifierId")
     }
     
     fun withDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F): AugmentModifier {
