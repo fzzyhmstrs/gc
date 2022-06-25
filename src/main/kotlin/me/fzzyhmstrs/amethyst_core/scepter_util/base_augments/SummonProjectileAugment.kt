@@ -1,6 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
 
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.AugmentEffect
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentEffect
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity

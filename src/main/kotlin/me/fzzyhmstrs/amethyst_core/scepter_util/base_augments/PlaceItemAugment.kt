@@ -3,8 +3,8 @@ package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
 import me.fzzyhmstrs.amethyst_core.scepter_util.BuilderAugment
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.AugmentConsumer
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.AugmentEffect
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentConsumer
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentEffect
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.PacketSender

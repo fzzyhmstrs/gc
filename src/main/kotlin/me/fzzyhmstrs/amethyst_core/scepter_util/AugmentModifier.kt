@@ -1,11 +1,12 @@
-package me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments
+package me.fzzyhmstrs.amethyst_core.scepter_util
 
+import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
+import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
-import me.fzzyhmstrs.amethyst_imbuement.AI
-import me.fzzyhmstrs.amethyst_imbuement.registry.RegisterModifier
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.AugmentConsumer.*
-import me.fzzyhmstrs.amethyst_imbuement.util.AcceptableItemStacks
-import me.fzzyhmstrs.amethyst_imbuement.util.SpellType
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentConsumer.*
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults.BLANK_EFFECT
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults.BLANK_XP_MOD
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
@@ -17,9 +18,11 @@ import kotlin.math.max
     //alternative version with the AugmentEffect directly included
 
 object AugmentModifierDefaults{
-    val blankId = Identifier(AI.MOD_ID,"blank_modifier")
+    val blankId = Identifier(AC.MOD_ID,"blank_modifier")
     val EMPTY = AugmentModifier(blankId)
     val EMPTY_COMPILED = CompiledAugmentModifier(blankId)
+    val BLANK_EFFECT = AugmentEffect()
+    val BLANK_XP_MOD = XpModifiers()
 }
 
 
@@ -57,7 +60,7 @@ open class AugmentModifier(
         return lineage
     }
     private fun generateLineage(): List<Identifier>{
-        val nextInLineage = RegisterModifier.ENTRIES.get(descendant)
+        val nextInLineage = ModifierRegistry.get(descendant)
         val lineage: MutableList<Identifier> = mutableListOf(this.modifierId)
         lineage.addAll(nextInLineage?.getModLineage() ?: listOf())
         return lineage
@@ -66,66 +69,66 @@ open class AugmentModifier(
         return secondaryEffect
     }
 
-    fun getEffectModifier(): AugmentEffect{
+    fun getEffectModifier(): AugmentEffect {
         return effects
     }
 
-    fun getXpModifiers(): XpModifiers{
+    fun getXpModifiers(): XpModifiers {
         return xpModifier
     }
     
-    fun withDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F): AugmentModifier{
-        effects.plus(ScepterObject.BLANK_EFFECT.withDamage(damage, damagePerLevel, damagePercent))
+    fun withDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F): AugmentModifier {
+        effects.plus(BLANK_EFFECT.withDamage(damage, damagePerLevel, damagePercent))
         return this
     }
-    fun withAmplifier(amplifier: Int = 0, amplifierPerLevel: Int = 0, amplifierPercent: Int = 0): AugmentModifier{
-        effects.plus(ScepterObject.BLANK_EFFECT.withAmplifier(amplifier, amplifierPerLevel, amplifierPercent))
+    fun withAmplifier(amplifier: Int = 0, amplifierPerLevel: Int = 0, amplifierPercent: Int = 0): AugmentModifier {
+        effects.plus(BLANK_EFFECT.withAmplifier(amplifier, amplifierPerLevel, amplifierPercent))
         return this
     }
-    fun withDuration(duration: Int = 0, durationPerLevel: Int = 0, durationPercent: Int = 0): AugmentModifier{
-        effects.plus(ScepterObject.BLANK_EFFECT.withDuration(duration, durationPerLevel, durationPercent))
+    fun withDuration(duration: Int = 0, durationPerLevel: Int = 0, durationPercent: Int = 0): AugmentModifier {
+        effects.plus(BLANK_EFFECT.withDuration(duration, durationPerLevel, durationPercent))
         return this
     }
-    fun withRange(range: Double = 0.0, rangePerLevel: Double = 0.0, rangePercent: Double = 0.0): AugmentModifier{
-        effects.plus(ScepterObject.BLANK_EFFECT.withRange(range, rangePerLevel, rangePercent))
+    fun withRange(range: Double = 0.0, rangePerLevel: Double = 0.0, rangePercent: Double = 0.0): AugmentModifier {
+        effects.plus(BLANK_EFFECT.withRange(range, rangePerLevel, rangePercent))
         return this
     }
-    fun withSecondaryEffect(effect: AugmentEffect): AugmentModifier{
+    fun withSecondaryEffect(effect: AugmentEffect): AugmentModifier {
         effects.plus(effect)
         return this
     }
-    fun withXpMod(type: SpellType, xpMod: Int): AugmentModifier{
+    fun withXpMod(type: SpellType, xpMod: Int): AugmentModifier {
         val xpMods = when(type){
                 SpellType.FURY ->{
-                    ScepterObject.BLANK_XP_MOD.withFuryMod(xpMod)}
+                    BLANK_XP_MOD.withFuryMod(xpMod)}
                 SpellType.WIT ->{
-                    ScepterObject.BLANK_XP_MOD.withWitMod(xpMod)}
+                    BLANK_XP_MOD.withWitMod(xpMod)}
                 SpellType.GRACE ->{
-                    ScepterObject.BLANK_XP_MOD.withGraceMod(xpMod)}
+                    BLANK_XP_MOD.withGraceMod(xpMod)}
                 else -> return this
             }
         xpModifier.plus(xpMods)
         return this
     }
-    fun withSpellToAffect(predicate: Predicate<Identifier>): AugmentModifier{
+    fun withSpellToAffect(predicate: Predicate<Identifier>): AugmentModifier {
         spellsToAffect = predicate
         hasSpell = true
         return this
     }
-    fun withEffect(augment: ScepterAugment): AugmentModifier{
+    fun withEffect(augment: ScepterAugment): AugmentModifier {
         secondaryEffect = augment
         hasSecondEffect = true
         return this
     }
-    fun withConsumer(consumer: Consumer<List<LivingEntity>>, type: Type): AugmentModifier{
+    fun withConsumer(consumer: Consumer<List<LivingEntity>>, type: Type): AugmentModifier {
         effects.withConsumer(consumer,type)
         return this
     }
-    fun withConsumer(augmentConsumer: AugmentConsumer): AugmentModifier{
+    fun withConsumer(augmentConsumer: AugmentConsumer): AugmentModifier {
         effects.withConsumer(augmentConsumer.consumer,augmentConsumer.type)
         return this
     }
-    fun withDescendant(modifier: AugmentModifier): AugmentModifier{
+    fun withDescendant(modifier: AugmentModifier): AugmentModifier {
         val id = modifier.modifierId
         descendant = id
         hasDesc = true
@@ -167,7 +170,8 @@ data class AugmentEffect(
     private var damageData: PerLvlF = PerLvlF(),
     private var amplifierData: PerLvlI = PerLvlI(),
     private var durationData: PerLvlI = PerLvlI(),
-    private var rangeData: PerLvlD = PerLvlD()){
+    private var rangeData: PerLvlD = PerLvlD()
+){
     private var goodConsumers: MutableList<AugmentConsumer> = mutableListOf()
     private var badConsumers: MutableList<AugmentConsumer> = mutableListOf()
 
@@ -223,7 +227,7 @@ data class AugmentEffect(
         accept(listOf(entity), type)
     }
 
-    fun withDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F): AugmentEffect{
+    fun withDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F): AugmentEffect {
         return this.copy(damageData = PerLvlF(damage, damagePerLevel, damagePercent))
     }
     fun addDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F){
@@ -235,7 +239,7 @@ data class AugmentEffect(
     fun setDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F){
         damageData = PerLvlF(damage, damagePerLevel, damagePercent)
     }
-    fun withAmplifier(amplifier: Int = 0, amplifierPerLevel: Int = 0, amplifierPercent: Int = 0): AugmentEffect{
+    fun withAmplifier(amplifier: Int = 0, amplifierPerLevel: Int = 0, amplifierPercent: Int = 0): AugmentEffect {
         return this.copy(amplifierData = PerLvlI(amplifier,amplifierPerLevel,amplifierPercent))
     }
     fun addAmplifier(amplifier: Int = 0, amplifierPerLevel: Int = 0, amplifierPercent: Int = 0){
@@ -247,7 +251,7 @@ data class AugmentEffect(
     fun setAmplifier(amplifier: Int = 0, amplifierPerLevel: Int = 0, amplifierPercent: Int = 0){
         amplifierData = PerLvlI(amplifier,amplifierPerLevel,amplifierPercent)
     }
-    fun withDuration(duration: Int = 0, durationPerLevel: Int = 0, durationPercent: Int = 0): AugmentEffect{
+    fun withDuration(duration: Int = 0, durationPerLevel: Int = 0, durationPercent: Int = 0): AugmentEffect {
         return this.copy(durationData = PerLvlI(duration, durationPerLevel, durationPercent))
     }
     fun addDuration(duration: Int = 0, durationPerLevel: Int = 0, durationPercent: Int = 0){
@@ -271,7 +275,7 @@ data class AugmentEffect(
     fun setRange(range: Double = 0.0, rangePerLevel: Double = 0.0, rangePercent: Double = 0.0){
         rangeData = PerLvlD(range, rangePerLevel, rangePercent)
     }
-    fun withConsumer(consumer: Consumer<List<LivingEntity>>, type: Type): AugmentEffect{
+    fun withConsumer(consumer: Consumer<List<LivingEntity>>, type: Type): AugmentEffect {
         addConsumer(consumer, type)
         return this
     }
@@ -319,13 +323,13 @@ data class XpModifiers(var furyXpMod: Int = 0, var witXpMod: Int = 0, var graceX
             else -> 0
         }
     }
-    fun withFuryMod(furyXpMod: Int = 0): XpModifiers{
+    fun withFuryMod(furyXpMod: Int = 0): XpModifiers {
         return this.copy(furyXpMod = furyXpMod)
     }
-    fun withWitMod(witXpMod: Int = 0): XpModifiers{
+    fun withWitMod(witXpMod: Int = 0): XpModifiers {
         return this.copy(witXpMod = witXpMod)
     }
-    fun withGraceMod(graceXpMod: Int = 0): XpModifiers{
+    fun withGraceMod(graceXpMod: Int = 0): XpModifiers {
         return this.copy(graceXpMod = graceXpMod)
     }
 }
@@ -341,7 +345,7 @@ data class PerLvlI(val base: Int = 0, val perLevel: Int = 0, val percent: Int = 
     fun value(level: Int): Int{
         return (base + perLevel * level) * (100 + percent) / 100
     }
-    fun plus(ldi: PerLvlI): PerLvlI{
+    fun plus(ldi: PerLvlI): PerLvlI {
         return PerLvlI(base + ldi.base, perLevel + ldi.perLevel, percent + ldi.percent)
     }
 }
@@ -350,7 +354,7 @@ data class PerLvlF(val base: Float = 0.0F, val perLevel: Float = 0.0F, val perce
     fun value(level: Int): Float{
         return (base + perLevel * level) * (100 + percent) / 100
     }
-    fun plus(ldf: PerLvlF): PerLvlF{
+    fun plus(ldf: PerLvlF): PerLvlF {
         return PerLvlF(base + ldf.base, perLevel + ldf.perLevel, percent + ldf.percent)
     }
 }
@@ -359,7 +363,7 @@ data class PerLvlD(val base: Double = 0.0, val perLevel: Double = 0.0, val perce
     fun value(level: Int): Double{
         return (base + perLevel * level) * (100 + percent) / 100
     }
-    fun plus(ldd: PerLvlD): PerLvlD{
+    fun plus(ldd: PerLvlD): PerLvlD {
         return PerLvlD(base + ldd.base, perLevel + ldd.perLevel, percent + ldd.percent)
     }
 }

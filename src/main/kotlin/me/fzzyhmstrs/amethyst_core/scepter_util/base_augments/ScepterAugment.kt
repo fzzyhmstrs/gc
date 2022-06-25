@@ -1,9 +1,9 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
 
 import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.AugmentEffect
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.AugmentModifier
-import me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments.CompiledAugmentModifier
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentEffect
+import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.scepter_util.CompiledAugmentModifier
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity
