@@ -1,9 +1,6 @@
-package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
+package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentEffect
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.scepter_util.CompiledAugmentModifier
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity
@@ -26,10 +23,6 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         val effectModifiers = AugmentEffect()
         effectModifiers.plus(modifierData?.getEffectModifier()?: AugmentEffect())
         effectModifiers.plus(baseEffect)
-/*        println("Damage:" + effectModifiers.damage(level))
-        println("Duration: " + effectModifiers.duration(level))
-        println("Amplifier: " + effectModifiers.amplifier(level))
-        println("Range: " + effectModifiers.range(level))*/
         val bl = applyTasks(world,user,hand,level,effectModifiers)
         if (bl) {
             modifiers.forEach {

@@ -1,45 +1,16 @@
-package me.fzzyhmstrs.amethyst_core.registry
+package me.fzzyhmstrs.amethyst_core.misc_util
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import me.fzzyhmstrs.amethyst_core.AC
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.network.PacketByteBuf
-import net.minecraft.util.Identifier
 import java.io.File
+import java.io.FileWriter
 
-object SyncConfigPacketRegistry {
+object SyncedConfigHelper {
 
-    private val SYNC_CONFIG_PACKET = Identifier(AC.MOD_ID,"sync_config_packet")
-    private val configs : MutableList<SyncedConfig> = mutableListOf()
     val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-
-    internal fun registerClient() {
-        ClientPlayNetworking.registerGlobalReceiver(SYNC_CONFIG_PACKET) { _, _, buf, _ ->
-            configs.forEach {
-                it.readFromServer(buf)
-            }
-        }
-    }
-
-    internal fun registerServer() {
-        ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
-            val player = handler.player
-            configs.forEach {
-                val buf = PacketByteBufs.create()
-                it.writeToClient(buf)
-                ServerPlayNetworking.send(player, SYNC_CONFIG_PACKET, buf)
-            }
-        }
-    }
-
-    fun registerConfig(config: SyncedConfig){
-        configs.add(config)
-    }
 
     inline fun <reified T> readOrCreate(file: String, child: String = "", base: String = AC.MOD_ID, configClass: () -> T): T {
         val (dir,dirCreated) = makeDir(child, base)
@@ -123,5 +94,23 @@ object SyncConfigPacketRegistry {
 
         fun generateNewClass(): Any
 
+    }
+    interface ReadMeWriter{
+        fun writeReadMe(file: String){
+            val textLines: List<String> = readmeText()
+            val dirPair = makeDir("",AC.MOD_ID)
+            if (!dirPair.second){
+                println("Couldn't make directory for storing the readme")
+            }
+            val f = File(dirPair.first,file)
+            val fw = FileWriter(f)
+            textLines.forEach {
+                    value -> fw.write(value)
+                fw.write(System.getProperty("line.separator"))
+            }
+            fw.close()
+        }
+
+        fun readmeText(): List<String>
     }
 }

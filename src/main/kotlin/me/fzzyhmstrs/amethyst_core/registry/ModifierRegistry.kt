@@ -1,9 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
 import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults
-import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
+import me.fzzyhmstrs.amethyst_core.scepter_util.ModifierDefaults
 import net.minecraft.util.Identifier
 
 object ModifierRegistry {
@@ -11,7 +9,7 @@ object ModifierRegistry {
 
     fun register(modifier: AugmentModifier){
         val id = modifier.modifierId
-        if (registry.containsKey(id)){throw IllegalStateException("Modifier with id $id already present in ModififerRegistry")}
+        if (registry.containsKey(id)){throw IllegalStateException("AbstractModifier with id $id already present in ModififerRegistry")}
         registry[id] = modifier
     }
     fun get(id: Identifier): AugmentModifier?{
@@ -21,7 +19,7 @@ object ModifierRegistry {
         return registry[getIdByRawId(rawId)]
     }
     fun getIdByRawId(rawId:Int): Identifier {
-        return registry.keys.elementAtOrElse(rawId) { AugmentModifierDefaults.blankId }
+        return registry.keys.elementAtOrElse(rawId) { ModifierDefaults.BLANK_ID }
     }
     fun getRawId(id: Identifier): Int{
         return registry.keys.indexOf(id)

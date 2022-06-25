@@ -1,16 +1,18 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlD
+import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlF
+import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
-import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
 import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentConsumer.*
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults.BLANK_EFFECT
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifierDefaults.BLANK_XP_MOD
+import me.fzzyhmstrs.amethyst_core.scepter_util.ModifierDefaults.BLANK_EFFECT
+import me.fzzyhmstrs.amethyst_core.scepter_util.ModifierDefaults.BLANK_XP_MOD
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -19,44 +21,28 @@ import kotlin.math.max
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
     //alternative version with the AugmentEffect directly included
 
-object AugmentModifierDefaults{
-    val blankId = Identifier(AC.MOD_ID,"blank_modifier")
-    val EMPTY = AugmentModifier(blankId)
-    val EMPTY_COMPILED = CompiledAugmentModifier(blankId)
+object ModifierDefaults{
+    val BLANK_ID = Identifier(AC.MOD_ID,"blank_modifier")
     val BLANK_EFFECT = AugmentEffect()
     val BLANK_XP_MOD = XpModifiers()
 }
 
+open class AbstractModifier(val modifierId: Identifier){
 
-open class AugmentModifier(
-    val modifierId: Identifier,
-    open val levelModifier: Int = 0,
-    open val cooldownModifier: Double = 0.0,
-    open val manaCostModifier: Double = 0.0
-    ) {
-
-    protected val effects: AugmentEffect = AugmentEffect()
-    protected val xpModifier: XpModifiers = XpModifiers()
-    private var spellsToAffect: Predicate<Identifier>? = null
-    private var secondaryEffect: ScepterAugment? = null
-    private var descendant: Identifier = AugmentModifierDefaults.blankId
+    private var descendant: Identifier = ModifierDefaults.BLANK_ID
     private val lineage: List<Identifier> by lazy { generateLineage() }
-        
-    private var hasSpell: Boolean = false
-    private var hasSecondEffect: Boolean = false
-    private var hasDesc: Boolean = false
+    private var objectsToAffect: Predicate<Identifier>? = null
 
-    fun hasSpellToAffect(): Boolean{
-        return hasSpell
-    }
-    fun checkSpellsToAffect(id: Identifier): Boolean{
-        return spellsToAffect?.test(id) ?: return false
-    }
-    fun hasSecondaryEffect(): Boolean{
-        return hasSecondEffect
-    }
+    private var hasDesc: Boolean = false
+    private var hasObjectToAffect: Boolean = false
+
     fun hasDescendant(): Boolean{
         return hasDesc
+    }
+    fun addDescendant(modifier: AbstractModifier){
+        val id = modifier.modifierId
+        descendant = id
+        hasDesc = true
     }
     fun getModLineage(): List<Identifier>{
         return lineage
@@ -67,20 +53,63 @@ open class AugmentModifier(
         lineage.addAll(nextInLineage?.getModLineage() ?: listOf())
         return lineage
     }
+    open fun hasObjectToAffect(): Boolean{
+        return hasObjectToAffect
+    }
+    open fun addObjectToAffect(predicate: Predicate<Identifier>){
+        objectsToAffect = predicate
+        hasObjectToAffect = true
+    }
+    open fun checkObjectsToAffect(id: Identifier): Boolean{
+        return objectsToAffect?.test(id) ?: return false
+    }
+    open fun getName(): Text {
+        return LiteralText("$modifierId")
+    }
+    open fun isAcceptableItem(stack: ItemStack): Boolean{
+        acceptableItemStacks().forEach {
+            if (stack.isOf(it.item)){
+                return true
+            }
+        }
+        return false
+    }
+    open fun acceptableItemStacks(): MutableList<ItemStack>{
+        return mutableListOf()
+    }
+}
+
+open class AugmentModifier(
+    modifierId: Identifier,
+    open val levelModifier: Int = 0,
+    open val cooldownModifier: Double = 0.0,
+    open val manaCostModifier: Double = 0.0
+    ): AbstractModifier(modifierId) {
+
+    protected val effects: AugmentEffect = AugmentEffect()
+    protected val xpModifier: XpModifiers = XpModifiers()
+    private var secondaryEffect: ScepterAugment? = null
+        
+    private var hasSecondEffect: Boolean = false
+    private var hasDesc: Boolean = false
+
+    fun hasSpellToAffect(): Boolean{
+        return hasObjectToAffect()
+    }
+    fun checkSpellsToAffect(id: Identifier): Boolean{
+        return checkObjectsToAffect(id)
+    }
+    fun hasSecondaryEffect(): Boolean{
+        return hasSecondEffect
+    }
     fun getSecondaryEffect(): ScepterAugment?{
         return secondaryEffect
     }
-
     fun getEffectModifier(): AugmentEffect {
         return effects
     }
-
     fun getXpModifiers(): XpModifiers {
         return xpModifier
-    }
-
-    fun getName(): Text {
-        return TranslatableText("scepter.modifiers.$modifierId")
     }
     
     fun withDamage(damage: Float = 0.0F, damagePerLevel: Float = 0.0F, damagePercent: Float = 0.0F): AugmentModifier {
@@ -117,11 +146,10 @@ open class AugmentModifier(
         return this
     }
     fun withSpellToAffect(predicate: Predicate<Identifier>): AugmentModifier {
-        spellsToAffect = predicate
-        hasSpell = true
+        addObjectToAffect(predicate)
         return this
     }
-    fun withEffect(augment: ScepterAugment): AugmentModifier {
+    fun withSecondaryEffect(augment: ScepterAugment): AugmentModifier {
         secondaryEffect = augment
         hasSecondEffect = true
         return this
@@ -135,42 +163,33 @@ open class AugmentModifier(
         return this
     }
     fun withDescendant(modifier: AugmentModifier): AugmentModifier {
-        val id = modifier.modifierId
-        descendant = id
-        hasDesc = true
+        addDescendant(modifier)
         return this
     }
 
-    open fun isAcceptableItem(stack: ItemStack): Boolean{
-        acceptableItemStacks().forEach {
-            if (stack.isOf(it.item)){
-                return true
-            }
-        }
-        return false
-    }
-    open fun acceptableItemStacks(): MutableList<ItemStack>{
+    override fun acceptableItemStacks(): MutableList<ItemStack>{
         return AcceptableItemStacks.scepterAcceptableItemStacks(1)
     }
 
-    //data class SecondaryEffect(val overridesEffect: Boolean = false, val secondaryEffect: ScepterAugment? = null)
 }
 
 class CompiledAugmentModifier(
-    modifierId: Identifier = AugmentModifierDefaults.blankId,
+    modifierId: Identifier = ModifierDefaults.BLANK_ID,
     override var levelModifier: Int = 0,
     override var cooldownModifier: Double = 0.0,
     override var manaCostModifier: Double = 0.0)
     : AugmentModifier(modifierId, levelModifier, cooldownModifier, manaCostModifier){
 
-        fun plus(am: AugmentModifier) {
-            levelModifier += am.levelModifier
-            cooldownModifier += am.cooldownModifier
-            manaCostModifier += am.manaCostModifier
-            xpModifier.plus(am.getXpModifiers())
-            effects.plus(am.getEffectModifier())
-        }
+    fun plus(am: AugmentModifier) {
+        levelModifier += am.levelModifier
+        cooldownModifier += am.cooldownModifier
+        manaCostModifier += am.manaCostModifier
+        xpModifier.plus(am.getXpModifiers())
+        effects.plus(am.getEffectModifier())
     }
+
+    data class CompiledModifiers(val modifiers: List<AugmentModifier>, val compiledData: CompiledAugmentModifier)
+}
 
 data class AugmentEffect(
     private var damageData: PerLvlF = PerLvlF(),
@@ -347,29 +366,3 @@ data class AugmentConsumer(val consumer: Consumer<List<LivingEntity>>, val type:
     }
 }
 
-data class PerLvlI(val base: Int = 0, val perLevel: Int = 0, val percent: Int = 0){
-    fun value(level: Int): Int{
-        return (base + perLevel * level) * (100 + percent) / 100
-    }
-    fun plus(ldi: PerLvlI): PerLvlI {
-        return PerLvlI(base + ldi.base, perLevel + ldi.perLevel, percent + ldi.percent)
-    }
-}
-
-data class PerLvlF(val base: Float = 0.0F, val perLevel: Float = 0.0F, val percent: Float = 0.0F){
-    fun value(level: Int): Float{
-        return (base + perLevel * level) * (100 + percent) / 100
-    }
-    fun plus(ldf: PerLvlF): PerLvlF {
-        return PerLvlF(base + ldf.base, perLevel + ldf.perLevel, percent + ldf.percent)
-    }
-}
-
-data class PerLvlD(val base: Double = 0.0, val perLevel: Double = 0.0, val percent: Double = 0.0){
-    fun value(level: Int): Double{
-        return (base + perLevel * level) * (100 + percent) / 100
-    }
-    fun plus(ldd: PerLvlD): PerLvlD {
-        return PerLvlD(base + ldd.base, perLevel + ldd.perLevel, percent + ldd.percent)
-    }
-}

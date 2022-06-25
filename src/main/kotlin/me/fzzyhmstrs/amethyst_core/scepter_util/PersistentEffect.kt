@@ -1,13 +1,12 @@
-package me.fzzyhmstrs.amethyst_imbuement.scepter.base_augments
+package me.fzzyhmstrs.amethyst_core.scepter_util
 
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentEffect
-import me.fzzyhmstrs.amethyst_core.scepter_util.PerLvlI
+import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-interface PersistentAugment {
+interface PersistentEffect {
 
     val delay: PerLvlI
 
