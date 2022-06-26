@@ -1,7 +1,5 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.misc_util.SyncedConfigHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
