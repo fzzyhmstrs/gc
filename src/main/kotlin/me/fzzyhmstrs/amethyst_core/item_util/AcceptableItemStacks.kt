@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterMaterialAddon
 import net.minecraft.block.Block
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
