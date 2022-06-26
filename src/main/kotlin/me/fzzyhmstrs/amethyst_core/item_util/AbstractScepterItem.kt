@@ -5,6 +5,7 @@ import me.fzzyhmstrs.amethyst_core.misc_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
+import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -28,18 +29,14 @@ import net.minecraft.util.math.MathHelper
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
-abstract class AbstractScepterItem(material: ToolMaterial, settings: Settings, baseRegen: Int, vararg defaultModifier: Identifier): ToolItem(material, settings), ManaItem {
+abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Settings, vararg defaultModifier: Identifier): ToolItem(material, settings), ManaItem {
 
     private val tickerManaRepair: Long
     protected val defaultModifiers: MutableList<Identifier> = mutableListOf()
     abstract val fallbackId: Identifier
 
     init {
-        tickerManaRepair = if (material !is ScepterMaterialAddon){
-            baseRegen.toLong()
-        } else {
-            material.healCooldown()
-        }
+        tickerManaRepair = material.healCooldown()
         defaultModifier.forEach {
             defaultModifiers.add(it)
         }

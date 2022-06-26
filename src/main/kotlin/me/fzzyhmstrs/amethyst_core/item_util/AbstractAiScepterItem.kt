@@ -5,6 +5,7 @@ import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterAugment
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
+import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
@@ -25,7 +26,8 @@ import net.minecraft.world.World
 import kotlin.math.max
 
 @Suppress("SameParameterValue", "unused", "USELESS_IS_CHECK")
-abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings, baseRegen: Int, vararg defaultModifier: Identifier): AbstractScepterItem(material,settings, baseRegen, *defaultModifier){
+abstract class AbstractAiScepterItem(material: ScepterToolMaterial, settings: Settings, vararg defaultModifier: Identifier):
+    AbstractScepterItem(material,settings, *defaultModifier){
     
     override fun appendTooltip(
         stack: ItemStack,
