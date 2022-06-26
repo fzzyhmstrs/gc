@@ -48,7 +48,7 @@ interface AugmentDamage {
         stack: ItemStack,
         aug: Enchantment,
         entity: PlayerEntity,
-        message: String = TranslatableText("augment_damage.burnout").append(aug.getName(1)).toString()) {
+        message: Text = TranslatableText("augment_damage.burnout").append(aug.getName(1))) {
         val enchantList = EnchantmentHelper.get(stack)
         val newEnchantList: MutableMap<Enchantment, Int> = mutableMapOf()
         for (enchant in enchantList.keys) {
@@ -56,8 +56,8 @@ interface AugmentDamage {
                 newEnchantList[enchant] = enchantList[enchant] ?: 0
             }
         }
-        if (message != "") {
-            entity.sendMessage(LiteralText(message),false)
+        if (message.asString() != "") {
+            entity.sendMessage(message,false)
         }
         EnchantmentHelper.set(newEnchantList, stack)
     }
