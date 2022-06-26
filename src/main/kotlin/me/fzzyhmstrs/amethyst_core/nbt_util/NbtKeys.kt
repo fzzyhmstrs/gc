@@ -32,6 +32,16 @@ enum class NbtKeys {
             return "active_enchant_id"
         }
     },
+    LAST_USED{
+        override fun str(): String {
+            return "_last_used"
+        }
+    },
+    LAST_USED_LIST{
+        override fun str(): String {
+            return "last_used_list"
+        }
+    },
     DISENCHANT_COUNT{
         override fun str(): String {
             return "disenchant_count"
