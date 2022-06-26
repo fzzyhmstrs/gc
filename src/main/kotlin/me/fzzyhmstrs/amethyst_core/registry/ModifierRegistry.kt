@@ -1,9 +1,9 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentConsumer
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.scepter_util.ModifierDefaults
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierDefaults
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects

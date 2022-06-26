@@ -3,6 +3,9 @@ package me.fzzyhmstrs.amethyst_core.scepter_util
 import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.misc_util.SyncedConfigHelper.readOrCreate
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.modifier_util.CompiledAugmentModifier
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity

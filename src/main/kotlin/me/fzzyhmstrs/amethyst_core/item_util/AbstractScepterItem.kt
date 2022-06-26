@@ -6,15 +6,22 @@ import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.ToolItem
 import net.minecraft.item.ToolMaterial
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.LiteralText
+import net.minecraft.text.MutableText
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.UseAction
 import net.minecraft.util.math.MathHelper
@@ -24,7 +31,8 @@ import net.minecraft.world.World
 abstract class AbstractScepterItem(material: ToolMaterial, settings: Settings, baseRegen: Int, vararg defaultModifier: Identifier): ToolItem(material, settings), ManaItem {
 
     private val tickerManaRepair: Long
-    private val defaultModifiers: MutableList<Identifier> = mutableListOf()
+    protected val defaultModifiers: MutableList<Identifier> = mutableListOf()
+    abstract val fallbackId: Identifier
 
     init {
         tickerManaRepair = if (material !is ScepterMaterialAddon){
@@ -54,12 +62,13 @@ abstract class AbstractScepterItem(material: ToolMaterial, settings: Settings, b
     }
 
     open fun defaultActiveEnchant(): Identifier{
-        return Identifier("vanishing_curse")
+        return fallbackId
     }
 
     companion object{
         val defaultId = Identifier("vanishing_curse")
-        val SCEPTER_SMOKE_PACKET = Identifier(AC.MOD_ID,"scepter_smoke_packet")
+        private val SCEPTER_SMOKE_PACKET = Identifier(AC.MOD_ID,"scepter_smoke_packet")
+        val commaText: MutableText = LiteralText(", ").formatted(Formatting.GOLD)
         fun registerClient(){
             ClientPlayNetworking.registerGlobalReceiver(SCEPTER_SMOKE_PACKET) { minecraftClient: MinecraftClient, _, _, _ ->
                 val world = minecraftClient.world
@@ -70,11 +79,17 @@ abstract class AbstractScepterItem(material: ToolMaterial, settings: Settings, b
             }
         }
 
+        fun sendSmokePacket(user: ServerPlayerEntity){
+            val buf = PacketByteBufs.create()
+            ServerPlayNetworking.send(user, SCEPTER_SMOKE_PACKET, buf)
+        }
+
         private fun doSmoke(world: World, client: MinecraftClient, user: LivingEntity){
             val particlePos = scepterParticlePos(client, user)
             world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,particlePos.x,particlePos.y,particlePos.z,user.velocity.x,user.velocity.y + 0.5,user.velocity.z)
         }
-        private fun doSmoke(world: World, user: LivingEntity){
+
+        fun doSmoke(world: World, user: LivingEntity){
             val pos = user.eyePos
             val width = user.width
             val yaw = user.yaw
@@ -89,7 +104,7 @@ abstract class AbstractScepterItem(material: ToolMaterial, settings: Settings, b
             val item = stack.item
             if (item is AbstractScepterItem) {
                 if(!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
-                    val identifier = item.defaultActiveEnchant()
+                    val identifier = item.fallbackId
                     Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), identifier.toString(), nbt)
                 }
                 val nbtList = NbtList()
@@ -105,7 +120,7 @@ abstract class AbstractScepterItem(material: ToolMaterial, settings: Settings, b
         fun addDefaultEnchantment(stack: ItemStack){
             val item = stack.item
             if (item is AbstractScepterItem) {
-                val enchantToAdd = Registry.ENCHANTMENT.get(item.defaultActiveEnchant())
+                val enchantToAdd = Registry.ENCHANTMENT.get(item.fallbackId)
                 if (enchantToAdd != null){
                     if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
                         stack.addEnchantment(enchantToAdd,1)
