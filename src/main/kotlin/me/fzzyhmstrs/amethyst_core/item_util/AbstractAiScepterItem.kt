@@ -68,7 +68,7 @@ abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings,
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         val stack = user.getStackInHand(hand)
         val nbt = stack.orCreateNbt
-        val activeEnchantId: String = ScepterHelper.activeEnchantHelperNbtOnly(stack)
+        val activeEnchantId: String = ScepterHelper.activeEnchantHelper(stack)
         val testEnchant: Enchantment = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
         if (testEnchant !is ScepterAugment) return resetCooldown(stack,world,user,activeEnchantId)
 
@@ -123,7 +123,7 @@ abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings,
 
         val modifiers = ScepterHelper.getActiveModifiers(stack)
 
-        val cd : Int? = ScepterHelper.useScepterNbtOnly(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
+        val cd : Int? = ScepterHelper.useScepter(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {
             val manaCost = ScepterHelper.getAugmentManaCost(activeEnchantId,modifiers.compiledData.manaCostModifier)
             if (!ScepterHelper.checkManaCost(manaCost,stack)) return resetCooldown(stack,world,user,activeEnchantId)
@@ -150,7 +150,7 @@ abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings,
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
         addDefaultEnchantment(stack)
         writeDefaultNbt(stack)
-        ScepterHelper.initializeScepterNbtOnly(stack)
+        ScepterHelper.initializeScepter(stack)
     }
 
     //removes cooldown on the item if you switch item
