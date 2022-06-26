@@ -8,7 +8,6 @@ import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.modifier_util.*
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
-import me.fzzyhmstrs.amethyst_core.nbt_util.NbtScepterHelper
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentDamage
@@ -172,6 +171,7 @@ object ScepterHelper: AugmentDamage {
             user.itemCooldownManager.set(stack.item, (cooldown - timeSinceLast).toInt())
         }
         DUSTBIN.markDirty(stack)
+        Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),newActiveEnchant, nbt)
         val message = TranslatableText("scepter.new_active_spell").append(TranslatableText("enchantment.amethyst_imbuement.${Identifier(newActiveEnchant).path}"))
         user.sendMessage(message,false)
     }
@@ -572,6 +572,39 @@ object ScepterHelper: AugmentDamage {
         return stats
     }
 
+    object NbtScepterHelper {
+
+        fun checkLastUsed(lastUsedList: NbtCompound, activeEnchantId: String, time: Long): Long{
+            val key = activeEnchantId + NbtKeys.LAST_USED.str()
+            return if (!lastUsedList.contains(key)) {
+                Nbt.writeLongNbt(key, time, lastUsedList)
+                time
+            } else {
+                Nbt.readLongNbt(key, lastUsedList)
+            }
+        }
+        fun updateLastUsed(lastUsedList: NbtCompound, activeEnchantId: String, currentTime: Long){
+            val key = activeEnchantId + NbtKeys.LAST_USED.str()
+            Nbt.writeLongNbt(key, currentTime, lastUsedList)
+
+        }
+
+        fun getOrCreateLastUsedList(nbtCompound: NbtCompound): NbtCompound {
+            val lastUsedList = nbtCompound.get(NbtKeys.LAST_USED_LIST.str())
+            return if (lastUsedList == null){
+                createLastUsedList(nbtCompound)
+            } else {
+                lastUsedList as NbtCompound
+            }
+        }
+
+        private fun createLastUsedList(nbtCompound: NbtCompound): NbtCompound {
+            val lastUsedList = NbtCompound()
+            nbtCompound.put(NbtKeys.LAST_USED_LIST.str(),lastUsedList)
+            return lastUsedList
+        }
+
+
+    }
+
 }
-
-
