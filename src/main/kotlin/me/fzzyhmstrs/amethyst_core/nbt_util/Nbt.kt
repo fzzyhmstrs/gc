@@ -19,6 +19,12 @@ object Nbt {
     fun readIntNbt(key: String, nbt: NbtCompound): Int {
         return nbt.getInt(key)
     }
+    fun writeLongNbt(key: String, input: Long, nbt: NbtCompound){
+        nbt.putLong(key,input)
+    }
+    fun readLongNbt(key: String, nbt: NbtCompound): Long {
+        return nbt.getLong(key)
+    }
     fun writeStringNbt(key: String, input: String, nbt: NbtCompound){
         nbt.putString(key,input)
     }
