@@ -12,9 +12,9 @@ object EventRegistry {
 
     private val TICKER_EVENT = Identifier(AC.MOD_ID, "ticker_event")
     private val QUEUE_TICK_EVENT = Identifier(AC.MOD_ID, "queue_tick_event")
-    val ticker_armor = Ticker(30)
-    val ticker_jewelry = Ticker(30)
-    val ticker_totem = Ticker(20)
+    val ticker_40 = Ticker(40)
+    val ticker_30 = Ticker(30)
+    val ticker_20 = Ticker(20)
 
     fun registerAll(){
         registerServerTick()
@@ -30,9 +30,9 @@ object EventRegistry {
 
     private fun registerServerTick(){
         ServerTickEvents.START_SERVER_TICK.register(TICKER_EVENT) {
-            ticker_armor.tickUp()
-            ticker_jewelry.tickUp()
-            ticker_totem.tickUp()
+            ticker_40.tickUp()
+            ticker_30.tickUp()
+            ticker_20.tickUp()
             ScepterHelper.tickModifiers()
             PersistentEffectHelper.persistentEffectTicker()
         }
