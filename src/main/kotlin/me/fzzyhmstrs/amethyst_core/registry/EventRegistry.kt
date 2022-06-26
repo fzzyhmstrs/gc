@@ -2,6 +2,7 @@ package me.fzzyhmstrs.amethyst_core.registry
 
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
+import me.fzzyhmstrs.amethyst_core.misc_util.PersistentEffectHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.trinket_util.BaseAugment
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
@@ -33,6 +34,7 @@ object EventRegistry {
             ticker_jewelry.tickUp()
             ticker_totem.tickUp()
             ScepterHelper.tickModifiers()
+            PersistentEffectHelper.persistentEffectTicker()
         }
         ServerTickEvents.END_SERVER_TICK.register(QUEUE_TICK_EVENT) {
             if (BaseAugment.checkEffectsQueue()){

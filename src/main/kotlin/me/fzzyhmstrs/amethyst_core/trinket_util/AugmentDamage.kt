@@ -19,10 +19,7 @@ interface AugmentDamage {
         amount: Int,
         message: Text = TranslatableText("augment_damage.check_can_use")
     ): Boolean {
-        val damage = stack.damage
-        val maxDamage = stack.maxDamage
-        val damageLeft = maxDamage - damage
-        return if (damageLeft >= amount) {
+        return if (checkCanUseHandler(stack, amount)) {
             true
         } else {
             if (message.asString() != "") {
@@ -38,6 +35,13 @@ interface AugmentDamage {
             }
             false
         }
+    }
+
+    fun checkCanUseHandler(stack: ItemStack,amount: Int): Boolean{
+        val damage = stack.damage
+        val maxDamage = stack.maxDamage
+        val damageLeft = maxDamage - damage
+        return damageLeft >= amount
     }
 
     fun burnOutHandler(
@@ -63,7 +67,8 @@ interface AugmentDamage {
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: String = TranslatableText("augment_damage.damage").toString(), unbreakingFlag: Boolean = false): Boolean {
+        message: Text = TranslatableText("augment_damage.damage"),
+        unbreakingFlag: Boolean = false): Boolean {
         val currentDmg = stack.damage
         val maxDmg = stack.maxDamage
         var newCurrentDmg = currentDmg
@@ -89,8 +94,8 @@ interface AugmentDamage {
                     1.0F,
                     1.0F
                 )
-                if (message != "") {
-                    entity.sendMessage(LiteralText(message),false)
+                if (message.asString() != "") {
+                    entity.sendMessage(message,false)
                 }
             }
             if (newCurrentDmg == (maxDmg - 1)) {
@@ -99,7 +104,7 @@ interface AugmentDamage {
                 } else {
                     unbreakingDamage(stack,entity,newCurrentDmg - currentDmg)
                 }
-                if (message != "") {
+                if (message.asString() != "") {
                     world.playSound(
                         null,
                         entity.blockPos,

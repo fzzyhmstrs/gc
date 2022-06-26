@@ -1,6 +1,5 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
-import me.fzzyhmstrs.amethyst_core.misc_util.PersistentEffectHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
@@ -9,6 +8,7 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
@@ -67,37 +67,10 @@ abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings,
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         val stack = user.getStackInHand(hand)
-        val activeEnchantId: String
-        val testEnchant: Any
-        var nbt = stack.nbt
-        if (nbt != null) {
-            if  (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) {
-                activeEnchantId = ScepterHelper.activeEnchantHelper(world,stack,Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt))
-                testEnchant = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
-            } else {
-                ScepterHelper.initializeScepter(stack,world)
-                activeEnchantId = ScepterHelper.activeEnchantHelper(world,stack,Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt))
-                testEnchant = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
-            }
-        } else {
-            ScepterHelper.initializeScepter(stack,world)
-            nbt = stack.nbt
-            if (nbt != null) {
-                activeEnchantId =
-                    ScepterHelper.activeEnchantHelper(world,stack, Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt))
-                testEnchant =
-                    Registry.ENCHANTMENT.get(Identifier(activeEnchantId)) ?: return resetCooldown(
-                        stack,
-                        world,
-                        user,
-                        activeEnchantId
-                    )
-            } else {
-                return TypedActionResult.fail(stack)
-            }
-        }
+        val nbt = stack.orCreateNbt
+        val activeEnchantId: String = ScepterHelper.activeEnchantHelperNbtOnly(stack)
+        val testEnchant: Enchantment = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
         if (testEnchant !is ScepterAugment) return resetCooldown(stack,world,user,activeEnchantId)
-
 
         //determine the level at which to apply the active augment, from 1 to the maximum level the augment can operate
         val level = ScepterHelper.getScepterStat(nbt,activeEnchantId).first
@@ -150,10 +123,10 @@ abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings,
 
         val modifiers = ScepterHelper.getActiveModifiers(stack)
 
-        val cd : Int? = ScepterHelper.useScepter(activeEnchantId, stack, user, world, modifiers.compiledData.cooldownModifier)
+        val cd : Int? = ScepterHelper.useScepterNbtOnly(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {
             val manaCost = ScepterHelper.getAugmentManaCost(activeEnchantId,modifiers.compiledData.manaCostModifier)
-            if (!ScepterHelper.checkManaCost(manaCost,stack,world,user)) return resetCooldown(stack,world,user,activeEnchantId)
+            if (!ScepterHelper.checkManaCost(manaCost,stack)) return resetCooldown(stack,world,user,activeEnchantId)
             val level = max(1,testLevel + modifiers.compiledData.levelModifier)
             if (testEnchant.applyModifiableTasks(world, user, hand, level, modifiers.modifiers, modifiers.compiledData)) {
                 ScepterHelper.applyManaCost(manaCost,stack, world, user)
@@ -177,37 +150,22 @@ abstract class AbstractAiScepterItem(material: ToolMaterial, settings: Settings,
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
         addDefaultEnchantment(stack)
         writeDefaultNbt(stack)
-        ScepterHelper.initializeScepter(stack,world)
+        ScepterHelper.initializeScepterNbtOnly(stack)
     }
 
     //removes cooldown on the item if you switch item
     override fun inventoryTick(stack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
         if (world.isClient) return
         if (entity !is PlayerEntity) return
-
-        val id = ScepterHelper.scepterTickNbtCheck(stack)
-        if (id > 0){
-            if (PersistentEffectHelper.getPersistentTickerNeed(id)){
-                PersistentEffectHelper.persistentEffectTicker(id)
-            }
-            val chk = ScepterHelper.shouldRemoveCooldownChecker(id)
-            if (chk > 0){
-                entity.itemCooldownManager.set(stack.item,chk)
-                ScepterHelper.activeEnchantHelper(world,stack, fallbackId.toString())
-            } else if (chk == 0){
-                entity.itemCooldownManager.remove(stack.item)
-            }
-            //slowly heal damage over time
-            if (ScepterHelper.tickTicker(id)){
-                healDamage(1,stack)
-            }
+        //slowly heal damage over time
+        if (ScepterHelper.tickTicker(stack)){
+            healDamage(1,stack)
         }
-
     }
 
     private fun resetCooldown(stack: ItemStack, world: World, user: PlayerEntity, activeEnchant: String): TypedActionResult<ItemStack>{
         world.playSound(null,user.blockPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6F,0.8F)
-        ScepterHelper.resetCooldown(stack,activeEnchant)
+        ScepterHelper.resetCooldown(world, stack, activeEnchant)
         if (user is ServerPlayerEntity) {
             sendSmokePacket(user)
         } else {
