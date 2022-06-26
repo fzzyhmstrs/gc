@@ -2,6 +2,7 @@ package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
+import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.misc_util.SyncedConfigHelper.readOrCreate
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
@@ -98,7 +99,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
     }
 
     open fun acceptableItemStacks(): MutableList<ItemStack> {
-        return mutableListOf()
+        return AcceptableItemStacks.scepterAcceptableItemStacks(tier)
     }
 
     fun getTier(): Int{
