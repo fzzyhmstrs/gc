@@ -1,6 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.misc_util
 
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentEffect
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.scepter_util.PersistentEffect
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
@@ -63,6 +63,7 @@ object PersistentEffectHelper {
 
     private data class PersistentEffectData(val world: World, val user: LivingEntity,
                                             val entityList: MutableList<Entity>, val level: Int, val blockPos: BlockPos,
-                                            val augment: PersistentEffect, var delay: Int, var duration: Int, val effect: AugmentEffect)
+                                            val augment: PersistentEffect, var delay: Int, var duration: Int, val effect: AugmentEffect
+    )
 
 }

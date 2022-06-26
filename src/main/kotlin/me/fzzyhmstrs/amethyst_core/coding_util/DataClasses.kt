@@ -1,7 +1,5 @@
 package me.fzzyhmstrs.amethyst_core.coding_util
 
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.scepter_util.CompiledAugmentModifier
 import me.fzzyhmstrs.amethyst_core.scepter_util.LoreTier
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import net.minecraft.item.Item
