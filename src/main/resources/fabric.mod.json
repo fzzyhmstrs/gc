@@ -21,6 +21,12 @@
         "adapter": "kotlin",
         "value": "me.fzzyhmstrs.amethyst_core.AC"
       }
+    ],
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "me.fzzyhmstrs.amethyst_core.ACC"
+      }
     ]
   },
   "mixins": [
