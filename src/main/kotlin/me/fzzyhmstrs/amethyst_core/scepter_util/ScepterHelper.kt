@@ -3,9 +3,9 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint
 import me.fzzyhmstrs.amethyst_core.coding_util.Dustbin
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
+import me.fzzyhmstrs.amethyst_core.modifier_util.*
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
@@ -17,8 +17,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.enchantment.Enchantments
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -32,10 +30,8 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
-import java.util.*
 import kotlin.NoSuchElementException
 import kotlin.math.max
 import kotlin.random.Random
@@ -49,15 +45,32 @@ object ScepterHelper: AugmentDamage {
     private val augmentApplied: MutableMap<Int,Int> = mutableMapOf()
     private val augmentModifiers: MutableMap<Int,MutableList<Identifier>> = mutableMapOf()
     private val activeScepterModifiers: MutableMap<Int, CompiledAugmentModifier.CompiledModifiers> = mutableMapOf()
+    private val augmentModifiers2: MutableMap<ItemStack ,MutableList<Identifier>> = mutableMapOf()
+    private val activeScepterModifiers2: MutableMap<ItemStack, CompiledAugmentModifier.CompiledModifiers> = mutableMapOf()
+    private val scepterHealTickers2: MutableMap<ItemStack, EventRegistry.Ticker> = mutableMapOf()
     private val scepterHealTickers: MutableMap<Int, EventRegistry.Ticker> = mutableMapOf()
-    //const val fallbackAugment = AI.MOD_ID+":magic_missile"
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
     private val DUSTBIN = Dustbin({ dirt -> gatherActiveScepterModifiers(dirt) },-1)
-    @Deprecated("moving to amethyst_core")
-    val BLANK_EFFECT = AugmentEffect()
-    @Deprecated("moving to amethyst_core")
-    val BLANK_XP_MOD = XpModifiers()
+    private val DUSTBIN2 = Dustbin({ dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }, ItemStack.EMPTY)
 
+    fun initializeScepterNbtOnly(stack: ItemStack){
+        val scepterNbt = stack.orCreateNbt
+        if(!scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
+            AbstractScepterItem.writeDefaultNbt(stack)
+            AbstractScepterItem.addDefaultEnchantment(stack)
+        }
+        if (scepterNbt.contains(NbtKeys.MODIFIERS.str())){
+            initializeModifiersNbtOnly(scepterNbt, stack)
+        }
+        DUSTBIN2.markDirty(stack)
+        DUSTBIN.clean()
+        if (!scepterHealTickers2.containsKey(stack)){
+            val item = stack.item
+            if (item is AbstractScepterItem) {
+                scepterHealTickers2[stack] = EventRegistry.Ticker(item.getRepairTime())
+            }
+        }
+    }
 
     fun initializeScepter(stack: ItemStack, world: World){
         val id : Int
@@ -80,7 +93,7 @@ object ScepterHelper: AugmentDamage {
             AbstractScepterItem.addDefaultEnchantment(stack)
         }
         if (scepterNbt.contains(NbtKeys.MODIFIERS.str())){
-            initializeModifiers(id,scepterNbt, stack)
+            initializeModifiers(id, scepterNbt, stack)
         }
         DUSTBIN.markDirty(id)
         activeAugment[id] = readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),scepterNbt)
@@ -106,6 +119,33 @@ object ScepterHelper: AugmentDamage {
                 scepters[id]?.put(stringId, world.time-1000000L)
             }
         }
+    }
+
+    fun useScepterNbtOnly(activeEnchantId: String, activeEnchant: ScepterAugment, stack: ItemStack, user: PlayerEntity, world: World, cdMod: Double = 0.0): Int?{
+        if (world !is ServerWorld){return null}
+        val scepterNbt = stack.orCreateNbt
+
+        val enchantCheck = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?:return null
+        if (EnchantmentHelper.getLevel(enchantCheck,stack) == 0){
+            fixActiveEnchantWhenMissing(stack, world)
+            return null
+        }
+        //cooldown modifier is a percentage modifier, so 20% will boost cooldown by 20%. -20% will take away 20% cooldown
+        val cooldown = (augmentStats[activeEnchantId]?.cooldown?.times(100.0+ cdMod)?.div(100.0))?.toInt()
+        val time = user.world.time
+
+        val lastUsed = scepters[id]?.get(activeEnchantId)
+        if (cooldown != null && lastUsed != null){
+            val cooldown2 = max(cooldown,1) // don't let cooldown be less than 1 tick
+            return if (time - cooldown2 >= lastUsed){ //checks that enough time has passed since last usage
+                scepters[id]?.put(activeEnchantId, user.world.time)
+                cooldown2
+            } else {
+                null
+            }
+        }
+
+        return null
     }
 
     fun useScepter(activeEnchantId: String, stack: ItemStack, user: PlayerEntity, world: World, cdMod: Double = 0.0): Int?{
@@ -182,7 +222,7 @@ object ScepterHelper: AugmentDamage {
         val activeEnchantCheck = if (augmentApplied[id] == -1) {
             readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
         } else {
-            activeAugment[id] ?: (item.defaultActiveEnchant().toString())
+            activeAugment[id] ?: (item.fallbackId.toString())
         }
 
         val activeCheck = Registry.ENCHANTMENT.get(Identifier(activeEnchantCheck))
@@ -268,7 +308,7 @@ object ScepterHelper: AugmentDamage {
             val item = stack.item
             if (item is AbstractScepterItem) {
                 AbstractScepterItem.addDefaultEnchantment(stack)
-                item.defaultActiveEnchant()
+                item.fallbackId
             } else {
                 AbstractScepterItem.defaultId
             }
@@ -293,7 +333,7 @@ object ScepterHelper: AugmentDamage {
                 activeAugment[id]?.let { nxt = it }
                 if (!world.isClient) {
                     augmentApplied[id] = -1
-                    writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nxt, nbt)
+                    Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nxt, nbt)
                 }
                 nxt
             } else {
@@ -474,8 +514,7 @@ object ScepterHelper: AugmentDamage {
 
     fun addModifier(modifier: Identifier, stack: ItemStack): Boolean{
         val nbt = stack.orCreateNbt
-        val id: Int = nbtChecker(nbt)
-        return addModifier(modifier, id, nbt)
+        return addModifier(modifier, stack, nbt)
     }
     fun addModifierForREI(modifier: Identifier, stack: ItemStack){
         val nbt = stack.orCreateNbt
@@ -511,6 +550,36 @@ object ScepterHelper: AugmentDamage {
         DUSTBIN.markDirty(scepter)
         return true
     }
+    private fun addModifier(modifier: Identifier, scepter: ItemStack, nbt: NbtCompound): Boolean{
+        if (!augmentModifiers2.containsKey(scepter)) {
+            augmentModifiers2[scepter] = mutableListOf()
+        }
+        val highestModifier = checkDescendant(modifier,scepter)
+        if (highestModifier != null){
+            val mod = ModifierRegistry.get(modifier)
+            return if (mod?.hasDescendant() == true){
+                val highestDescendantPresent = checkModifierLineage(mod,scepter)
+                if (highestDescendantPresent < 0){
+                    false
+                } else {
+                    val lineage = mod.getModLineage()
+                    val newDescendant = lineage[highestDescendantPresent]
+                    val currentGeneration = lineage[max(highestDescendantPresent - 1,0)]
+                    augmentModifiers2[scepter]?.add(newDescendant)
+                    addModifierToNbt(newDescendant, nbt)
+                    removeModifier(scepter, currentGeneration, nbt)
+                    DUSTBIN2.markDirty(scepter)
+                    true
+                }
+            } else {
+                false
+            }
+        }
+        augmentModifiers2[scepter]?.add(modifier)
+        addModifierToNbt(modifier, nbt)
+        DUSTBIN2.markDirty(scepter)
+        return true
+    }
     private fun addModifier(modifier: Identifier,scepter: Int){
         if (!augmentModifiers.containsKey(scepter)) {
             augmentModifiers[scepter] = mutableListOf()
@@ -523,6 +592,11 @@ object ScepterHelper: AugmentDamage {
     private fun removeModifier(scepter: Int, modifier: Identifier, nbt: NbtCompound){
         augmentModifiers[scepter]?.remove(modifier)
         DUSTBIN.markDirty(scepter)
+        removeModifierFromNbt(modifier,nbt)
+    }
+    private fun removeModifier(scepter: ItemStack, modifier: Identifier, nbt: NbtCompound){
+        augmentModifiers2[scepter]?.remove(modifier)
+        DUSTBIN2.markDirty(scepter)
         removeModifierFromNbt(modifier,nbt)
     }
     private fun addModifierToNbt(modifier: Identifier, nbt: NbtCompound){
@@ -551,9 +625,42 @@ object ScepterHelper: AugmentDamage {
         }
         initializeForAttunedEnchant(stack, id, nbt)
     }
+    private fun initializeModifiersNbtOnly(nbt: NbtCompound, stack: ItemStack){
+        val nbtList = nbt.getList(NbtKeys.MODIFIERS.str(),10)
+        for (el in nbtList){
+            val compound = el as NbtCompound
+            if (compound.contains(NbtKeys.MODIFIER_ID.str())){
+                val modifier = compound.getString(NbtKeys.MODIFIER_ID.str())
+                addModifier(Identifier(modifier),stack)
+            }
+        }
+        initializeForAttunedEnchant(stack, stack, nbt)
+    }
 
     @Deprecated("Removing after modifiers are released for long enough. Target end of 2022.")
     private fun initializeForAttunedEnchant(stack: ItemStack, id: Int, nbt: NbtCompound){
+        if (stack.hasEnchantments()){
+            val enchants = stack.enchantments
+            var attunedLevel = 0
+            var nbtEl: NbtCompound
+            for (el in enchants) {
+                nbtEl = el as NbtCompound
+                if (EnchantmentHelper.getIdFromNbt(nbtEl) == Identifier("amethyst_imbuement","attuned")){
+                    attunedLevel = EnchantmentHelper.getLevelFromNbt(nbtEl)
+                    break
+                }
+            }
+            if (attunedLevel > 0) {
+                for (i in 1..attunedLevel) {
+                    addModifier(ModifierRegistry.LESSER_ATTUNED.modifierId, id, nbt)
+                }
+                val newEnchants = EnchantmentHelper.fromNbt(enchants)
+                EnchantmentHelper.set(newEnchants,stack)
+            }
+        }
+    }
+    @Deprecated("Removing after modifiers are released for long enough. Target end of 2022.")
+    private fun initializeForAttunedEnchant(stack: ItemStack, id: ItemStack, nbt: NbtCompound){
         if (stack.hasEnchantments()){
             val enchants = stack.enchantments
             var attunedLevel = 0
@@ -604,25 +711,31 @@ object ScepterHelper: AugmentDamage {
         }
         return highestModifier
     }
+    private fun checkDescendant(modifier: Identifier, scepter: ItemStack): Identifier?{
+        val mod = ModifierRegistry.get(modifier)
+        val lineage = mod?.getModLineage() ?: return modifier
+        var highestModifier: Identifier? = null
+        lineage.forEach { identifier ->
+            if (augmentModifiers2[scepter]?.contains(identifier) == true){
+                highestModifier = identifier
+            }
+        }
+        return highestModifier
+    }
     fun checkModifierLineage(modifier:Identifier, stack: ItemStack): Boolean{
         val mod = ModifierRegistry.get(modifier)
         return if (mod != null){
-            checkModifierLineage(mod, stack)
+            checkModifierLineage(mod, stack) > 0
         } else {
             false
         }
     }
-    private fun checkModifierLineage(mod:AugmentModifier, stack: ItemStack): Boolean{
-        val id: Int = nbtChecker(stack.orCreateNbt)
-        return checkModifierLineage(mod, id) > 0
-    }
-    private fun checkModifierLineage(mod:AugmentModifier, id: Int): Int{
+    private fun checkModifierLineage(mod: AugmentModifier, stack: ItemStack): Int{
         val lineage = mod.getModLineage()
-        //println("lineage: $lineage")
         val highestOrderDescendant = lineage.size
         var highestDescendantPresent = 1
         lineage.forEachIndexed { index, identifier ->
-            if (augmentModifiers[id]?.contains(identifier) == true){
+            if (augmentModifiers2[stack]?.contains(identifier) == true){
                 highestDescendantPresent = index + 1
             }
         }
@@ -652,6 +765,28 @@ object ScepterHelper: AugmentDamage {
             }
         }
         activeScepterModifiers[scepter] = CompiledAugmentModifier.CompiledModifiers(list, compiledModifier)
+    }
+    private fun gatherActiveScepterModifiers(scepter: ItemStack){
+        val nbt = scepter.orCreateNbt
+        if (!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) return
+        val activeEnchant =  Identifier(Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),nbt))
+        val list : MutableList<AugmentModifier> = mutableListOf()
+        val compiledModifier = CompiledAugmentModifier()
+        augmentModifiers2[scepter]?.forEach { identifier ->
+            val modifier = ModifierRegistry.get(identifier)
+            if (modifier != null){
+                if (!modifier.hasSpellToAffect()){
+                    list.add(modifier)
+                    compiledModifier.plus(modifier)
+                } else {
+                    if (modifier.checkSpellsToAffect(activeEnchant)){
+                        list.add(modifier)
+                        compiledModifier.plus(modifier)
+                    }
+                }
+            }
+        }
+        activeScepterModifiers2[scepter] = CompiledAugmentModifier.CompiledModifiers(list, compiledModifier)
     }
 
     fun tickModifiers(){
