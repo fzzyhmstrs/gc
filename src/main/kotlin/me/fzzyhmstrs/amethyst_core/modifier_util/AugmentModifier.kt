@@ -2,6 +2,7 @@ package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.scepter_util.*
+import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier

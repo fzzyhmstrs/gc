@@ -1,7 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.misc_util.PlayerParticles.scepterParticlePos
+import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
@@ -12,10 +12,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.ToolItem
-import net.minecraft.item.ToolMaterial
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.particle.ParticleTypes

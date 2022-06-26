@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierDefaults
@@ -9,8 +10,9 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.util.Identifier
 
+@Suppress("MemberVisibilityCanBePrivate")
 object ModifierRegistry {
-    private val registry: MutableMap<Identifier, AugmentModifier> = mutableMapOf()
+    private val registry: MutableMap<Identifier, AbstractModifier> = mutableMapOf()
 
     private val DEBUG_NECROTIC_CONSUMER = AugmentConsumer({ list: List<LivingEntity> -> necroticConsumer(list)}, AugmentConsumer.Type.HARMFUL)
     private fun necroticConsumer(list: List<LivingEntity>){
@@ -56,10 +58,10 @@ object ModifierRegistry {
         if (registry.containsKey(id)){throw IllegalStateException("AbstractModifier with id $id already present in ModififerRegistry")}
         registry[id] = modifier
     }
-    fun get(id: Identifier): AugmentModifier?{
+    fun get(id: Identifier): AbstractModifier?{
         return registry[id]
     }
-    fun getByRawId(rawId: Int): AugmentModifier?{
+    fun getByRawId(rawId: Int): AbstractModifier?{
         return registry[getIdByRawId(rawId)]
     }
     fun getIdByRawId(rawId:Int): Identifier {
@@ -70,5 +72,14 @@ object ModifierRegistry {
     }
     fun isModifier(id: Identifier): Boolean{
         return this.get(id) != null
+    }
+
+    inline fun <reified T> getByType(id: Identifier): T?{
+        val mod = get(id)
+        return if (mod is T){
+            mod
+        } else {
+            null
+        }
     }
 }

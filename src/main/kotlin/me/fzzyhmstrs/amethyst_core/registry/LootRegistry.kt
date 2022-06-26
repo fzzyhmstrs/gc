@@ -1,6 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
-import me.fzzyhmstrs.amethyst_core.misc_util.AbstractModLoot
+import me.fzzyhmstrs.amethyst_core.item_util.AbstractModLoot
 import net.fabricmc.fabric.api.loot.v1.FabricLootSupplierBuilder
 import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback
 import net.minecraft.loot.LootManager

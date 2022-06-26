@@ -1,4 +1,4 @@
-package me.fzzyhmstrs.amethyst_core.trinket_util
+package me.fzzyhmstrs.amethyst_core.trinket_util.base_augments
 
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import net.minecraft.enchantment.Enchantment
@@ -15,12 +15,12 @@ import java.util.*
 
 open class BaseAugment(weight: Rarity, val mxLvl: Int = 1, val target: EnchantmentTarget, vararg slot: EquipmentSlot): Enchantment(weight, target ,slot) {
 
-    open fun tickEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
-        return
-    }
-
     open fun specialEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY): Boolean{
         return true
+    }
+
+    open fun equipEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
+        return
     }
 
     open fun unequipEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
@@ -61,8 +61,6 @@ open class BaseAugment(weight: Rarity, val mxLvl: Int = 1, val target: Enchantme
 
     companion object{
         private val countQueue: MutableMap<UUID,MutableMap<String,Int>> = mutableMapOf()
-        private val effectQueue: MutableMap<LivingEntity,MutableMap<StatusEffect,MutableList<Pair<Int,Int>>>> = mutableMapOf()
-        private var checkEffects: Boolean = false
 
         fun addCountToQueue(uuid: UUID,countTag: String,count: Int){
             if (countQueue.containsKey(uuid)){
@@ -80,41 +78,6 @@ open class BaseAugment(weight: Rarity, val mxLvl: Int = 1, val target: Enchantme
                 }
             }
             return 0
-        }
-
-        fun addStatusToQueue(livingEntity: LivingEntity, effect: StatusEffect, duration: Int, amplifier: Int){
-            if (effectQueue.containsKey(livingEntity)) {
-                if (effectQueue[livingEntity]?.containsKey(effect) != true) {
-                    effectQueue[livingEntity]?.set(effect, mutableListOf())
-                }
-                effectQueue[livingEntity]?.get(effect)?.add(Pair(duration,amplifier))
-            } else {
-                effectQueue[livingEntity] = mutableMapOf(effect to mutableListOf(Pair(duration,amplifier)))
-            }
-            checkEffects = true
-        }
-
-
-        fun applyEffects(){
-            for ((entity,statusMap) in effectQueue){
-                if (entity.isDead|| entity.isRemoved) continue
-                for ((effect,effectList) in statusMap){
-                    for ((dur,amp) in effectList) {
-                        entity.addStatusEffect(StatusEffectInstance(effect, dur, amp))
-                    }
-                }
-            }
-            //clear out the queue if any are needed
-            clearStatusesFromQueue()
-        }
-
-        private fun clearStatusesFromQueue(){
-            effectQueue.clear()
-            checkEffects = false
-        }
-
-        fun checkEffectsQueue(): Boolean{
-            return checkEffects
         }
     }
 }
