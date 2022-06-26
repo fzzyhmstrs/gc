@@ -148,7 +148,11 @@ abstract class SlashAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot):
         world.addParticle(particleEffect,true,pos.x,pos.y,pos.z,velocity.x,velocity.y,velocity.z)
     }
 
-    private val particleSpeed = 2.5
+    open fun particleSpeed(): Double{
+        return 2.5
+    }
+
+    private val particleSpeed by lazy { particleSpeed() }
     private val particles: Array<Pair<Double,Double>> = arrayOf(
         Pair(-1.0,0.0),
         Pair(-0.9,0.05),

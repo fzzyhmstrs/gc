@@ -6,7 +6,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
 
 
-open class AbstractEquipmentAugment(weight: Rarity, mxLvl: Int = 1, vararg slot: EquipmentSlot): BaseAugment(weight,mxLvl,EnchantmentTarget.ARMOR, *slot) {
+open class AbstractEquipmentAugment(weight: Rarity, mxLvl: Int = 1, target: EnchantmentTarget = EnchantmentTarget.ARMOR, vararg slot: EquipmentSlot): BaseAugment(weight,mxLvl,target, *slot) {
 
     open fun equipmentEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
         return
