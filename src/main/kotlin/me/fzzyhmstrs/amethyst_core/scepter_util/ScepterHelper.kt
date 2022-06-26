@@ -10,6 +10,7 @@ import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
+import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentDamage
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -38,7 +39,7 @@ import kotlin.math.max
 
 object ScepterHelper: AugmentDamage {
 
-    private val augmentStats: MutableMap<String, me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint> = mutableMapOf()
+    private val augmentStats: MutableMap<String, AugmentDatapoint> = mutableMapOf()
     private val augmentModifiers: MutableMap<ItemStack ,MutableList<Identifier>> = mutableMapOf()
     private val activeScepterModifiers: MutableMap<ItemStack, CompiledAugmentModifier.CompiledModifiers> = mutableMapOf()
     private val scepterHealTickers: MutableMap<ItemStack, EventRegistry.Ticker> = mutableMapOf()
@@ -238,7 +239,7 @@ object ScepterHelper: AugmentDamage {
         return getStatsHelper(nbt)
     }
 
-    fun isAcceptableScepterItem(augment:ScepterAugment, stack: ItemStack, player: PlayerEntity): Boolean {
+    fun isAcceptableScepterItem(augment: ScepterAugment, stack: ItemStack, player: PlayerEntity): Boolean {
         val nbt = stack.orCreateNbt
         return checkScepterStat(
             nbt,
@@ -284,7 +285,7 @@ object ScepterHelper: AugmentDamage {
         return list[rndIndex]
     }
 
-    fun registerAugmentStat(id: String, dataPoint: me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint, overwrite: Boolean = false){
+    fun registerAugmentStat(id: String, dataPoint: AugmentDatapoint, overwrite: Boolean = false){
         if(!augmentStats.containsKey(id) || overwrite){
             augmentStats[id] = dataPoint
             dataPoint.bookOfLoreTier.addToList(id)
@@ -300,7 +301,7 @@ object ScepterHelper: AugmentDamage {
         registerAugmentStat(id,configAugmentStat(augment,id,imbueLevel),true)
     }
 
-    private fun configAugmentStat(augment: ScepterAugment,id: String,imbueLevel: Int = 1): me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint{
+    private fun configAugmentStat(augment: ScepterAugment, id: String, imbueLevel: Int = 1): AugmentDatapoint {
         val stat = augment.augmentStat(imbueLevel)
         val augmentConfig = ScepterAugment.Companion.AugmentStats()
         val type = stat.type
@@ -311,7 +312,7 @@ object ScepterHelper: AugmentDamage {
         val tier = stat.bookOfLoreTier
         val item = stat.keyItem
         val augmentAfterConfig = ScepterAugment.configAugment(this.javaClass.simpleName + ScepterAugment.augmentVersion +".json",augmentConfig)
-        return me.fzzyhmstrs.amethyst_core.coding_util.AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
+        return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
     }
 
     fun checkAugmentStat(id: String): Boolean{
@@ -375,7 +376,7 @@ object ScepterHelper: AugmentDamage {
         }
         val highestModifier = checkDescendant(modifier,scepter)
         if (highestModifier != null){
-            val mod = ModifierRegistry.get(modifier)
+            val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
             return if (mod?.hasDescendant() == true){
                 val highestDescendantPresent = checkModifierLineage(mod,scepter)
                 if (highestDescendantPresent < 0){
@@ -481,7 +482,7 @@ object ScepterHelper: AugmentDamage {
     }
 
     fun checkModifierLineage(modifier:Identifier, stack: ItemStack): Boolean{
-        val mod = ModifierRegistry.get(modifier)
+        val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
         return if (mod != null){
             checkModifierLineage(mod, stack) > 0
         } else {
@@ -512,7 +513,7 @@ object ScepterHelper: AugmentDamage {
         val list : MutableList<AugmentModifier> = mutableListOf()
         val compiledModifier = CompiledAugmentModifier()
         augmentModifiers[scepter]?.forEach { identifier ->
-            val modifier = ModifierRegistry.get(identifier)
+            val modifier = ModifierRegistry.getByType<AugmentModifier>(identifier)
             if (modifier != null){
                 if (!modifier.hasSpellToAffect()){
                     list.add(modifier)

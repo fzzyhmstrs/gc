@@ -1,8 +1,7 @@
-package me.fzzyhmstrs.amethyst_core.misc_util
+package me.fzzyhmstrs.amethyst_core.coding_util
 
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
-import me.fzzyhmstrs.amethyst_core.scepter_util.PersistentEffect
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
@@ -12,15 +11,19 @@ object PersistentEffectHelper {
 
     private val persistentEffects: MutableList<PersistentEffectData> = mutableListOf()
     private val persistentEffectsMarkedForRemoval: MutableList<PersistentEffectData> = mutableListOf()
+    private var persistentEffectsFlag: Boolean = false
     private var markedForRemovalFlag: Boolean = false
-    private val persistentEffectNeed: MutableMap<Int,Int> = mutableMapOf()
 
     fun persistentEffectTicker(){
         if (markedForRemovalFlag){
             persistentEffects.removeAll(persistentEffectsMarkedForRemoval)
+            if (persistentEffects.isEmpty()) {
+                persistentEffectsFlag = false
+            }
             persistentEffectsMarkedForRemoval.clear()
             markedForRemovalFlag = false
         }
+        if (!persistentEffectsFlag) return
         persistentEffects.forEach {
             it.ticker.tickUp()
             if (it.ticker.isReady()){
@@ -51,6 +54,7 @@ object PersistentEffectHelper {
         effect: AugmentEffect
     ){
         persistentEffects.add(PersistentEffectData(world,user,entityList,level,blockPos,augment,delay,duration, effect, EventRegistry.Ticker(delay)))
+        persistentEffectsFlag = true
     }
 
     private data class PersistentEffectData(val world: World, val user: LivingEntity,
@@ -58,5 +62,12 @@ object PersistentEffectHelper {
                                             val augment: PersistentEffect, var delay: Int, var duration: Int,
                                             val effect: AugmentEffect, val ticker: EventRegistry.Ticker
     )
+
+    interface PersistentEffect {
+
+        val delay: PerLvlI
+
+        fun persistentEffect(world: World, user: LivingEntity, blockPos: BlockPos, entityList: MutableList<Entity>, level: Int = 1, effect: AugmentEffect)
+    }
 
 }

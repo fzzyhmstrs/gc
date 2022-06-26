@@ -1,4 +1,4 @@
-package me.fzzyhmstrs.amethyst_core.misc_util
+package me.fzzyhmstrs.amethyst_core.item_util
 
 import net.fabricmc.fabric.api.loot.v1.FabricLootSupplierBuilder
 import net.minecraft.util.Identifier

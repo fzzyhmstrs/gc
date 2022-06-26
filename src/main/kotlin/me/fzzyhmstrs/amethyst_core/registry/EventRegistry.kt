@@ -1,12 +1,16 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.Dustbin
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
-import me.fzzyhmstrs.amethyst_core.misc_util.PersistentEffectHelper
+import me.fzzyhmstrs.amethyst_core.coding_util.PersistentEffectHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
-import me.fzzyhmstrs.amethyst_core.trinket_util.BaseAugment
+import me.fzzyhmstrs.amethyst_core.trinket_util.EffectQueue
+import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.BaseAugment
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Identifier
+import java.util.function.Consumer
 
 object EventRegistry {
 
@@ -15,30 +19,39 @@ object EventRegistry {
     val ticker_40 = Ticker(40)
     val ticker_30 = Ticker(30)
     val ticker_20 = Ticker(20)
+    private val tickers: MutableList<Ticker> = mutableListOf()
 
-    fun registerAll(){
+    fun registerTicker(ticker: Ticker){
+        tickers.add(ticker)
+    }
+
+    internal fun registerAll(){
+        registerTicker(ticker_20)
+        registerTicker(ticker_30)
+        registerTicker(ticker_40)
         registerServerTick()
-        SyncedConfigPacketRegistry.registerServer()
+        SyncedConfigRegistry.registerServer()
         ScepterHelper.registerServer()
         //PlaceItemAugment.registerServer()
     }
 
-    fun registerClient(){
-        SyncedConfigPacketRegistry.registerClient()
+    internal fun registerClient(){
+        SyncedConfigRegistry.registerClient()
         AbstractScepterItem.registerClient()
     }
 
     private fun registerServerTick(){
         ServerTickEvents.START_SERVER_TICK.register(TICKER_EVENT) {
-            ticker_40.tickUp()
-            ticker_30.tickUp()
-            ticker_20.tickUp()
+            tickers.forEach {
+                it.tickUp()
+            }
+
             ScepterHelper.tickModifiers()
             PersistentEffectHelper.persistentEffectTicker()
         }
         ServerTickEvents.END_SERVER_TICK.register(QUEUE_TICK_EVENT) {
-            if (BaseAugment.checkEffectsQueue()){
-                BaseAugment.applyEffects()
+            if (EffectQueue.checkEffectsQueue()){
+                EffectQueue.applyEffects()
             }
         }
 
@@ -65,6 +78,4 @@ object EventRegistry {
             return !ready
         }
     }
-
-
 }

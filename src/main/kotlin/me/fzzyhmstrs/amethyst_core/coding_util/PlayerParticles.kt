@@ -1,4 +1,4 @@
-package me.fzzyhmstrs.amethyst_core.misc_util
+package me.fzzyhmstrs.amethyst_core.coding_util
 
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.Perspective
