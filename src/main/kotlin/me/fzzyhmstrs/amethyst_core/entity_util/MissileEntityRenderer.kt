@@ -29,13 +29,13 @@ class MissileEntityRenderer(context: EntityRendererFactory.Context, val r: Float
     override fun render(
         missileEntity: MissileEntity,
         f: Float,
-        g: Float,
+        h: Float,
         matrixStack: MatrixStack,
         vertexConsumerProvider: VertexConsumerProvider,
         i: Int
     ) {
         matrixStack.push()
-        val k = missileEntity.age.toFloat() + g
+        val k = missileEntity.age.toFloat() + h
         matrixStack.translate(0.0, 0.15, 0.0)
         matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.sin(k * 0.1f) * 180.0f))
         matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(MathHelper.cos(k * 0.1f) * 180.0f))
@@ -47,7 +47,7 @@ class MissileEntityRenderer(context: EntityRendererFactory.Context, val r: Float
         val vertexConsumer2 = vertexConsumerProvider.getBuffer(LAYER)
         model.render(matrixStack, vertexConsumer2, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 0.15f)
         matrixStack.pop()
-        super.render(missileEntity, f, g, matrixStack, vertexConsumerProvider, i)
+        super.render(missileEntity, f, h, matrixStack, vertexConsumerProvider, i)
     }
 
     override fun getTexture(missileEntityCopy: MissileEntity): Identifier {
