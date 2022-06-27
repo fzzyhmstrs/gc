@@ -1,5 +1,8 @@
 package me.fzzyhmstrs.amethyst_core.trinket_util
 
+import com.google.common.collect.Maps
+import com.google.common.collect.Multimap
+import com.google.common.collect.Multimaps
 import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.AbstractActiveAugment
 import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.AbstractPassiveAugment
 import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.AbstractUsedActiveAugment
@@ -11,6 +14,7 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
+import java.util.ArrayList
 
 interface AugmentTasks {
 
@@ -91,18 +95,15 @@ interface AugmentTasks {
     }
 
     //used with "PassiveAugment" for accessing the tickEffect method
-    fun modifierEnchantmentTasks(stack: ItemStack,world: World,entity: Entity): MutableMap<EntityAttribute, EntityAttributeModifier>?{
-        if (entity !is LivingEntity) return null
-        val modifiers : MutableMap<EntityAttribute, EntityAttributeModifier> = mutableMapOf()
+    fun modifierEnchantmentTasks(stack: ItemStack,world: World,entity: Entity, map: Multimap<EntityAttribute, EntityAttributeModifier>){
+        if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
         for (enchant in enchants.keys){
             if (enchant is BaseAugment){
-                //val lvl = enchants[enchant] ?: 1
                 val modifier: Pair<EntityAttribute, EntityAttributeModifier> = enchant.attributeModifier(stack,entity.uuid)?:continue
-                modifiers[modifier.first] = modifier.second
+                map.put(modifier.first,modifier.second)
             }
         }
-        return modifiers
     }
 
 }
