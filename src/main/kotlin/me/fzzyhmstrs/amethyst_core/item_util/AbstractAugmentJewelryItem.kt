@@ -53,21 +53,21 @@ open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identi
 
     override fun onEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         super.onEquip(stack, slot, entity)
+        if (entity.world.isClient()) return
         jewelryEquip(stack, entity)
     }
 
     open fun jewelryEquip(stack: ItemStack, entity: LivingEntity){
-        if (entity.world.isClient()) return
         equipEnchantmentTasks(stack,entity.world,entity)
     }
 
     override fun onUnequip(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         super.onUnequip(stack, slot, entity)
+        if(entity.world.isClient()) return
         jewelryUnEquip(stack, entity)
     }
 
     open fun jewelryUnEquip(stack: ItemStack, entity: LivingEntity){
-        if(entity.world.isClient()) return
         unequipEnchantmentTasks(stack,entity.world,entity)
     }
 
