@@ -44,7 +44,7 @@ object ScepterHelper: AugmentDamage {
     private val activeScepterModifiers: MutableMap<ItemStack, CompiledAugmentModifier.CompiledModifiers> = mutableMapOf()
     private val scepterHealTickers: MutableMap<ItemStack, EventRegistry.Ticker> = mutableMapOf()
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
-    private val DUSTBIN = Dustbin({ dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }, ItemStack.EMPTY)
+    private val DUSTBIN = TickingDustbin({ dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }, ItemStack.EMPTY)
 
     fun initializeScepter(stack: ItemStack){
         val scepterNbt = stack.orCreateNbt
@@ -529,11 +529,6 @@ object ScepterHelper: AugmentDamage {
         activeScepterModifiers[scepter] = CompiledAugmentModifier.CompiledModifiers(list, compiledModifier)
     }
 
-    fun tickModifiers(){
-        if (DUSTBIN.isDirty()){
-            DUSTBIN.clean()
-        }
-    }
     fun tickTicker(id: ItemStack): Boolean{
         val ticker = scepterHealTickers[id]?:return false
         ticker.tickUp()
