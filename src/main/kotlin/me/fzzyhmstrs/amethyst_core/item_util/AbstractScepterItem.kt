@@ -59,41 +59,19 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     open fun defaultActiveEnchant(): Identifier{
         return fallbackId
     }
+    
+    //removes cooldown on the item if you switch item
+    override fun inventoryTick(stack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
+        if (world.isClient) return
+        if (entity !is PlayerEntity) return
+        //slowly heal damage over time
+        if (ScepterHelper.tickTicker(stack)){
+            healDamage(1,stack)
+        }
+    }
 
     companion object{
-        val defaultId = Identifier("vanishing_curse")
-        private val SCEPTER_SMOKE_PACKET = Identifier(AC.MOD_ID,"scepter_smoke_packet")
-        val commaText: MutableText = LiteralText(", ").formatted(Formatting.GOLD)
-        fun registerClient(){
-            ClientPlayNetworking.registerGlobalReceiver(SCEPTER_SMOKE_PACKET) { minecraftClient: MinecraftClient, _, _, _ ->
-                val world = minecraftClient.world
-                val entity = minecraftClient.player
-                if (world != null && entity != null){
-                    doSmoke(world,minecraftClient,entity)
-                }
-            }
-        }
-
-        fun sendSmokePacket(user: ServerPlayerEntity){
-            val buf = PacketByteBufs.create()
-            ServerPlayNetworking.send(user, SCEPTER_SMOKE_PACKET, buf)
-        }
-
-        private fun doSmoke(world: World, client: MinecraftClient, user: LivingEntity){
-            val particlePos = scepterParticlePos(client, user)
-            world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,particlePos.x,particlePos.y,particlePos.z,user.velocity.x,user.velocity.y + 0.5,user.velocity.z)
-        }
-
-        fun doSmoke(world: World, user: LivingEntity){
-            val pos = user.eyePos
-            val width = user.width
-            val yaw = user.yaw
-            val posX = pos.x - (width + 0.8f) * 0.5 * MathHelper.sin(yaw * (Math.PI.toFloat() / 180)) - 0.6 * MathHelper.cos(yaw * (Math.PI.toFloat() / 180))
-            val posY = pos.y - 0.1
-            val posZ = pos.z + (width + 0.8f) * 0.5 * MathHelper.cos(yaw * (Math.PI.toFloat() / 180)) - 0.6 * MathHelper.sin(yaw * (Math.PI.toFloat() / 180))
-            world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,posX,posY,posZ,user.velocity.x,user.velocity.y + 0.5,user.velocity.z)
-        }
-
+       
         fun writeDefaultNbt(stack: ItemStack){
             val nbt = stack.orCreateNbt
             val item = stack.item
