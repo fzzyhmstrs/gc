@@ -1,6 +1,8 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import com.google.common.collect.Maps
 import com.google.common.collect.Multimap
+import com.google.common.collect.Multimaps
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
@@ -14,15 +16,16 @@ import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
+import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import java.util.*
 
-open class AbstractAugmentJewelryItem(settings: Settings, val ttn: String):TrinketItem(settings), AugmentTasks {
+open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identifier):TrinketItem(settings), AugmentTasks {
 
 
     override fun appendTooltip(stack: ItemStack?, world: World?, tooltip: MutableList<Text>?, context: TooltipContext?) {
         super.appendTooltip(stack, world, tooltip, context)
-        tooltip?.add(TranslatableText("item.amethyst_imbuement.$ttn.tooltip1").formatted(Formatting.WHITE, Formatting.ITALIC))
+        tooltip?.add(TranslatableText("item.${id.namespace}.${id.path}.tooltip1").formatted(Formatting.WHITE, Formatting.ITALIC))
     }
 
     override fun getModifiers(
@@ -32,23 +35,38 @@ open class AbstractAugmentJewelryItem(settings: Settings, val ttn: String):Trink
         uuid: UUID
     ): Multimap<EntityAttribute, EntityAttributeModifier> {
         val modifiers = super.getModifiers(stack, slot, entity, uuid)
-        val modifiersNew = modifierEnchantmentTasks(stack,entity.world,entity)
-        if (modifiersNew != null){
-            for (mod in modifiersNew.keys){
-                modifiers.put(mod,modifiersNew[mod])
-            }
-        }
+        modifiers.putAll(getAugmentModifiers(stack, entity, uuid))
         return modifiers
+    }
+
+    open fun getAugmentModifiers(
+        stack: ItemStack,
+        entity: LivingEntity,
+        uuid: UUID
+    ): Multimap<EntityAttribute, EntityAttributeModifier>{
+        val map = Multimaps.newMultimap(
+            Maps.newLinkedHashMap<EntityAttribute, Collection<EntityAttributeModifier>>()
+        ) { ArrayList() }
+        modifierEnchantmentTasks(stack,entity.world,entity, map)
+        return map
     }
 
     override fun onEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         super.onEquip(stack, slot, entity)
+        jewelryEquip(stack, entity)
+    }
+
+    open fun jewelryEquip(stack: ItemStack, entity: LivingEntity){
         if (entity.world.isClient()) return
         equipEnchantmentTasks(stack,entity.world,entity)
     }
 
     override fun onUnequip(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         super.onUnequip(stack, slot, entity)
+        jewelryUnEquip(stack, entity)
+    }
+
+    open fun jewelryUnEquip(stack: ItemStack, entity: LivingEntity){
         if(entity.world.isClient()) return
         unequipEnchantmentTasks(stack,entity.world,entity)
     }
@@ -56,8 +74,12 @@ open class AbstractAugmentJewelryItem(settings: Settings, val ttn: String):Trink
     override fun tick(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         if(entity.world.isClient()) return
         if (EventRegistry.ticker_30.isReady()){
-            passiveEnchantmentTasks(stack,entity.world,entity)
+            jewelryIntermittentTick(stack, entity)
         }
+    }
+
+    open fun jewelryIntermittentTick(stack: ItemStack, entity: LivingEntity){
+        passiveEnchantmentTasks(stack,entity.world,entity)
     }
 
     override fun passiveEnchantmentTasks(stack: ItemStack,world: World,entity: Entity){
