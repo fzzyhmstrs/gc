@@ -9,65 +9,68 @@ import net.minecraft.world.World
 
 object PersistentEffectHelper {
 
-    private val persistentEffects: MutableList<PersistentEffectData> = mutableListOf()
-    private val persistentEffectsMarkedForRemoval: MutableList<PersistentEffectData> = mutableListOf()
+    private val persistentEffects: MutableList<PersistentEffectInstance> = mutableListOf()
+    private val DUSTBIN = Dustbin({data -> persistentEffects.remove(data); if (persistentEffects.isEmpty()){persistentEffectsFlag = false}})
     private var persistentEffectsFlag: Boolean = false
-    private var markedForRemovalFlag: Boolean = false
 
     fun persistentEffectTicker(){
-        if (markedForRemovalFlag){
-            persistentEffects.removeAll(persistentEffectsMarkedForRemoval)
-            if (persistentEffects.isEmpty()) {
-                persistentEffectsFlag = false
-            }
-            persistentEffectsMarkedForRemoval.clear()
-            markedForRemovalFlag = false
-        }
+        DUSTBIN.clean()
         if (!persistentEffectsFlag) return
         persistentEffects.forEach {
             it.ticker.tickUp()
             if (it.ticker.isReady()){
                 val aug = it.augment
-                val world = it.world
-                val user = it.user
-                val blockPos = it.blockPos
-                val entityList = it.entityList
-                val level = it.level
-                val effect = it.effect
-                aug.persistentEffect(world, user, blockPos, entityList, level, effect)
-                val dur = it.duration
-                val newDur = dur - it.delay
+                aug.persistentEffect(it.world, it.user, it.blockPos, it.entityList, it.level, it.effect)
+                val newDur = it.duration - it.delay
                 if (newDur <= 0){
-                    persistentEffectsMarkedForRemoval.add(it)
-                    markedForRemovalFlag = true
+                    DUSTBIN.markDirty(it)
                 }
             }
         }
     }
 
     fun setPersistentTickerNeed(
-        world: World, user: LivingEntity,
-        entityList: MutableList<Entity>,
-        level: Int, blockPos: BlockPos,
         augment: PersistentEffect,
         delay: Int, duration: Int,
-        effect: AugmentEffect
+        data: PersistentEffectData
     ){
-        persistentEffects.add(PersistentEffectData(world,user,entityList,level,blockPos,augment,delay,duration, effect, EventRegistry.Ticker(delay)))
+        persistentEffects.add(PersistentEffectInstance(EventRegistry.Ticker(delay),delay, duration, effect, data))
         persistentEffectsFlag = true
     }
 
-    private data class PersistentEffectData(val world: World, val user: LivingEntity,
-                                            val entityList: MutableList<Entity>, val level: Int, val blockPos: BlockPos,
-                                            val augment: PersistentEffect, var delay: Int, var duration: Int,
-                                            val effect: AugmentEffect, val ticker: EventRegistry.Ticker
+    private data class PersistentEffectInstance(val ticker: EventRegistry.Ticker, val delay: Int, val duration: Int, val augment: PersistentEffect, val data: PersistentEffectData)
     )
+    
+    class AugmentPersistentEffectData: PersistentEffectData(val world: World, val user: LivingEntity, 
+                                                            val blockPos: BlockPos, val entityList: MutableList<Entity>, 
+                                                            val level: Int = 1, effect: AugmentEffect)
+    
+    
+    interface AugmentPersistentEffect{
+        override fun persistentEffect(data: PersistentEffectData){
+            if (data !is AugmentPersistentEffectData) return
+            augmentPersistentEffect(
+                data.world,
+                data.user,
+                data.blockPos,
+                data.entityList,
+                data.level,
+                data.effect
+            )
+        }
+        
+        fun augmentPersistentEffect(world: World, user: LivingEntity, blockPos: BlockPos, entityList: MutableList<Entity>, level: Int = 1, effect: AugmentEffect)
+    }
 
     interface PersistentEffect {
 
         val delay: PerLvlI
 
-        fun persistentEffect(world: World, user: LivingEntity, blockPos: BlockPos, entityList: MutableList<Entity>, level: Int = 1, effect: AugmentEffect)
+        fun persistentEffect(data: PersistentEffectData)
+    }
+    
+    interface PersistentEffectData{
+        
     }
 
 }
