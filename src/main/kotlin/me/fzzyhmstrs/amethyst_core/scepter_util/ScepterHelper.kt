@@ -52,7 +52,7 @@ object ScepterHelper: AugmentDamage {
     private val scepterHealTickers: MutableMap<Int, EventRegistry.Ticker> = mutableMapOf()
     //const val fallbackAugment = AI.MOD_ID+":magic_missile"
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
-    private val DUSTBIN = Dustbin({ dirt -> gatherActiveScepterModifiers(dirt) },-1)
+    private val DUSTBIN = TickingDustbin({ dirt -> gatherActiveScepterModifiers(dirt) })
     @Deprecated("moving to amethyst_core")
     val BLANK_EFFECT = AugmentEffect()
     @Deprecated("moving to amethyst_core")
@@ -652,12 +652,6 @@ object ScepterHelper: AugmentDamage {
             }
         }
         activeScepterModifiers[scepter] = CompiledAugmentModifier.CompiledModifiers(list, compiledModifier)
-    }
-
-    fun tickModifiers(){
-        if (DUSTBIN.isDirty()){
-            DUSTBIN.clean()
-        }
     }
 
     fun tickTicker(id: Int): Boolean{
