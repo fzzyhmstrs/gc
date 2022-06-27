@@ -9,6 +9,4 @@ interface ScepterMaterialAddon {
         return 150L
     }
     fun healCooldown(): Long
-
-    fun scepterTier(): Int
 }
