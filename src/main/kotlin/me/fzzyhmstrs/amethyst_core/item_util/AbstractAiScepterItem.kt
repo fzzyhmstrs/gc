@@ -155,16 +155,6 @@ abstract class AbstractAiScepterItem(material: ScepterToolMaterial, settings: Se
         ScepterHelper.initializeScepter(stack)
     }
 
-    //removes cooldown on the item if you switch item
-    override fun inventoryTick(stack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
-        if (world.isClient) return
-        if (entity !is PlayerEntity) return
-        //slowly heal damage over time
-        if (ScepterHelper.tickTicker(stack)){
-            healDamage(1,stack)
-        }
-    }
-
     private fun resetCooldown(stack: ItemStack, world: World, user: PlayerEntity, activeEnchant: String): TypedActionResult<ItemStack>{
         world.playSound(null,user.blockPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6F,0.8F)
         ScepterHelper.resetCooldown(world, stack, activeEnchant)
@@ -176,5 +166,27 @@ abstract class AbstractAiScepterItem(material: ScepterToolMaterial, settings: Se
         return TypedActionResult.fail(stack)
     }
 
-    //companion object for the scepter item, handles private functions and other housekeeping
+    companion object{
+        private val SCEPTER_SMOKE_PACKET = Identifier(AC.MOD_ID,"scepter_smoke_packet")
+        val commaText: MutableText = LiteralText(", ").formatted(Formatting.GOLD)
+        fun registerClient(){
+            ClientPlayNetworking.registerGlobalReceiver(SCEPTER_SMOKE_PACKET) { minecraftClient: MinecraftClient, _, _, _ ->
+                val world = minecraftClient.world
+                val entity = minecraftClient.player
+                if (world != null && entity != null){
+                    doSmoke(world,minecraftClient,entity)
+                }
+            }
+        }
+
+        fun sendSmokePacket(user: ServerPlayerEntity){
+            val buf = PacketByteBufs.create()
+            ServerPlayNetworking.send(user, SCEPTER_SMOKE_PACKET, buf)
+        }
+
+        private fun doSmoke(world: World, client: MinecraftClient, user: LivingEntity){
+            val particlePos = scepterParticlePos(client, user)
+            world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,particlePos.x,particlePos.y,particlePos.z,user.velocity.x,user.velocity.y + 0.5,user.velocity.z)
+        }
+    }
 }
