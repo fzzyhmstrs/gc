@@ -19,16 +19,16 @@ object EventRegistry {
     val ticker_40 = Ticker(40)
     val ticker_30 = Ticker(30)
     val ticker_20 = Ticker(20)
-    private val tickers: MutableList<Ticker> = mutableListOf()
+    private val tickers: MutableList<TickUppable> = mutableListOf()
 
-    fun registerTicker(ticker: Ticker){
+    fun registerTickUppable(ticker: Ticker){
         tickers.add(ticker)
     }
 
     internal fun registerAll(){
-        registerTicker(ticker_20)
-        registerTicker(ticker_30)
-        registerTicker(ticker_40)
+        registerTickUppable(ticker_20)
+        registerTickUppable(ticker_30)
+        registerTickUppable(ticker_40)
         registerServerTick()
         SyncedConfigRegistry.registerServer()
         ScepterHelper.registerServer()
@@ -54,21 +54,24 @@ object EventRegistry {
                 EffectQueue.applyEffects()
             }
         }
-
     }
 
-    class Ticker(private val reset: Int = 20){
+    open class Ticker(private val reset: Int = 20): TickUppable{
         private var tick = 1
         private var ready = false
 
-        fun tickUp(){
+        override fun tickUp(){
             if (tick == reset) {
                 tick = 1
                 ready = true
+                ready()
                 return
             }
             ready = false
             tick++
+        }
+        
+        open fun ready(){
         }
 
         fun isReady(): Boolean{
@@ -77,5 +80,9 @@ object EventRegistry {
         fun isNotReady(): Boolean{
             return !ready
         }
+    }
+    
+    interface TickUppable{
+        fun tickUp()
     }
 }
