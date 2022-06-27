@@ -16,7 +16,7 @@ object LootRegistry {
         LootTableLoadingCallback.EVENT.register(LootTableLoadingCallback { _: ResourceManager, _: LootManager, id: Identifier, table: FabricLootSupplierBuilder, _: LootTableLoadingCallback.LootTableSetter ->
             if (modLoots.isEmpty()) return@LootTableLoadingCallback
             for (modLoot in modLoots) {
-                if (modLoot.lootBuilder(id, table)) return@LootTableLoadingCallback
+                if (modLoot.buildLoot(id, table)) return@LootTableLoadingCallback
             }
         })
     }
