@@ -152,7 +152,7 @@ abstract class SlashAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot):
         return 2.5
     }
 
-    private val particleSpeed by lazy { particleSpeed() }
+    protected val particleSpeed by lazy { particleSpeed() }
     private val particles: Array<Pair<Double,Double>> = arrayOf(
         Pair(-1.0,0.0),
         Pair(-0.9,0.05),
