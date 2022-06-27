@@ -35,39 +35,19 @@ open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identi
         uuid: UUID
     ): Multimap<EntityAttribute, EntityAttributeModifier> {
         val modifiers = super.getModifiers(stack, slot, entity, uuid)
-        modifiers.putAll(getAugmentModifiers(stack, entity, uuid))
+        modifierEnchantmentTasks(stack,entity.world,entity, modifiers)
         return modifiers
-    }
-
-    open fun getAugmentModifiers(
-        stack: ItemStack,
-        entity: LivingEntity,
-        uuid: UUID
-    ): Multimap<EntityAttribute, EntityAttributeModifier>{
-        val map = Multimaps.newMultimap(
-            Maps.newLinkedHashMap<EntityAttribute, Collection<EntityAttributeModifier>>()
-        ) { ArrayList() }
-        modifierEnchantmentTasks(stack,entity.world,entity, map)
-        return map
     }
 
     override fun onEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         super.onEquip(stack, slot, entity)
         if (entity.world.isClient()) return
-        jewelryEquip(stack, entity)
-    }
-
-    open fun jewelryEquip(stack: ItemStack, entity: LivingEntity){
         equipEnchantmentTasks(stack,entity.world,entity)
     }
 
     override fun onUnequip(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         super.onUnequip(stack, slot, entity)
         if(entity.world.isClient()) return
-        jewelryUnEquip(stack, entity)
-    }
-
-    open fun jewelryUnEquip(stack: ItemStack, entity: LivingEntity){
         unequipEnchantmentTasks(stack,entity.world,entity)
     }
 
@@ -78,12 +58,7 @@ open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identi
         }
     }
 
-    open fun jewelryIntermittentTick(stack: ItemStack, entity: LivingEntity){
+    open fun intermittentTick(stack: ItemStack, entity: LivingEntity){
         passiveEnchantmentTasks(stack,entity.world,entity)
-    }
-
-    override fun passiveEnchantmentTasks(stack: ItemStack,world: World,entity: Entity){
-        if (!entity.isPlayer) return
-        super.passiveEnchantmentTasks(stack, world, entity)
     }
 }
