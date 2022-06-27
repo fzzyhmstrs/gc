@@ -45,8 +45,6 @@ object EventRegistry {
             tickers.forEach {
                 it.tickUp()
             }
-
-            ScepterHelper.tickModifiers()
             PersistentEffectHelper.persistentEffectTicker()
         }
         ServerTickEvents.END_SERVER_TICK.register(QUEUE_TICK_EVENT) {
