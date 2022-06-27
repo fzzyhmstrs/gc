@@ -45,6 +45,7 @@ object ScepterHelper: AugmentDamage {
     private val scepterHealTickers: MutableMap<ItemStack, EventRegistry.Ticker> = mutableMapOf()
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
     private val DUSTBIN = TickingDustbin({ dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }, ItemStack.EMPTY)
+    private val defaultId = Identifier("vanishing_curse")
 
     fun initializeScepter(stack: ItemStack){
         val scepterNbt = stack.orCreateNbt
@@ -188,7 +189,7 @@ object ScepterHelper: AugmentDamage {
                 AbstractScepterItem.addDefaultEnchantment(stack)
                 item.fallbackId
             } else {
-                AbstractScepterItem.defaultId
+                defaultId
             }
         }
         if (identifier != null) {
@@ -279,7 +280,7 @@ object ScepterHelper: AugmentDamage {
         return nbt
     }
     private fun getRandBookOfLoreAugment(list: List<String>): String{
-        if (list.isEmpty()) return AbstractScepterItem.defaultId.toString()
+        if (list.isEmpty()) return defaultId.toString()
         val rndMax = list.size
         val rndIndex = AC.acRandom.nextInt(rndMax)
         return list[rndIndex]
