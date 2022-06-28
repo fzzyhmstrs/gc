@@ -117,10 +117,10 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         val cd : Int? = ScepterHelper.useScepter(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {
             val manaCost = ScepterHelper.getAugmentManaCost(activeEnchantId,modifiers.compiledData.manaCostModifier)
-            if (!ScepterHelper.checkManaCost(manaCost,stack)) return resetCooldown(stack,world,user,activeEnchantId)
+            if (!checkManaCost(manaCost,stack, world, user)) return resetCooldown(stack,world,user,activeEnchantId)
             val level = max(1,testLevel + modifiers.compiledData.levelModifier)
             if (testEnchant.applyModifiableTasks(world, user, hand, level, modifiers.modifiers, modifiers.compiledData)) {
-                ScepterHelper.applyManaCost(manaCost,stack, world, user)
+                applyManaCost(manaCost,stack, world, user)
                 ScepterHelper.incrementScepterStats(stack.orCreateNbt, activeEnchantId, modifiers.compiledData.getXpModifiers())
                 user.itemCooldownManager.set(stack.item, cd)
                 TypedActionResult.success(stack)
@@ -136,6 +136,14 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
                           activeEnchantId: String, testEnchant: ScepterAugment, testLevel: Int): TypedActionResult<ItemStack>{
         testEnchant.clientTask(world,user,hand,testLevel)
         return TypedActionResult.pass(stack)
+    }
+
+    fun checkManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity): Boolean{
+        return (checkCanUse(stack,world,user, cost))
+    }
+
+    fun applyManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity){
+        manaDamage(stack, world, user, cost)
     }
 
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
