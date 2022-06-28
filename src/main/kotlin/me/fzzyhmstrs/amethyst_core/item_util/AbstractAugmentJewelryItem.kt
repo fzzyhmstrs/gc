@@ -1,14 +1,11 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
-import com.google.common.collect.Maps
 import com.google.common.collect.Multimap
-import com.google.common.collect.Multimaps
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentTasks
 import net.minecraft.client.item.TooltipContext
-import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -20,7 +17,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import java.util.*
 
-open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identifier):TrinketItem(settings), AugmentTasks {
+open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identifier): TrinketItem(settings), AugmentTasks {
 
 
     override fun appendTooltip(stack: ItemStack?, world: World?, tooltip: MutableList<Text>?, context: TooltipContext?) {
@@ -54,7 +51,7 @@ open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identi
     override fun tick(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         if(entity.world.isClient()) return
         if (EventRegistry.ticker_30.isReady()){
-            jewelryIntermittentTick(stack, entity)
+            intermittentTick(stack, entity)
         }
     }
 

@@ -1,6 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
-interface ScepterMaterialAddon {
+interface ManaItemMaterial {
 
     fun minCooldown(): Long{
         return 20L
