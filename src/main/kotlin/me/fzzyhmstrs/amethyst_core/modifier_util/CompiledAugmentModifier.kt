@@ -8,14 +8,4 @@ class CompiledAugmentModifier(
     override var cooldownModifier: Double = 0.0,
     override var manaCostModifier: Double = 0.0)
     : AugmentModifier(modifierId, levelModifier, cooldownModifier, manaCostModifier){
-
-    fun plus(am: AugmentModifier) {
-        levelModifier += am.levelModifier
-        cooldownModifier += am.cooldownModifier
-        manaCostModifier += am.manaCostModifier
-        xpModifier.plus(am.getXpModifiers())
-        effects.plus(am.getEffectModifier())
-    }
-
-    data class CompiledModifiers(val modifiers: List<AugmentModifier>, val compiledData: CompiledAugmentModifier)
 }

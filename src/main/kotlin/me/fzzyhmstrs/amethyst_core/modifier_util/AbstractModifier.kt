@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.Addable
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import net.minecraft.item.ItemStack
 import net.minecraft.text.LiteralText
@@ -7,7 +8,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import java.util.function.Predicate
 
-open class AbstractModifier(val modifierId: Identifier){
+abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Addable<T> {
 
     private var descendant: Identifier = ModifierDefaults.BLANK_ID
     private val lineage: List<Identifier> by lazy { generateLineage() }
@@ -16,10 +17,14 @@ open class AbstractModifier(val modifierId: Identifier){
     private var hasDesc: Boolean = false
     private var hasObjectToAffect: Boolean = false
 
+    abstract fun compiler(): T
+
+    abstract fun compile(modifiers: List<T>, compiledData: T): CompiledModifiers
+
     fun hasDescendant(): Boolean{
         return hasDesc
     }
-    fun addDescendant(modifier: AbstractModifier){
+    fun addDescendant(modifier: AbstractModifier<*>){
         val id = modifier.modifierId
         descendant = id
         hasDesc = true
@@ -56,5 +61,16 @@ open class AbstractModifier(val modifierId: Identifier){
     }
     open fun acceptableItemStacks(): MutableList<ItemStack>{
         return mutableListOf()
+    }
+
+    inner class CompiledModifiers(val modifiers: List<T>, val compiledData: T)
+
+    inner class Compiler(val modifiers: MutableList<T>, val compiledData: T){
+
+        fun add(modifier: T){
+            modifiers.add(modifier)
+            compiledData.plus(modifier)
+        }
+
     }
 }
