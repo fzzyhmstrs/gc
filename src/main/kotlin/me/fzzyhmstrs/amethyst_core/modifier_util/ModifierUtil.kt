@@ -11,10 +11,11 @@ import java.util.function.Consumer
 
 object ModifierDefaults{
     val BLANK_ID = Identifier(AC.MOD_ID,"blank_modifier")
+    val BLANK_AUG_MOD = AugmentModifier(BLANK_ID)
     val BLANK_EFFECT = AugmentEffect()
     val BLANK_XP_MOD = XpModifiers()
-    val EMPTY_COMPILED = CompiledAugmentModifier(BLANK_ID)
-    val BLANK_COMPILED_DATA = CompiledAugmentModifier.CompiledModifiers(listOf(), EMPTY_COMPILED)
+    val BLANK_COMPILED_DATA = BLANK_AUG_MOD.CompiledModifiers(listOf(), BLANK_AUG_MOD)
+
 }
 
 data class XpModifiers(var furyXpMod: Int = 0, var witXpMod: Int = 0, var graceXpMod: Int = 0){

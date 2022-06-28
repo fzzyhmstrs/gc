@@ -10,11 +10,11 @@ import java.util.function.Consumer
 import java.util.function.Predicate
 
 open class AugmentModifier(
-    modifierId: Identifier,
-    open val levelModifier: Int = 0,
-    open val cooldownModifier: Double = 0.0,
-    open val manaCostModifier: Double = 0.0
-    ): AbstractModifier(modifierId) {
+    modifierId: Identifier = ModifierDefaults.BLANK_ID,
+    open var levelModifier: Int = 0,
+    open var cooldownModifier: Double = 0.0,
+    open var manaCostModifier: Double = 0.0
+    ): AbstractModifier<AugmentModifier>(modifierId) {
 
     protected val effects: AugmentEffect = AugmentEffect()
     protected val xpModifier: XpModifiers = XpModifiers()
@@ -22,6 +22,15 @@ open class AugmentModifier(
 
     private var hasSecondEffect: Boolean = false
     private var hasDesc: Boolean = false
+
+    override fun plus(other: AugmentModifier): AugmentModifier {
+        levelModifier += other.levelModifier
+        cooldownModifier += other.cooldownModifier
+        manaCostModifier += other.manaCostModifier
+        xpModifier.plus(other.getXpModifiers())
+        effects.plus(other.getEffectModifier())
+        return this
+    }
 
     fun hasSpellToAffect(): Boolean{
         return hasObjectToAffect()
@@ -101,4 +110,11 @@ open class AugmentModifier(
         return AcceptableItemStacks.scepterAcceptableItemStacks(1)
     }
 
+    override fun compiler(): AugmentModifier {
+        return AugmentModifier()
+    }
+
+    override fun compile(modifiers: List<AugmentModifier>, compiledData: AugmentModifier): CompiledModifiers {
+        return CompiledModifiers(modifiers, compiledData)
+    }
 }
