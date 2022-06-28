@@ -23,7 +23,7 @@ open class Dustbin<T>(private val consumer: Consumer<T>){
     }
 }
 
-open class TickingDustbin<T>(consumer: Consumer<T>): Dustbin(consumer), TickUppable{
+open class TickingDustbin<T>(consumer: Consumer<T>): Dustbin<T>(consumer), EventRegistry.TickUppable {
     
     init{
         EventRegistry.registerTickUppable(this)
