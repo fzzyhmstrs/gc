@@ -4,6 +4,6 @@ import net.minecraft.item.ToolMaterial
 
 abstract class ScepterToolMaterial: ToolMaterial, ManaItemMaterial {
    
-  fun scepterTier(): Int
+  abstract fun scepterTier(): Int
   
 }

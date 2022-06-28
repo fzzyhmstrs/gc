@@ -1,22 +1,35 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
 import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
+import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper.fallbackId
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.Enchantment
+import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtList
+import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.LiteralText
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.*
@@ -26,48 +39,18 @@ import net.minecraft.world.World
 import kotlin.math.max
 
 @Suppress("SameParameterValue", "unused", "USELESS_IS_CHECK")
-abstract class AbstractAiScepterItem(material: ScepterToolMaterial, settings: Settings, vararg defaultModifier: Identifier):
-    AbstractScepterItem(material,settings, *defaultModifier){
-    
-    override fun appendTooltip(
-        stack: ItemStack,
-        world: World?,
-        tooltip: MutableList<Text>,
-        context: TooltipContext?
-    ) {
-        super.appendTooltip(stack, world, tooltip, context)
-        val nbt = stack.orCreateNbt
-        val activeSpell = if (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) {
-            val activeEnchantId = Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
-            TranslatableText("enchantment.amethyst_imbuement.${Identifier(activeEnchantId).path}")
-        } else {
-            TranslatableText("enchantment.amethyst_imbuement.none")
-        }
-        tooltip.add(TranslatableText("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell.formatted(Formatting.GOLD)))
-        val stats = ScepterHelper.getScepterStats(stack)
-        val furyText = TranslatableText("scepter.fury.lvl").string + stats[0].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[3],stats[0]).toString()
-        tooltip.add(LiteralText(furyText).formatted(SpellType.FURY.fmt()))
-        val graceText = TranslatableText("scepter.grace.lvl").string + stats[1].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[4],stats[1]).toString()
-        tooltip.add(LiteralText(graceText).formatted(SpellType.GRACE.fmt()))
-        val witText = TranslatableText("scepter.wit.lvl").string + stats[2].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
-        tooltip.add(LiteralText(witText).formatted(SpellType.WIT.fmt()))
-        val modifierList = ScepterHelper.getModifiers(stack)
-        if (modifierList.isNotEmpty()){
-            val modifierText = TranslatableText("scepter.modifiers").formatted(Formatting.GOLD)
+abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Settings, ):
+    ModifiableScepterItem(material,settings){
 
-            val itr = modifierList.asIterable().iterator()
-            while(itr.hasNext()){
-                val mod = itr.next()
-                modifierText.append(TranslatableText("scepter.modifiers.${mod}").formatted(Formatting.GOLD))
-                if (itr.hasNext()){
-                    modifierText.append(commaText)
-                }
-            }
-            tooltip.add(modifierText)
-        }
+    var defaultAugments: List<ScepterAugment> = listOf()
+
+    fun withAugments(startingAugments: List<ScepterAugment> = listOf()): AugmentScepterItem{
+        defaultAugments = startingAugments
+        return this
     }
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
+        super.use(world, user, hand)
         val stack = user.getStackInHand(hand)
         val nbt = stack.orCreateNbt
         val activeEnchantId: String = ScepterHelper.activeEnchantHelper(stack)
@@ -150,43 +133,39 @@ abstract class AbstractAiScepterItem(material: ScepterToolMaterial, settings: Se
     }
 
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
+        super.onCraft(stack, world, player)
         addDefaultEnchantment(stack)
-        writeDefaultNbt(stack)
-        ScepterHelper.initializeScepter(stack)
     }
 
-    private fun resetCooldown(stack: ItemStack, world: World, user: PlayerEntity, activeEnchant: String): TypedActionResult<ItemStack>{
-        world.playSound(null,user.blockPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6F,0.8F)
-        ScepterHelper.resetCooldown(world, stack, activeEnchant)
-        if (user is ServerPlayerEntity) {
-            sendSmokePacket(user)
-        } else {
-            doSmoke(world,user)
+    override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {
+        super.writeDefaultNbt(stack, scepterNbt)
+        if(!scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
+            val identifier = fallbackId
+            Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), identifier.toString(), scepterNbt)
         }
-        return TypedActionResult.fail(stack)
     }
 
-    companion object{
-        private val SCEPTER_SMOKE_PACKET = Identifier(AC.MOD_ID,"scepter_smoke_packet")
-        val commaText: MutableText = LiteralText(", ").formatted(Formatting.GOLD)
-        fun registerClient(){
-            ClientPlayNetworking.registerGlobalReceiver(SCEPTER_SMOKE_PACKET) { minecraftClient: MinecraftClient, _, _, _ ->
-                val world = minecraftClient.world
-                val entity = minecraftClient.player
-                if (world != null && entity != null){
-                    doSmoke(world,minecraftClient,entity)
-                }
+    override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
+        super.initializeScepter(stack, scepterNbt)
+        if(!scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
+            val identifier = fallbackId
+            Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), identifier.toString(), scepterNbt)
+        }
+        addDefaultEnchantment(stack)
+    }
+
+    open fun addDefaultEnchantment(stack: ItemStack){
+        val enchantToAdd = Registry.ENCHANTMENT.get(this.fallbackId)
+        if (enchantToAdd != null){
+            if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
+                stack.addEnchantment(enchantToAdd,1)
             }
         }
+    }
 
-        fun sendSmokePacket(user: ServerPlayerEntity){
-            val buf = PacketByteBufs.create()
-            ServerPlayNetworking.send(user, SCEPTER_SMOKE_PACKET, buf)
-        }
-
-        private fun doSmoke(world: World, client: MinecraftClient, user: LivingEntity){
-            val particlePos = scepterParticlePos(client, user)
-            world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,particlePos.x,particlePos.y,particlePos.z,user.velocity.x,user.velocity.y + 0.5,user.velocity.z)
-        }
+    open fun resetCooldown(stack: ItemStack, world: World, user: PlayerEntity, activeEnchant: String): TypedActionResult<ItemStack>{
+        world.playSound(null,user.blockPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6F,0.8F)
+        ScepterHelper.resetCooldown(world, stack, activeEnchant)
+        return TypedActionResult.fail(stack)
     }
 }
