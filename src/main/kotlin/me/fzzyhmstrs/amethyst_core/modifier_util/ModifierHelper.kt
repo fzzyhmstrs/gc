@@ -14,7 +14,7 @@ object ModifierHelper {
 
     private val augmentModifiers: MutableMap<ItemStack ,MutableList<Identifier>> = mutableMapOf()
     private val activeScepterModifiers: MutableMap<ItemStack, AbstractModifier<AugmentModifier>.CompiledModifiers> = mutableMapOf()
-    private val DUSTBIN = TickingDustbin { dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }
+    internal val DUSTBIN = TickingDustbin { dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }
 
     fun addModifier(modifier: Identifier, stack: ItemStack): Boolean{
         val nbt = stack.orCreateNbt
