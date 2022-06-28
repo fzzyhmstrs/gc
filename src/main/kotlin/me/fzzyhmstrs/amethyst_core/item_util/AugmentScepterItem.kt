@@ -2,7 +2,9 @@ package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
+import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
@@ -39,14 +41,18 @@ import net.minecraft.world.World
 import kotlin.math.max
 
 @Suppress("SameParameterValue", "unused", "USELESS_IS_CHECK")
-abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Settings, ):
-    ModifiableScepterItem(material,settings){
+abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Settings):
+    ModifiableScepterItem<AugmentModifier>(material, settings){
 
     var defaultAugments: List<ScepterAugment> = listOf()
 
     fun withAugments(startingAugments: List<ScepterAugment> = listOf()): AugmentScepterItem{
         defaultAugments = startingAugments
         return this
+    }
+
+    override fun getActiveModifiers(stack: ItemStack): AbstractModifier<AugmentModifier>.CompiledModifiers {
+        return ModifierHelper.getActiveModifiers(stack)
     }
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
@@ -106,7 +112,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
     private fun serverUse(world: World, user: PlayerEntity, hand: Hand, stack: ItemStack,
                           activeEnchantId: String, testEnchant: ScepterAugment, testLevel: Int): TypedActionResult<ItemStack>{
 
-        val modifiers = ScepterHelper.getActiveModifiers(stack)
+        val modifiers = ModifierHelper.getActiveModifiers(stack)
 
         val cd : Int? = ScepterHelper.useScepter(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {

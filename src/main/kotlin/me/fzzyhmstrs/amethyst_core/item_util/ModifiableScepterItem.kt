@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Modifiable
+import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
@@ -11,11 +12,11 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.Identifier
 
-abstract class ModifiableScepterItem(material: ScepterToolMaterial, settings: Settings): AbstractScepterItem(material, settings), Modifiable{
+abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterToolMaterial, settings: Settings): AbstractScepterItem(material, settings), Modifiable<T>{
 
     override val defaultModifiers: MutableList<Identifier> = mutableListOf()
 
-    fun withModifiers(defaultMods: List<AugmentModifier> = listOf()): ModifiableScepterItem{
+    fun withModifiers(defaultMods: List<AugmentModifier> = listOf()): ModifiableScepterItem<T>{
         defaultMods.forEach {
             defaultModifiers.add(it.modifierId)
         }
