@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ModifierRegistry {
-    private val registry: MutableMap<Identifier, AbstractModifier> = mutableMapOf()
+    private val registry: MutableMap<Identifier, AbstractModifier<*>> = mutableMapOf()
 
     private val DEBUG_NECROTIC_CONSUMER = AugmentConsumer({ list: List<LivingEntity> -> necroticConsumer(list)}, AugmentConsumer.Type.HARMFUL)
     private fun necroticConsumer(list: List<LivingEntity>){
@@ -41,7 +41,7 @@ object ModifierRegistry {
     val MODIFIER_DEBUG_2 = AugmentModifier(Identifier(AC.MOD_ID,"modifier_debug_2"), levelModifier = 1).withDuration(10, durationPercent = 15).withAmplifier(1)
     val MODIFIER_DEBUG_3 = AugmentModifier(Identifier(AC.MOD_ID,"modifier_debug_3")).withConsumer(DEBUG_HEALING_CONSUMER).withConsumer(DEBUG_NECROTIC_CONSUMER)
 
-    fun registerAll(){
+    internal fun registerAll(){
         register(GREATER_ATTUNED)
         register(ATTUNED)
         register(LESSER_ATTUNED)
@@ -58,10 +58,10 @@ object ModifierRegistry {
         if (registry.containsKey(id)){throw IllegalStateException("AbstractModifier with id $id already present in ModififerRegistry")}
         registry[id] = modifier
     }
-    fun get(id: Identifier): AbstractModifier?{
+    fun get(id: Identifier): AbstractModifier<*>?{
         return registry[id]
     }
-    fun getByRawId(rawId: Int): AbstractModifier?{
+    fun getByRawId(rawId: Int): AbstractModifier<*>?{
         return registry[getIdByRawId(rawId)]
     }
     fun getIdByRawId(rawId:Int): Identifier {

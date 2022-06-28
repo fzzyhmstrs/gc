@@ -25,6 +25,6 @@ object RegisterBaseEntity {
         }.dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
     )
 
-    fun registerAll(){}
+    internal fun registerAll(){}
 
 }
