@@ -1,4 +1,4 @@
-package me.fzzyhmstrs.amethyst_core.item_util
+package me.fzzyhmstrs.amethyst_core.mana_util
 
 import net.minecraft.item.ItemStack
 import kotlin.math.max
@@ -6,7 +6,6 @@ import kotlin.math.min
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.LiteralText
@@ -16,6 +15,8 @@ import net.minecraft.world.World
 
 interface ManaItem {
 
+    fun getRepairTime(): Int
+
     //interface used for type comparison
     fun healDamage(amount: Int, stack: ItemStack): Int{
         val healedAmount = min(amount,stack.damage)
@@ -23,7 +24,7 @@ interface ManaItem {
         return healedAmount
     }
 
-    fun checkCanUseHandler(
+    fun checkCanUse(
         stack: ItemStack,
         world: World,
         entity: PlayerEntity,
@@ -69,7 +70,7 @@ interface ManaItem {
         EnchantmentHelper.set(newEnchantList, stack)
     }
 
-    fun damageHandler(
+    fun manaDamage(
         stack: ItemStack,
         world: World,
         entity: PlayerEntity,
