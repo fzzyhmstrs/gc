@@ -1,16 +1,12 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.coding_util.Dustbin
-import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.coding_util.PersistentEffectHelper
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.trinket_util.EffectQueue
-import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.BaseAugment
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
-import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Identifier
-import java.util.function.Consumer
 
 object EventRegistry {
 
@@ -21,7 +17,7 @@ object EventRegistry {
     val ticker_20 = Ticker(20)
     private val tickers: MutableList<TickUppable> = mutableListOf()
 
-    fun registerTickUppable(ticker: Ticker){
+    fun registerTickUppable(ticker: TickUppable){
         tickers.add(ticker)
     }
 
@@ -37,7 +33,7 @@ object EventRegistry {
 
     internal fun registerClient(){
         SyncedConfigRegistry.registerClient()
-        AbstractScepterItem.registerClient()
+        ParticleEmitting.registerClient()
     }
 
     private fun registerServerTick(){
