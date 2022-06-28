@@ -4,6 +4,7 @@ import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
@@ -69,7 +70,7 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         tooltip.add(LiteralText(graceText).formatted(SpellType.GRACE.fmt()))
         val witText = TranslatableText("scepter.wit.lvl").string + stats[2].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
         tooltip.add(LiteralText(witText).formatted(SpellType.WIT.fmt()))
-        val modifierList = ScepterHelper.getModifiers(stack)
+        val modifierList = ModifierHelper.getModifiers(stack)
         if (modifierList.isNotEmpty()){
             val modifierText = TranslatableText("scepter.modifiers").formatted(Formatting.GOLD)
 

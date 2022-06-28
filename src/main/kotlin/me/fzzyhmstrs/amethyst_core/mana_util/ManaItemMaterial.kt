@@ -1,4 +1,4 @@
-package me.fzzyhmstrs.amethyst_core.scepter_util
+package me.fzzyhmstrs.amethyst_core.mana_util
 
 interface ManaItemMaterial {
 

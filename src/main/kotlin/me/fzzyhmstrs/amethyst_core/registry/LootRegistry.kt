@@ -11,7 +11,7 @@ object LootRegistry {
 
     private val modLoots: MutableList<AbstractModLoot> = mutableListOf()
 
-    fun registerAll(){
+    internal fun registerAll(){
 
         LootTableLoadingCallback.EVENT.register(LootTableLoadingCallback { _: ResourceManager, _: LootManager, id: Identifier, table: FabricLootSupplierBuilder, _: LootTableLoadingCallback.LootTableSetter ->
             if (modLoots.isEmpty()) return@LootTableLoadingCallback

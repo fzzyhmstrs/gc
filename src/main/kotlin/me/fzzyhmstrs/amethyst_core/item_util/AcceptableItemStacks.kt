@@ -1,6 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
-import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterMaterialAddon
+import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import net.minecraft.block.Block
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
@@ -157,7 +157,7 @@ object AcceptableItemStacks {
                 val item = entry.value()
                 if (item is AbstractScepterItem){
                     val material = item.material
-                    if (material is ScepterMaterialAddon){
+                    if (material is ScepterToolMaterial){
                         if (material.scepterTier() >= tier){
                             list.add(ItemStack(item,1))
                         }

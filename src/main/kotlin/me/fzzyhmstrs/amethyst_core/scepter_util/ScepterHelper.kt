@@ -3,7 +3,6 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.coding_util.TickingDustbin
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.item_util.AugmentScepterItem
 import me.fzzyhmstrs.amethyst_core.mana_util.ManaItem
@@ -11,9 +10,7 @@ import me.fzzyhmstrs.amethyst_core.modifier_util.*
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
-import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
-import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentDamage
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.PacketSender
@@ -30,7 +27,6 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayNetworkHandler
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
@@ -39,7 +35,8 @@ import net.minecraft.world.World
 import kotlin.NoSuchElementException
 import kotlin.math.max
 
-object ScepterHelper: AugmentDamage {
+@Deprecated("refactoring and moving certain functions")
+object ScepterHelper {
 
     private val augmentStats: MutableMap<String, AugmentDatapoint> = mutableMapOf()
     private val scepterHealTickers: MutableMap<ItemStack, EventRegistry.Ticker> = mutableMapOf()
@@ -198,13 +195,13 @@ object ScepterHelper: AugmentDamage {
         }
     }
 
-    fun checkManaCost(cost: Int, stack: ItemStack): Boolean{
+/*    fun checkManaCost(cost: Int, stack: ItemStack): Boolean{
         return (checkCanUseHandler(stack, cost))
     }
 
     fun applyManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity){
         damageHandler(stack,world,user,cost,LiteralText.EMPTY)
-    }
+    }*/
 
     fun incrementScepterStats(scepterNbt: NbtCompound, activeEnchantId: String, xpMods: XpModifiers? = null){
         val spellKey = augmentStats[activeEnchantId]?.type?.name ?: return

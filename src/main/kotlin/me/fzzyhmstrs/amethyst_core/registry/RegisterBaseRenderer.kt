@@ -9,7 +9,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory
 @Environment(value = EnvType.CLIENT)
 object RegisterBaseRenderer {
 
-    fun registerAll(){
+    internal fun registerAll(){
         EntityRendererRegistry.register(
             RegisterBaseEntity.MISSILE_ENTITY
         ){context: EntityRendererFactory.Context ->

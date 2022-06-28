@@ -38,7 +38,7 @@ object ItemModelRegistry: SynchronousResourceReloader {
         }
     }
 
-    fun registerAll(){
+    internal fun registerAll(){
         registerReloader()
     }
 
