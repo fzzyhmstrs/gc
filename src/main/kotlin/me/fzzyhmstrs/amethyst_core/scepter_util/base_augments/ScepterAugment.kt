@@ -1,12 +1,11 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
 
 import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentDatapoint
-import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.modifier_util.CompiledAugmentModifier
+import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity
@@ -25,7 +24,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
 
     abstract fun applyTasks(world: World, user: LivingEntity, hand: Hand, level: Int, effects: AugmentEffect): Boolean
 
-    fun applyModifiableTasks(world: World, user: LivingEntity, hand: Hand, level: Int, modifiers: List<AugmentModifier> = listOf(), modifierData: CompiledAugmentModifier? = null): Boolean{
+    fun applyModifiableTasks(world: World, user: LivingEntity, hand: Hand, level: Int, modifiers: List<AugmentModifier> = listOf(), modifierData: AugmentModifier? = null): Boolean{
         val effectModifiers = AugmentEffect()
         effectModifiers.plus(modifierData?.getEffectModifier()?: AugmentEffect())
         effectModifiers.plus(baseEffect)
@@ -113,7 +112,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         const val augmentVersion = "_v0"
 
         class AugmentStats {
-            var id: String = AbstractScepterItem.defaultId.toString()
+            var id: String = ScepterHelper.fallbackId.toString()
             var cooldown: Int = 20
             var manaCost: Int = 2
             var minLvl: Int = 1
