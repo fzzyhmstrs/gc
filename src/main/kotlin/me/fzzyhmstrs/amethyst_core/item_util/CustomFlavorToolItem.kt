@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Flavorful
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -12,22 +13,14 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
-open class CustomFlavorToolItem(material: ToolMaterial,settings: Settings) : ToolItem(material, settings) {
+open class CustomFlavorToolItem(material: ToolMaterial,settings: Settings) : ToolItem(material, settings), Flavorful {
 
-    private var glint = false
+    override var glint: Boolean = false
+    override var flavor: String = ""
 
-    private val id: Identifier by lazy{
-        Registry.ITEM.getId(this)
-    }
-
-    fun withGlint(): CustomFlavorToolItem{
-        glint = true
-        return this
-    }
-    
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
-        tooltip.add(TranslatableText("item.${id.namespace}.${id.path}.flavor").formatted(Formatting.WHITE, Formatting.ITALIC))
+        tooltip.add(TranslatableText(flavor).formatted(Formatting.WHITE, Formatting.ITALIC))
     }
 
     override fun hasGlint(stack: ItemStack): Boolean {

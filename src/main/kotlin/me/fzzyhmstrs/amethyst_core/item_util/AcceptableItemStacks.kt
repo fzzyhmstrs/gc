@@ -9,7 +9,7 @@ import net.minecraft.util.registry.Registry
 
 object AcceptableItemStacks {
     
-    val scepterAcceptableMap: MutableMap<Int,MutableList<ItemStack>> = mutableMapOf()
+    private val scepterAcceptableMap: MutableMap<Int,MutableList<ItemStack>> = mutableMapOf()
 
     fun baseAcceptableItemStacks(target: EnchantmentTarget?): MutableList<ItemStack>{
         val entries = Registry.ITEM.indexedEntries

@@ -17,7 +17,7 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
     private var hasDesc: Boolean = false
     private var hasObjectToAffect: Boolean = false
 
-    abstract fun compiler(): T
+    abstract fun compiler(): Compiler
 
     abstract fun compile(modifiers: List<T>, compiledData: T): CompiledModifiers
 
@@ -65,11 +65,15 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
 
     inner class CompiledModifiers(val modifiers: List<T>, val compiledData: T)
 
-    inner class Compiler(val modifiers: MutableList<T>, val compiledData: T){
+    inner class Compiler(private val modifiers: MutableList<T>, private val compiledData: T){
 
         fun add(modifier: T){
             modifiers.add(modifier)
             compiledData.plus(modifier)
+        }
+
+        fun compile(): CompiledModifiers{
+            return CompiledModifiers(modifiers, compiledData)
         }
 
     }

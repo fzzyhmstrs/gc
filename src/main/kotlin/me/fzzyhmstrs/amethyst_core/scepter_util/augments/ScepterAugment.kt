@@ -1,6 +1,6 @@
-package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
+package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
-import me.fzzyhmstrs.amethyst_core.scepter_util.AugmentDatapoint
+import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
@@ -112,7 +112,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         const val augmentVersion = "_v0"
 
         class AugmentStats {
-            var id: String = ScepterHelper.fallbackId.toString()
+            var id: String = AC.fallbackId.toString()
             var cooldown: Int = 20
             var manaCost: Int = 2
             var minLvl: Int = 1
