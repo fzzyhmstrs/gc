@@ -1,9 +1,8 @@
-package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
+package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
-import me.fzzyhmstrs.amethyst_core.scepter_util.SoulAugment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EquipmentSlot

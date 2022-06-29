@@ -95,6 +95,7 @@ object SyncedConfigHelper {
         fun generateNewClass(): Any
 
     }
+
     interface ReadMeWriter{
         fun writeReadMe(file: String){
             val textLines: List<String> = readmeText()

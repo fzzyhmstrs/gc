@@ -172,24 +172,21 @@ object ModifierHelper {
         val nbt = scepter.orCreateNbt
         if (!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) return
         val activeEnchant =  Identifier(Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),nbt))
-        val list : MutableList<AugmentModifier> = mutableListOf()
         val compiler = ModifierDefaults.BLANK_AUG_MOD.compiler()
         augmentModifiers[scepter]?.forEach { identifier ->
             val modifier = ModifierRegistry.getByType<AugmentModifier>(identifier)
             if (modifier != null){
                 if (!modifier.hasSpellToAffect()){
-                    list.add(modifier)
-                    compiler.plus(modifier)
+                    compiler.add(modifier)
                 } else {
                     if (modifier.checkSpellsToAffect(activeEnchant)){
-                        list.add(modifier)
-                        compiler.plus(modifier)
+                        compiler.add(modifier)
                     }
                 }
             }
         }
 
-        activeScepterModifiers[scepter] = ModifierDefaults.BLANK_AUG_MOD.CompiledModifiers(list, compiler)
+        activeScepterModifiers[scepter] = compiler.compile()
     }
 
 }

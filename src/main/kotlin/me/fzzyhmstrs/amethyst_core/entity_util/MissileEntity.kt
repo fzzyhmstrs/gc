@@ -16,7 +16,7 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.world.World
 
-open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: World): ExplosiveProjectileEntity(entityType,world), ModifiableDamageEntity {
+open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: World): ExplosiveProjectileEntity(entityType,world), ModifiableEffectEntity {
 
     constructor(world: World,owner: LivingEntity,_pierce: Boolean) : this(RegisterBaseEntity.MISSILE_ENTITY,world){
         this.pierce = _pierce

@@ -1,7 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import me.fzzyhmstrs.amethyst_core.mana_util.ManaHelper
 import me.fzzyhmstrs.amethyst_core.mana_util.ManaItem
-import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
@@ -51,7 +51,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     }
 
     open fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound){
-        ScepterHelper.initializeManaItem(stack)
+        ManaHelper.initializeManaItem(stack)
     }
 
     open fun needsInitialization(stack: ItemStack, scepterNbt: NbtCompound): Boolean{
@@ -62,7 +62,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     override fun inventoryTick(stack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
         if (world.isClient) return
         //slowly heal damage over time
-        if (ScepterHelper.tickTicker(stack)){
+        if (ManaHelper.tickHeal(stack)){
             healDamage(1,stack)
         }
     }

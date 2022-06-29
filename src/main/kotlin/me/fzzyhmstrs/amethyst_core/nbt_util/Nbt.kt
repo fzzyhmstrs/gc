@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.nbt_util
 
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.math.BlockPos
@@ -64,5 +65,31 @@ object Nbt {
             nbtList2.add(el)
         }
         baseNbt.put(listKey, nbtList2)
+    }
+
+    /**
+     * method for transferring nbt between two item stacks.
+     *
+     * does NOT transfer enchantments. Minecraft has methods for that.
+     *
+     * useful for maintaining custom nbt between stacks. For example, when crafting an item into a new tier of that item, nbt can be maintained with this funciton.
+     */
+    fun transferNbt(stack1: ItemStack, stack2: ItemStack){
+        val nbt1 = stack1.nbt ?: return
+        val nbt2 = stack2.orCreateNbt
+        for(nbtKey in nbt1.keys){
+            if(nbtKey == ItemStack.ENCHANTMENTS_KEY){
+                continue
+            }
+            nbt2.put(nbtKey,nbt1[nbtKey])
+        }
+    }
+
+    fun getOrCreateSubCompound(nbtCompound: NbtCompound, key: String): NbtCompound {
+        val subCompound = nbtCompound.get(key) ?: NbtCompound()
+        if (subCompound == NbtCompound()){
+            nbtCompound.put(key,subCompound)
+        }
+        return subCompound as NbtCompound
     }
 }

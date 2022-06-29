@@ -10,7 +10,9 @@ import me.fzzyhmstrs.amethyst_core.modifier_util.*
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
-import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentDatapoint
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.PacketSender
@@ -35,22 +37,10 @@ import net.minecraft.world.World
 import kotlin.NoSuchElementException
 import kotlin.math.max
 
-@Deprecated("refactoring and moving certain functions")
 object ScepterHelper {
 
-    private val augmentStats: MutableMap<String, AugmentDatapoint> = mutableMapOf()
-    private val scepterHealTickers: MutableMap<ItemStack, EventRegistry.Ticker> = mutableMapOf()
-    private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
-    val fallbackId = Identifier("vanishing_curse")
 
-    fun initializeManaItem(stack: ItemStack){
-        if (!scepterHealTickers.containsKey(stack)){
-            val item = stack.item
-            if (item is ManaItem) {
-                scepterHealTickers[stack] = EventRegistry.Ticker(item.getRepairTime())
-            }
-        }
-    }
+    private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
 
     fun useScepter(activeEnchantId: String, activeEnchant: ScepterAugment, stack: ItemStack, world: World, cdMod: Double = 0.0): Int?{
         if (world !is ServerWorld){return null}
@@ -60,22 +50,18 @@ object ScepterHelper {
             return null
         }
         //cooldown modifier is a percentage modifier, so 20% will boost cooldown by 20%. -20% will take away 20% cooldown
-        val cooldown = (augmentStats[activeEnchantId]?.cooldown?.times(100.0+ cdMod)?.div(100.0))?.toInt()
+        val cooldown = (AugmentHelper.getAugmentCooldown(activeEnchantId).times(100.0+ cdMod).div(100.0)).toInt()
         val time = world.time
 
-        val lastUsedList = NbtScepterHelper.getOrCreateLastUsedList(scepterNbt)
-        val lastUsed = NbtScepterHelper.checkLastUsed(lastUsedList,activeEnchantId,time-1000000L)
-        if (cooldown != null){
-            val cooldown2 = max(cooldown,1) // don't let cooldown be less than 1 tick
-            return if (time - cooldown2 >= lastUsed){ //checks that enough time has passed since last usage
-                NbtScepterHelper.updateLastUsed(lastUsedList, activeEnchantId, time)
-                cooldown2
-            } else {
-                null
-            }
+        val lastUsedList = Nbt.getOrCreateSubCompound(scepterNbt, NbtKeys.LAST_USED_LIST.str())
+        val lastUsed = checkLastUsed(lastUsedList,activeEnchantId,time-1000000L)
+        val cooldown2 = max(cooldown,1) // don't let cooldown be less than 1 tick
+        return if (time - cooldown2 >= lastUsed){ //checks that enough time has passed since last usage
+            updateLastUsed(lastUsedList, activeEnchantId, time)
+            cooldown2
+        } else {
+            null
         }
-
-        return null
     }
 
     fun sendScepterUpdateFromClient(up: Boolean) {
@@ -148,11 +134,11 @@ object ScepterHelper {
         }
         val nbtTemp = nbtEls[newIndex] as NbtCompound
         val newActiveEnchant = EnchantmentHelper.getIdFromNbt(nbtTemp)?.toString()?:return
-        val lastUsedList = NbtScepterHelper.getOrCreateLastUsedList(nbt)
+        val lastUsedList = Nbt.getOrCreateSubCompound(nbt, NbtKeys.LAST_USED_LIST.str())
         val currentTime = user.world.time
-        val lastUsed: Long = NbtScepterHelper.checkLastUsed(lastUsedList,newActiveEnchant,currentTime-1000000L)
+        val lastUsed: Long = checkLastUsed(lastUsedList,newActiveEnchant,currentTime-1000000L)
         val timeSinceLast = currentTime - lastUsed
-        val cooldown = (augmentStats[newActiveEnchant]?.cooldown?:20).toLong()
+        val cooldown = AugmentHelper.getAugmentCooldown(newActiveEnchant).toLong()
         if(timeSinceLast >= cooldown){
             user.itemCooldownManager.remove(stack.item)
         } else{
@@ -182,29 +168,8 @@ object ScepterHelper {
         }
     }
 
-    fun activeEnchantHelper(stack: ItemStack): String{
-        val nbt: NbtCompound = stack.orCreateNbt
-        return if (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
-            Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
-        } else {
-            val item = stack.item
-            if (item is AbstractScepterItem) {
-                item.initializeScepter(stack,nbt)
-            }
-            Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
-        }
-    }
-
-/*    fun checkManaCost(cost: Int, stack: ItemStack): Boolean{
-        return (checkCanUseHandler(stack, cost))
-    }
-
-    fun applyManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity){
-        damageHandler(stack,world,user,cost,LiteralText.EMPTY)
-    }*/
-
     fun incrementScepterStats(scepterNbt: NbtCompound, activeEnchantId: String, xpMods: XpModifiers? = null){
-        val spellKey = augmentStats[activeEnchantId]?.type?.name ?: return
+        val spellKey = AugmentHelper.getAugmentType(activeEnchantId).name
         if(spellKey == SpellType.NULL.name) return
         val statLvl = Nbt.readIntNbt(spellKey + "_lvl",scepterNbt)
         val statMod = xpMods?.getMod(spellKey) ?: 0
@@ -216,7 +181,7 @@ object ScepterHelper {
     }
 
     fun getScepterStat(scepterNbt: NbtCompound, activeEnchantId: String): Pair<Int,Int>{
-        val spellKey = augmentStats[activeEnchantId]?.type?.name ?: return Pair(1,0)
+        val spellKey = AugmentHelper.getAugmentType(activeEnchantId).name
         val statLvl = Nbt.readIntNbt(spellKey + "_lvl",scepterNbt)
         val statXp = Nbt.readIntNbt(spellKey + "_xp",scepterNbt)
         return Pair(statLvl,statXp)
@@ -227,133 +192,48 @@ object ScepterHelper {
         return getStatsHelper(nbt)
     }
 
+    /**
+     * library method to check if an augment scepter meets the level requirements of the given augment
+     *
+     * @see AugmentDatapoint needs to be defined in the augment class
+     */
     fun isAcceptableScepterItem(augment: ScepterAugment, stack: ItemStack, player: PlayerEntity): Boolean {
         val nbt = stack.orCreateNbt
-        return checkScepterStat(
-            nbt,
-            Registry.ENCHANTMENT.getId(augment)?.toString() ?: ""
-        ) || player.abilities.creativeMode
-    }
-    private fun checkScepterStat(scepterNbt: NbtCompound, activeEnchantId: String): Boolean{
-        if (!augmentStats.containsKey(activeEnchantId)) return false
-        val minLvl = augmentStats[activeEnchantId]?.minLvl?:return false
-        val curLvl = getScepterStat(scepterNbt,activeEnchantId).first
+        if (player.abilities.creativeMode) return true
+        val activeEnchantId = Registry.ENCHANTMENT.getId(augment)?.toString() ?: ""
+        if (!AugmentHelper.checkAugmentStat(activeEnchantId)) return false
+        val minLvl = AugmentHelper.getAugmentMinLvl(activeEnchantId)
+        val curLvl = getScepterStat(nbt,activeEnchantId).first
         return (curLvl >= minLvl)
+
     }
 
     fun resetCooldown(world: World,stack: ItemStack, activeEnchantId: String){
         val nbt = stack.nbt?: return
-        val lastUsedList = NbtScepterHelper.getOrCreateLastUsedList(nbt)
-        val cd = augmentStats[activeEnchantId]?.cooldown?:20
-        val currentLastUsed = NbtScepterHelper.checkLastUsed(lastUsedList,activeEnchantId, world.time)
-        NbtScepterHelper.updateLastUsed(lastUsedList,activeEnchantId,currentLastUsed - cd - 2)
+        val lastUsedList = Nbt.getOrCreateSubCompound(nbt, NbtKeys.LAST_USED_LIST.str())
+        val cd = AugmentHelper.getAugmentCooldown(activeEnchantId)
+        val currentLastUsed = checkLastUsed(lastUsedList,activeEnchantId, world.time)
+        updateLastUsed(lastUsedList,activeEnchantId,currentLastUsed - cd - 2)
     }
 
-    fun transferNbt(stack1: ItemStack,stack2: ItemStack){
-        val nbt1 = stack1.nbt ?: return
-        val nbt2 = stack2.orCreateNbt
-        for(nbtKey in nbt1.keys){
-            if(nbtKey == ItemStack.ENCHANTMENTS_KEY){
-                continue
-            }
-            nbt2.put(nbtKey,nbt1[nbtKey])
-        }
-    }
-
-    fun bookOfLoreNbtGenerator(tier: LoreTier = LoreTier.ANY_TIER): NbtCompound{
-        val nbt = NbtCompound()
-        val aug = getRandBookOfLoreAugment(tier.list())
-        nbt.putString(NbtKeys.LORE_KEY.str(),aug)
-        return nbt
-    }
-    private fun getRandBookOfLoreAugment(list: List<String>): String{
-        if (list.isEmpty()) return fallbackId.toString()
-        val rndMax = list.size
-        val rndIndex = AC.acRandom.nextInt(rndMax)
-        return list[rndIndex]
-    }
-
-    fun registerAugmentStat(id: String, dataPoint: AugmentDatapoint, overwrite: Boolean = false){
-        if(!augmentStats.containsKey(id) || overwrite){
-            augmentStats[id] = dataPoint
-            dataPoint.bookOfLoreTier.addToList(id)
-        }
-    }
-    fun registerAugmentStat(augment: ScepterAugment){
-        val id = EnchantmentHelper.getEnchantmentId(augment)?.toString()?:throw NoSuchElementException("Enchantment ID for ${this.javaClass.canonicalName} not found!")
-        val imbueLevel = if (checkAugmentStat(id)){
-            getAugmentImbueLevel(id)
+    fun checkLastUsed(lastUsedList: NbtCompound, activeEnchantId: String, time: Long): Long{
+        val key = activeEnchantId + NbtKeys.LAST_USED.str()
+        return if (!lastUsedList.contains(key)) {
+            Nbt.writeLongNbt(key, time, lastUsedList)
+            time
         } else {
-            1
+            Nbt.readLongNbt(key, lastUsedList)
         }
-        registerAugmentStat(id,configAugmentStat(augment,id,imbueLevel),true)
     }
+    fun updateLastUsed(lastUsedList: NbtCompound, activeEnchantId: String, currentTime: Long){
+        val key = activeEnchantId + NbtKeys.LAST_USED.str()
+        Nbt.writeLongNbt(key, currentTime, lastUsedList)
 
-    private fun configAugmentStat(augment: ScepterAugment, id: String, imbueLevel: Int = 1): AugmentDatapoint {
-        val stat = augment.augmentStat(imbueLevel)
-        val augmentConfig = ScepterAugment.Companion.AugmentStats()
-        val type = stat.type
-        augmentConfig.id = id
-        augmentConfig.cooldown = stat.cooldown
-        augmentConfig.manaCost = stat.manaCost
-        augmentConfig.minLvl = stat.minLvl
-        val tier = stat.bookOfLoreTier
-        val item = stat.keyItem
-        val augmentAfterConfig = ScepterAugment.configAugment(this.javaClass.simpleName + ScepterAugment.augmentVersion +".json",augmentConfig)
-        return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
-    }
-
-    fun checkAugmentStat(id: String): Boolean{
-        return augmentStats.containsKey(id)
-    }
-
-    fun getAugmentType(id: String): SpellType {
-        if(!augmentStats.containsKey(id)) return SpellType.NULL
-        return augmentStats[id]?.type?: SpellType.NULL
-    }
-
-    fun getAugmentItem(id: String): Item {
-        if(!augmentStats.containsKey(id)) return Items.GOLD_INGOT
-        return augmentStats[id]?.keyItem?:Items.GOLD_INGOT
-    }
-
-    fun getAugmentMinLvl(id: String): Int {
-        if(!augmentStats.containsKey(id)) return 1
-        return augmentStats[id]?.minLvl?:1
-    }
-
-    fun getAugmentManaCost(id: String, reduction: Double = 0.0): Int{
-        if(!augmentStats.containsKey(id)) return (10 * (100.0 + reduction) / 100.0).toInt()
-        val cost = (augmentStats[id]?.manaCost?.times(100.0 + reduction)?.div(100.0))?.toInt() ?: (10 * (100.0 + reduction) / 100.0).toInt()
-        return max(1,cost)
-    }
-
-    fun getAugmentCooldown(id: String): Int{
-        if(!augmentStats.containsKey(id)) return (20)
-        val cd = (augmentStats[id]?.cooldown) ?: 20
-        return max(1,cd)
-    }
-
-    fun getAugmentImbueLevel(id: String): Int{
-        if(!augmentStats.containsKey(id)) return (1)
-        val cd = (augmentStats[id]?.imbueLevel) ?: 1
-        return max(1,cd)
-    }
-
-    fun getAugmentTier(id: String): LoreTier {
-        if (!augmentStats.containsKey(id)) return (LoreTier.NO_TIER)
-        return (augmentStats[id]?.bookOfLoreTier) ?: LoreTier.NO_TIER
     }
 
     fun xpToNextLevel(xp: Int,lvl: Int): Int{
         val xpNext = (2 * lvl * lvl + 40 * lvl)
         return (xpNext - xp + 1)
-    }
-
-    fun tickTicker(id: ItemStack): Boolean{
-        val ticker = scepterHealTickers[id]?:return false
-        ticker.tickUp()
-        return ticker.isReady()
     }
 
     private fun checkXpForLevelUp(xp:Int,lvl:Int): Boolean{
@@ -387,41 +267,6 @@ object ScepterHelper {
         }
         stats[5] = nbt.getInt("WIT_xp")
         return stats
-    }
-
-    object NbtScepterHelper {
-
-        fun checkLastUsed(lastUsedList: NbtCompound, activeEnchantId: String, time: Long): Long{
-            val key = activeEnchantId + NbtKeys.LAST_USED.str()
-            return if (!lastUsedList.contains(key)) {
-                Nbt.writeLongNbt(key, time, lastUsedList)
-                time
-            } else {
-                Nbt.readLongNbt(key, lastUsedList)
-            }
-        }
-        fun updateLastUsed(lastUsedList: NbtCompound, activeEnchantId: String, currentTime: Long){
-            val key = activeEnchantId + NbtKeys.LAST_USED.str()
-            Nbt.writeLongNbt(key, currentTime, lastUsedList)
-
-        }
-
-        fun getOrCreateLastUsedList(nbtCompound: NbtCompound): NbtCompound {
-            val lastUsedList = nbtCompound.get(NbtKeys.LAST_USED_LIST.str())
-            return if (lastUsedList == null){
-                createLastUsedList(nbtCompound)
-            } else {
-                lastUsedList as NbtCompound
-            }
-        }
-
-        private fun createLastUsedList(nbtCompound: NbtCompound): NbtCompound {
-            val lastUsedList = NbtCompound()
-            nbtCompound.put(NbtKeys.LAST_USED_LIST.str(),lastUsedList)
-            return lastUsedList
-        }
-
-
     }
 
 }

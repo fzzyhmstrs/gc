@@ -4,8 +4,8 @@ import java.util.function.Consumer
 import me.fzzyhmstrs.amethyst_core.registry.*
 
 open class Dustbin<T>(private val consumer: Consumer<T>){
-    protected var dirty: Boolean = false
-    protected val dust: MutableList<T> = mutableListOf()
+    private var dirty: Boolean = false
+    private val dust: MutableList<T> = mutableListOf()
     fun markDirty(newDust: T){
         dust.add(newDust)
         dirty = true

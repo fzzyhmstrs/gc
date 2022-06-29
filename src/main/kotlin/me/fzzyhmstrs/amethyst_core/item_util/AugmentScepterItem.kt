@@ -1,39 +1,23 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
-import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
-import me.fzzyhmstrs.amethyst_core.scepter_util.base_augments.ScepterAugment
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
-import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper.fallbackId
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
-import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.LiteralText
-import net.minecraft.text.MutableText
-import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.*
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.registry.Registry
@@ -59,13 +43,13 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         super.use(world, user, hand)
         val stack = user.getStackInHand(hand)
         val nbt = stack.orCreateNbt
-        val activeEnchantId: String = ScepterHelper.activeEnchantHelper(stack)
+        val activeEnchantId: String = getActiveEnchant(stack)
         val testEnchant: Enchantment = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
         if (testEnchant !is ScepterAugment) return resetCooldown(stack,world,user,activeEnchantId)
 
         //determine the level at which to apply the active augment, from 1 to the maximum level the augment can operate
         val level = ScepterHelper.getScepterStat(nbt,activeEnchantId).first
-        val minLvl = ScepterHelper.getAugmentMinLvl(activeEnchantId)
+        val minLvl = AugmentHelper.getAugmentMinLvl(activeEnchantId)
         val maxLevel = (testEnchant.getAugmentMaxLevel()) + minLvl - 1
         var testLevel = 1
         if (level >= minLvl){
@@ -116,7 +100,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
         val cd : Int? = ScepterHelper.useScepter(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {
-            val manaCost = ScepterHelper.getAugmentManaCost(activeEnchantId,modifiers.compiledData.manaCostModifier)
+            val manaCost = AugmentHelper.getAugmentManaCost(activeEnchantId,modifiers.compiledData.manaCostModifier)
             if (!checkManaCost(manaCost,stack, world, user)) return resetCooldown(stack,world,user,activeEnchantId)
             val level = max(1,testLevel + modifiers.compiledData.levelModifier)
             if (testEnchant.applyModifiableTasks(world, user, hand, level, modifiers.modifiers, modifiers.compiledData)) {
@@ -181,5 +165,15 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         world.playSound(null,user.blockPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6F,0.8F)
         ScepterHelper.resetCooldown(world, stack, activeEnchant)
         return TypedActionResult.fail(stack)
+    }
+
+    fun getActiveEnchant(stack: ItemStack): String{
+        val nbt: NbtCompound = stack.orCreateNbt
+        return if (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
+            Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
+        } else {
+            initializeScepter(stack,nbt)
+            Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
+        }
     }
 }

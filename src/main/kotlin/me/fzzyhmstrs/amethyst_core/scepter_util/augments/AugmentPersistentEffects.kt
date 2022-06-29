@@ -1,4 +1,4 @@
-package me.fzzyhmstrs.amethyst_core.scepter_util.base_augments
+package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.coding_util.PersistentEffectHelper
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
