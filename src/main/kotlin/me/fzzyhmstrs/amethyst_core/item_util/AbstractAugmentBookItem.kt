@@ -4,14 +4,12 @@ import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.LoreTier
-import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -39,8 +37,8 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
         val nbt = stack.orCreateNbt
         if (nbt.contains(NbtKeys.LORE_KEY.str())){
             val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
-            tooltip.add(TranslatableText("lore_book.augment").formatted(Formatting.GOLD).append(TranslatableText("enchantment.amethyst_imbuement.${Identifier(bola).path}").formatted(Formatting.GOLD)))
-            tooltip.add(TranslatableText("enchantment.amethyst_imbuement.${Identifier(bola).path}.desc").formatted(Formatting.WHITE))
+            tooltip.add(TranslatableText("lore_book.augment").formatted(Formatting.GOLD).append(TranslatableText("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}").formatted(Formatting.GOLD)))
+            tooltip.add(TranslatableText("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}.desc").formatted(Formatting.WHITE))
             val type = AugmentHelper.getAugmentType(bola)
             if (type == SpellType.NULL){
                 tooltip.add(TranslatableText("lore_book.${type.str()}").formatted(type.fmt()))

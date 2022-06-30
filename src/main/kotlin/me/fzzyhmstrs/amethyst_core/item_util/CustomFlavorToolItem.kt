@@ -13,14 +13,16 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
-open class CustomFlavorToolItem(material: ToolMaterial,settings: Settings) : ToolItem(material, settings), Flavorful {
+open class CustomFlavorToolItem(material: ToolMaterial,settings: Settings) : ToolItem(material, settings), Flavorful<CustomFlavorToolItem> {
 
     override var glint: Boolean = false
     override var flavor: String = ""
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
-        tooltip.add(TranslatableText(flavor).formatted(Formatting.WHITE, Formatting.ITALIC))
+        if (flavor != "") {
+            tooltip.add(flavorText())
+        }
     }
 
     override fun hasGlint(stack: ItemStack): Boolean {
@@ -29,5 +31,9 @@ open class CustomFlavorToolItem(material: ToolMaterial,settings: Settings) : Too
         } else {
             super.hasGlint(stack)
         }
+    }
+
+    override fun getFlavorItem(): CustomFlavorToolItem {
+        return this
     }
 }
