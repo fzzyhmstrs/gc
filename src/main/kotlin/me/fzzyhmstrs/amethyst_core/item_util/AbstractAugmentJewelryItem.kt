@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.item_util
 import com.google.common.collect.Multimap
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Flavorful
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentTasks
 import net.minecraft.client.item.TooltipContext
@@ -17,12 +18,16 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import java.util.*
 
-open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identifier): TrinketItem(settings), AugmentTasks {
+open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings), AugmentTasks, Flavorful<AbstractAugmentJewelryItem> {
 
+    override var glint: Boolean = false
+    override var flavor: String = ""
 
-    override fun appendTooltip(stack: ItemStack?, world: World?, tooltip: MutableList<Text>?, context: TooltipContext?) {
+    override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
-        tooltip?.add(TranslatableText("item.${id.namespace}.${id.path}.tooltip1").formatted(Formatting.WHITE, Formatting.ITALIC))
+        if (flavor != "") {
+            tooltip.add(flavorText())
+        }
     }
 
     override fun getModifiers(
@@ -57,5 +62,9 @@ open class AbstractAugmentJewelryItem(settings: Settings, private val id: Identi
 
     open fun intermittentTick(stack: ItemStack, entity: LivingEntity){
         passiveEnchantmentTasks(stack,entity.world,entity)
+    }
+
+    override fun getFlavorItem(): AbstractAugmentJewelryItem {
+        return this
     }
 }

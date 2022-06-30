@@ -5,28 +5,29 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
-interface Flavorful {
+interface Flavorful<T: Flavorful<T>> {
 
     var glint: Boolean
     var flavor: String
 
-    fun withFlavor(flavorPath: String): Flavorful {
-        flavor = flavorPath
-        return this
+    fun withFlavor(flavorPath: String): T {
+        getFlavorItem().flavor = flavorPath
+        return getFlavorItem()
     }
 
-    fun withFlavorDefaultPath(id: Identifier): Flavorful {
-        flavor = "item.${id.namespace}.${id.path}.tooltip1"
-        return this
+    fun withFlavorDefaultPath(id: Identifier): T {
+        getFlavorItem().flavor = "item.${id.namespace}.${id.path}.tooltip1"
+        return getFlavorItem()
     }
 
-    fun withGlint(): Flavorful {
-        glint = true
-        return this
+    fun withGlint(): T {
+        getFlavorItem().glint = true
+        return getFlavorItem()
     }
 
     fun flavorText(): MutableText{
         return TranslatableText(flavor).formatted(Formatting.WHITE, Formatting.ITALIC)
     }
 
+    fun getFlavorItem():T
 }

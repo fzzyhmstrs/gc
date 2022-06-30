@@ -11,14 +11,16 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
-open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful {
+open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful<CustomFlavorItem> {
 
     override var glint = false
     override var flavor: String = ""
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
-        tooltip.add(flavorText())
+        if (flavor != "") {
+            tooltip.add(flavorText())
+        }
     }
 
     override fun hasGlint(stack: ItemStack): Boolean {
@@ -27,5 +29,9 @@ open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful {
         } else {
             super.hasGlint(stack)
         }
+    }
+
+    override fun getFlavorItem(): CustomFlavorItem {
+        return this
     }
 }

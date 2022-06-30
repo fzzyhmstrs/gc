@@ -13,7 +13,9 @@ import java.util.function.Consumer
 
 interface ParticleEmitting{
     
-    fun emitParticles(world: World, client: MinecraftClient, user: LivingEntity)
+    fun emitParticles(world: World, client: MinecraftClient, user: LivingEntity){
+
+    }
     
     fun particleChance(): Int{
         return 1

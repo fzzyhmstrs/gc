@@ -56,7 +56,7 @@ interface ManaItem {
         stack: ItemStack,
         aug: Enchantment,
         entity: PlayerEntity,
-        message: String = TranslatableText("augment_damage.burnout").append(aug.getName(1)).toString()) {
+        message: Text = TranslatableText("augment_damage.burnout").append(aug.getName(1))) {
         val enchantList = EnchantmentHelper.get(stack)
         val newEnchantList: MutableMap<Enchantment, Int> = mutableMapOf()
         for (enchant in enchantList.keys) {
@@ -64,8 +64,8 @@ interface ManaItem {
                 newEnchantList[enchant] = enchantList[enchant] ?: 0
             }
         }
-        if (message != "") {
-            entity.sendMessage(LiteralText(message),false)
+        if (message.asString() != "") {
+            entity.sendMessage(message,false)
         }
         EnchantmentHelper.set(newEnchantList, stack)
     }
@@ -75,7 +75,7 @@ interface ManaItem {
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: String = TranslatableText("augment_damage.damage").toString(), unbreakingFlag: Boolean = false): Boolean {
+        message: Text = TranslatableText("augment_damage.damage"), unbreakingFlag: Boolean = false): Boolean {
         val currentDmg = stack.damage
         val maxDmg = stack.maxDamage
         var newCurrentDmg = currentDmg
@@ -101,8 +101,8 @@ interface ManaItem {
                     1.0F,
                     1.0F
                 )
-                if (message != "") {
-                    entity.sendMessage(LiteralText(message),false)
+                if (message.asString() != "") {
+                    entity.sendMessage(message,false)
                 }
             }
             if (newCurrentDmg == (maxDmg - 1)) {
@@ -111,7 +111,7 @@ interface ManaItem {
                 } else {
                     unbreakingDamage(stack,entity,newCurrentDmg - currentDmg)
                 }
-                if (message != "") {
+                if (message.asString() != "") {
                     world.playSound(
                         null,
                         entity.blockPos,
