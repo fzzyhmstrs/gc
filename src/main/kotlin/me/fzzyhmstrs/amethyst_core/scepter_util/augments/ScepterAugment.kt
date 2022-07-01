@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
+import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 
@@ -119,7 +120,13 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         }
 
         fun configAugment(file: String, configClass: AugmentStats): AugmentStats {
-            return readOrCreate(file,"augments") {configClass}
+            val ns = Identifier(configClass.id).namespace
+            val base = if(ns == "minecraft"){
+                AC.MOD_ID
+            } else {
+                ns
+            }
+            return readOrCreate(file,"augments", base) {configClass}
         }
     }
 }

@@ -37,7 +37,7 @@ object AugmentHelper {
         augmentConfig.minLvl = stat.minLvl
         val tier = stat.bookOfLoreTier
         val item = stat.keyItem
-        val augmentAfterConfig = ScepterAugment.configAugment(this.javaClass.simpleName + ScepterAugment.augmentVersion +".json",augmentConfig)
+        val augmentAfterConfig = ScepterAugment.configAugment(this.javaClass.simpleName + ScepterAugment.augmentVersion +".json", augmentConfig)
         return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
     }
 
