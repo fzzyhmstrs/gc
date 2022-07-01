@@ -89,6 +89,7 @@ object SyncedConfigHelper {
     interface SyncedConfig{
         fun readFromServer(buf: PacketByteBuf)
         fun writeToClient(buf: PacketByteBuf)
+        fun initConfig()
     }
     interface OldClass{
 
@@ -97,9 +98,9 @@ object SyncedConfigHelper {
     }
 
     interface ReadMeWriter{
-        fun writeReadMe(file: String){
+        fun writeReadMe(file: String, base: String = AC.MOD_ID){
             val textLines: List<String> = readmeText()
-            val dirPair = makeDir("",AC.MOD_ID)
+            val dirPair = makeDir("", base)
             if (!dirPair.second){
                 println("Couldn't make directory for storing the readme")
             }

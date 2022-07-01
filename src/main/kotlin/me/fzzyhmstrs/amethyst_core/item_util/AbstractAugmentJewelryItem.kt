@@ -22,12 +22,11 @@ open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings)
 
     override var glint: Boolean = false
     override var flavor: String = ""
+    override var flavorDesc: String = ""
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
-        if (flavor != "") {
-            tooltip.add(flavorText())
-        }
+        addFlavorText(tooltip, context)
     }
 
     override fun getModifiers(
