@@ -12,8 +12,10 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.LiteralText
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
@@ -27,7 +29,7 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
     AugmentScepterItem(material,settings), ParticleEmitting{
 
     init{
-        ParticleEmitting.registerParticleEmitter("scepter_smoke_emitter") { client -> doSmoke(client) }
+        ParticleEmitting.registerParticleEmitter(smokePacketId) { client -> doSmoke(client) }
     }
 
     override fun appendTooltip(
@@ -68,8 +70,21 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         }
     }
 
+    override fun resetCooldown(
+        stack: ItemStack,
+        world: World,
+        user: PlayerEntity,
+        activeEnchant: String
+    ): TypedActionResult<ItemStack> {
+        if (user is ServerPlayerEntity) {
+            sendParticlePacket(user, smokePacketId)
+        }
+        return super.resetCooldown(stack, world, user, activeEnchant)
+    }
+
     companion object{
         val commaText: MutableText = LiteralText(", ").formatted(Formatting.GOLD)
+        private const val smokePacketId = "scepter_smoke_emitter"
 
         private fun doSmoke(client: MinecraftClient){
             val world = client.world
