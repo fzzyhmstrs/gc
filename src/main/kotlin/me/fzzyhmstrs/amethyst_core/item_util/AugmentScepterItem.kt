@@ -15,6 +15,9 @@ import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
+import net.minecraft.loot.function.LootFunction
+import net.minecraft.loot.function.SetEnchantmentsLootFunction
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -175,5 +178,21 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
             initializeScepter(stack,nbt)
             Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
         }
+    }
+
+    companion object{
+
+        fun startingAugments(item: AugmentScepterItem): LootFunction.Builder{
+            var builder = SetEnchantmentsLootFunction.Builder()
+            if (item.defaultAugments.isEmpty()){
+                return builder
+            } else {
+                item.defaultAugments.forEach {
+                    builder = builder.enchantment(it, ConstantLootNumberProvider.create(1.0F))
+                }
+            }
+            return builder
+        }
+
     }
 }
