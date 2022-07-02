@@ -20,6 +20,7 @@ object AC: ModInitializer {
         RegisterBaseEntity.registerAll()
         EventRegistry.registerAll()
         PlaceItemAugment.registerServer()
+        ModifierRegistry.registerAll()
     }
 }
 

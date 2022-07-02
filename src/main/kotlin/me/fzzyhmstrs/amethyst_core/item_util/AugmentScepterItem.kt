@@ -77,7 +77,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
                     }
                 }
             }
-            return clientUse(world, user, hand, stack, activeEnchantId, testEnchant,testLevel)
+            return clientUse(world, user, hand, stack, activeEnchantId, testEnchant, testLevel)
         } else {
             if (!stack2.isEmpty) {
                 if (stack2.item is BlockItem) {

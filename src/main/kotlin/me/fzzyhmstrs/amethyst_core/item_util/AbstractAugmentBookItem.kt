@@ -33,7 +33,6 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
         tooltip: MutableList<Text>,
         context: TooltipContext
     ) {
-        super.appendTooltip(stack, world, tooltip, context)
         val nbt = stack.orCreateNbt
         if (nbt.contains(NbtKeys.LORE_KEY.str())){
             val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
@@ -64,12 +63,7 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
                 )
             }
         } else {
-            tooltip.add(
-                TranslatableText(flavor).formatted(
-                    Formatting.WHITE,
-                    Formatting.ITALIC
-                )
-            )
+            addFlavorText(tooltip, context)
         }
     }
 

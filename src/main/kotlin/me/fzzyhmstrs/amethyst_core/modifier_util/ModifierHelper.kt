@@ -12,8 +12,8 @@ import kotlin.math.max
 
 object ModifierHelper {
 
-    private val augmentModifiers: MutableMap<ItemStack ,MutableList<Identifier>> = mutableMapOf()
-    private val activeScepterModifiers: MutableMap<ItemStack, AbstractModifier<AugmentModifier>.CompiledModifiers> = mutableMapOf()
+    private val augmentModifiers: MutableMap<Long ,MutableList<Identifier>> = mutableMapOf()
+    private val activeScepterModifiers: MutableMap<Long, AbstractModifier<AugmentModifier>.CompiledModifiers> = mutableMapOf()
     internal val DUSTBIN = TickingDustbin { dirt: ItemStack -> gatherActiveScepterModifiers(dirt) }
 
     fun addModifier(modifier: Identifier, stack: ItemStack): Boolean{
@@ -25,8 +25,12 @@ object ModifierHelper {
         addModifierToNbt(modifier, nbt)
     }
     private fun addModifier(modifier: Identifier, scepter: ItemStack, nbt: NbtCompound): Boolean{
-        if (!augmentModifiers.containsKey(scepter)) {
-            augmentModifiers[scepter] = mutableListOf()
+        val id = Nbt.getItemStackId(nbt)
+        if (id == -1L){
+            initializeModifiers(scepter,nbt)
+        }
+        if (!augmentModifiers.containsKey(id)) {
+            augmentModifiers[id] = mutableListOf()
         }
         val highestModifier = checkDescendant(modifier,scepter)
         if (highestModifier != null){
@@ -39,7 +43,7 @@ object ModifierHelper {
                     val lineage = mod.getModLineage()
                     val newDescendant = lineage[highestDescendantPresent]
                     val currentGeneration = lineage[max(highestDescendantPresent - 1,0)]
-                    augmentModifiers[scepter]?.add(newDescendant)
+                    augmentModifiers[id]?.add(newDescendant)
                     addModifierToNbt(newDescendant, nbt)
                     removeModifier(scepter, currentGeneration, nbt)
                     DUSTBIN.markDirty(scepter)
@@ -49,25 +53,28 @@ object ModifierHelper {
                 false
             }
         }
-        augmentModifiers[scepter]?.add(modifier)
         addModifierToNbt(modifier, nbt)
+        augmentModifiers[id]?.add(modifier)
+        println(augmentModifiers)
         DUSTBIN.markDirty(scepter)
         return true
 
     }
     private fun checkDescendant(modifier: Identifier, scepter: ItemStack): Identifier?{
+        val id = Nbt.getItemStackId(scepter)
         val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
         val lineage = mod?.getModLineage() ?: return modifier
         var highestModifier: Identifier? = null
         lineage.forEach { identifier ->
-            if (augmentModifiers[scepter]?.contains(identifier) == true){
+            if (augmentModifiers[id]?.contains(identifier) == true){
                 highestModifier = identifier
             }
         }
         return highestModifier
     }
     private fun removeModifier(scepter: ItemStack, modifier: Identifier, nbt: NbtCompound){
-        augmentModifiers[scepter]?.remove(modifier)
+        val id = Nbt.getItemStackId(nbt)
+        augmentModifiers[id]?.remove(modifier)
         DUSTBIN.markDirty(scepter)
         removeModifierFromNbt(modifier,nbt)
     }
@@ -88,19 +95,24 @@ object ModifierHelper {
     }
 
     fun initializeModifiers(stack: ItemStack, scepterNbt: NbtCompound){
+        var id = Nbt.getItemStackId(stack)
+        if (id == -1L){
+            id = Nbt.makeItemStackId(stack)
+        }
         if (scepterNbt.contains(NbtKeys.MODIFIERS.str())){
-            initializeModifiers(scepterNbt, stack)
+            initializeModifiers(scepterNbt, stack, id)
         }
         DUSTBIN.markDirty(stack)
         DUSTBIN.clean()
     }
-    private fun initializeModifiers(nbt: NbtCompound, stack: ItemStack){
+    private fun initializeModifiers(nbt: NbtCompound, stack: ItemStack, id: Long){
         val nbtList = nbt.getList(NbtKeys.MODIFIERS.str(),10)
+        augmentModifiers[id] = mutableListOf()
         for (el in nbtList){
             val compound = el as NbtCompound
             if (compound.contains(NbtKeys.MODIFIER_ID.str())){
                 val modifier = compound.getString(NbtKeys.MODIFIER_ID.str())
-                addModifier(Identifier(modifier),stack)
+                augmentModifiers[id]?.add(Identifier(modifier))
             }
         }
         initializeForAttunedEnchant(stack, stack, nbt)
@@ -131,33 +143,37 @@ object ModifierHelper {
 
     fun getModifiers(stack: ItemStack): List<Identifier>{
         val nbt = stack.orCreateNbt
-        if (!augmentModifiers.containsKey(stack)) {
+        val id = Nbt.getItemStackId(nbt)
+        if (id == -1L) return listOf()
+        if (!augmentModifiers.containsKey(id)) {
             if (stack.nbt?.contains(NbtKeys.MODIFIERS.str()) == true) {
-                initializeModifiers(nbt, stack)
+                initializeModifiers(nbt, stack, id)
             }
         }
-        return augmentModifiers[stack] ?: listOf()
+        return augmentModifiers[id] ?: listOf()
     }
 
     fun getActiveModifiers(stack: ItemStack): AbstractModifier<AugmentModifier>.CompiledModifiers {
-        return activeScepterModifiers[stack] ?: ModifierDefaults.BLANK_COMPILED_DATA
+        val id = Nbt.getItemStackId(stack)
+        return activeScepterModifiers[id] ?: ModifierDefaults.BLANK_COMPILED_DATA
     }
 
     fun checkModifierLineage(modifier:Identifier, stack: ItemStack): Boolean{
         val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
         return if (mod != null){
-            checkModifierLineage(mod, stack) > 0
+            checkModifierLineage(mod, stack) >= 0
         } else {
             false
         }
     }
 
     private fun checkModifierLineage(mod: AugmentModifier, stack: ItemStack): Int{
+        val id = Nbt.getItemStackId(stack)
         val lineage = mod.getModLineage()
         val highestOrderDescendant = lineage.size
-        var highestDescendantPresent = 1
+        var highestDescendantPresent = 0
         lineage.forEachIndexed { index, identifier ->
-            if (augmentModifiers[stack]?.contains(identifier) == true){
+            if (augmentModifiers[id]?.contains(identifier) == true){
                 highestDescendantPresent = index + 1
             }
         }
@@ -170,10 +186,11 @@ object ModifierHelper {
 
     private fun gatherActiveScepterModifiers(scepter: ItemStack){
         val nbt = scepter.orCreateNbt
+        val id = Nbt.getItemStackId(nbt)
         if (!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) return
         val activeEnchant =  Identifier(Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),nbt))
         val compiler = ModifierDefaults.BLANK_AUG_MOD.compiler()
-        augmentModifiers[scepter]?.forEach { identifier ->
+        augmentModifiers[id]?.forEach { identifier ->
             val modifier = ModifierRegistry.getByType<AugmentModifier>(identifier)
             if (modifier != null){
                 if (!modifier.hasSpellToAffect()){
@@ -186,7 +203,7 @@ object ModifierHelper {
             }
         }
 
-        activeScepterModifiers[scepter] = compiler.compile()
+        activeScepterModifiers[id] = compiler.compile()
     }
 
 }
