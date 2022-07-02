@@ -23,6 +23,12 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import java.util.*
 
+/**
+ * Augment template for a spell that casts a blade of energy in front of the caster. See Amethyst Imbuements Spectral Slash for a basic implementation.
+ *
+ * For an implementation consistent with Spectral Slash, leave the effect and clientEffect methods alone, and add your flair to the [addStatusInstance], [secondaryEffect], [particleType], and [soundEvent] methods.
+ */
+
 @Suppress("SameParameterValue")
 abstract class SlashAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): MiscAugment(tier, maxLvl, *slot),
     SoulAugment {

@@ -7,6 +7,10 @@ import net.minecraft.item.Item
 import net.minecraft.item.Items
 import kotlin.math.max
 
+/**
+ * helper object for dealing with Scepter Augments. Includes registration methods and data retrieval methods.
+ */
+
 object AugmentHelper {
 
     private val augmentStats: MutableMap<String, AugmentDatapoint> = mutableMapOf()
@@ -17,6 +21,10 @@ object AugmentHelper {
             dataPoint.bookOfLoreTier.addToList(id)
         }
     }
+
+    /**
+     * typically an augment will be registered with this. Call this registration AFTER registering the augment with the Enchantment Registry.
+     */
     fun registerAugmentStat(augment: ScepterAugment){
         val id = EnchantmentHelper.getEnchantmentId(augment)?.toString()?:throw NoSuchElementException("Enchantment ID for ${this.javaClass.canonicalName} not found!")
         val imbueLevel = if (checkAugmentStat(id)){

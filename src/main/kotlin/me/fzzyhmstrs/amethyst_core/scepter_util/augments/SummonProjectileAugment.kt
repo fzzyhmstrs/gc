@@ -11,6 +11,13 @@ import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Hand
 import net.minecraft.world.World
 
+/**
+ * template for summoning a projectile entity. Used for basic "bolt"/"blast"/"missile" spells like Amethyst Imbuements base spell Magic Missile
+ *
+ * the only method you need to override to succesfully extend this class is [entityClass], providing the projectile entity you would like to spawn into the world.
+ *
+ * see [MissileEntity] for an open class you can use to develop your own projectiles.
+ */
 abstract class SummonProjectileAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): ScepterAugment(tier,maxLvl,EnchantmentTarget.WEAPON, *slot) {
 
     override fun applyTasks(

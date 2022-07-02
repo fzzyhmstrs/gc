@@ -12,6 +12,14 @@ import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 
+/**
+ * As the name implies, for implementing miscellaneous augments that don't fit a template. Provides a very broad implementation base.
+ *
+ * A target is provided if found, the user is provided, as well as the genreal hitresult for alternate usages.
+ *
+ * Either or both [effect] functions can be overridden to provide any number of implementations. Add [AugmentPersistentEffect] to the subclass to create an Augment that has an effect over time.
+ */
+
 abstract class MiscAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): ScepterAugment(tier,maxLvl,EnchantmentTarget.WEAPON, *slot) {
 
     override fun applyTasks(

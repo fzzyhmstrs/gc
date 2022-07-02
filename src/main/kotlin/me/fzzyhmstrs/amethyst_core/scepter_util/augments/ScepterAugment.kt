@@ -19,11 +19,23 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 
+/**
+ * the base scepter augment. Any Augment-type scepter will be able to successfully cast an augment made with this class or one of the templates.
+ */
+
 abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, target: EnchantmentTarget, vararg slot: EquipmentSlot): Enchantment(Rarity.VERY_RARE, target,slot) {
     
     open val baseEffect = AugmentEffect()
 
+    /**
+     * The only mandatory method for extending in order to apply your spell effects. Other open functions below are available for use, but this method is where the basic effect implementation goes.
+     */
     abstract fun applyTasks(world: World, user: LivingEntity, hand: Hand, level: Int, effects: AugmentEffect): Boolean
+
+    /**
+     * define the augment characteristics here, such as mana cost, cooldown, etc. See [AugmentDatapoint] for more info.
+     */
+    abstract fun augmentStat(imbueLevel: Int = 1): AugmentDatapoint
 
     fun applyModifiableTasks(world: World, user: LivingEntity, hand: Hand, level: Int, modifiers: List<AugmentModifier> = listOf(), modifierData: AugmentModifier? = null): Boolean{
         val effectModifiers = AugmentEffect()
@@ -40,12 +52,21 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         return bl
     }
 
+    /**
+     * If your scepter has some client side effects/tasks, extend them here. This can be something like adding visual effects, or affecting a GUI, and so on.
+     */
     open fun clientTask(world: World, user: LivingEntity, hand: Hand, level: Int){
     }
 
+    /**
+     * optional open method that you can use for applying effects to secondary entities. See Amethyst Imbuements Freezing augment for an example.
+     */
     open fun entityTask(world: World, target: Entity, user: LivingEntity, level: Double, hit: HitResult?, effects: AugmentEffect){
     }
 
+    /**
+     * This method defines the sound that plays when the spell is cast. override this with your preferred sound event
+     */
     open fun soundEvent(): SoundEvent {
         return SoundEvents.BLOCK_BEACON_ACTIVATE
     }
@@ -105,8 +126,6 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
     fun getTier(): Int{
         return tier
     }
-
-    abstract fun augmentStat(imbueLevel: Int = 1): AugmentDatapoint
 
     companion object{
 

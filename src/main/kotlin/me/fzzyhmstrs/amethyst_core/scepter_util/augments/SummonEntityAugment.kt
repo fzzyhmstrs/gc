@@ -12,7 +12,11 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 
-
+/**
+ * template for summoning 1 or more entities into the world at a location. This template will not successfully cast if the player doesn't target a block, so if you want to summon entities in a more general way, consider a [MiscAugment]
+ *
+ * [placeEntity] is the primary method to override for this template. Ensure you have a super call so the sound event and Modifier Consumers can be applied.
+ */
 abstract class SummonEntityAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): ScepterAugment(tier,maxLvl,EnchantmentTarget.WEAPON, *slot) {
 
     override val baseEffect: AugmentEffect

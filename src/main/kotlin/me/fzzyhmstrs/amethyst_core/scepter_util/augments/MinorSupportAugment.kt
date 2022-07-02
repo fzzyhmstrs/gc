@@ -9,6 +9,14 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.util.Hand
 import net.minecraft.world.World
 
+/**
+ * Augment typically set up to provide an effect to the player or a single target.
+ *
+ * typical implementation will check if there is a target and apply the effect there, otherwise apply the effect to the user. Any number of alternative implementations are available of course.
+ *
+ * Implementation need not be limited to support effects. This template could also be used for an "instant damage" effect or a Life Drain spell, for a couple examples.
+ */
+
 abstract class MinorSupportAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): ScepterAugment(tier,maxLvl,EnchantmentTarget.WEAPON, *slot) {
 
     override val baseEffect: AugmentEffect
