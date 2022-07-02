@@ -32,6 +32,11 @@ import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import kotlin.math.max
 
+/**
+ * Helper object for dealing with Augment-type scepters. methods for using a scepter, working with the scepter stat system, and checking and resetting cooldowns
+ *
+ * Look into the AugmentScepterItem and DefaultScepterItem for implementation examples.
+ */
 object ScepterHelper {
 
 
