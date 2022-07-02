@@ -16,6 +16,18 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.world.World
 
+/**
+ * basic missile projectile for use with spells or any other projectile-lobbing object.
+ *
+ * Extend and modify as you might any other projectile, like arrows, with the added functionality of the Modifiability.
+ *
+ * See [ModifiableEffectEntity] for more info. In general, modifiable entities can pass modifications from the object that spawned it to the projectile damage/effect itself. See below for a basic implementation of the modifiable effect.
+ *
+ * The [entityEffects] bucket holds attributes like damage and range that can be used in the [onEntityHit] methods and others. This allows for dynamic damage rather than defining one static value. As seen below, 3.0 damage is set as a default value, but if passEffects is called and it's parameter has a different damage, the entity will deal that modified amount on hit.
+ *
+ * Similarly, if the effect is provided with a consumer, on hit the missile will apply any of those consumers marked as harmful. An example consumer would be one that applies 10 seconds of blindness to any affected entity. Basically a bucket for applying secondary effects on hit. See [AugmentEffect] for more info.
+ */
+
 open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: World): ExplosiveProjectileEntity(entityType,world), ModifiableEffectEntity {
 
     constructor(world: World,owner: LivingEntity,_pierce: Boolean) : this(RegisterBaseEntity.MISSILE_ENTITY,world){

@@ -14,6 +14,11 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3f
 
+/**
+ * A prebuilt renderer for a missile-type entity. This can be used as a simple way to provide a rendered shape for your missile.
+ *
+ * The color and overall scales of the entity can be set directly in the constructor.
+ */
 @Suppress("PrivatePropertyName", "SpellCheckingInspection")
 class MissileEntityRenderer(context: EntityRendererFactory.Context, val r: Float = 1.0f, val g: Float = 1.0f, val b: Float = 1.0f, val downScale: Float = 0.5f, val upScale: Float = 1.5f): EntityRenderer<MissileEntity>(context) {
 
