@@ -55,7 +55,6 @@ object ModifierHelper {
         }
         addModifierToNbt(modifier, nbt)
         augmentModifiers[id]?.add(modifier)
-        println(augmentModifiers)
         DUSTBIN.markDirty(scepter)
         return true
 
