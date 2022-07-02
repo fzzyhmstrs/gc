@@ -32,9 +32,21 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
     ModifiableScepterItem<AugmentModifier>(material, settings){
 
     var defaultAugments: List<ScepterAugment> = listOf()
+    var noFallback: Boolean = false
 
     fun withAugments(startingAugments: List<ScepterAugment> = listOf()): AugmentScepterItem{
         defaultAugments = startingAugments
+        return this
+    }
+
+    fun withAugments(startingAugments: List<ScepterAugment> = listOf(), noFallbackAugment: Boolean): AugmentScepterItem{
+        defaultAugments = startingAugments
+        noFallback = noFallbackAugment
+        return this
+    }
+
+    fun withNoFallback(): AugmentScepterItem{
+        noFallback = true
         return this
     }
 
@@ -135,7 +147,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
         super.onCraft(stack, world, player)
-        addDefaultEnchantment(stack)
+        addDefaultEnchantments(stack)
     }
 
     override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {
@@ -152,14 +164,19 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
             val identifier = fallbackId
             Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), identifier.toString(), scepterNbt)
         }
-        addDefaultEnchantment(stack)
+        addDefaultEnchantments(stack)
     }
 
-    open fun addDefaultEnchantment(stack: ItemStack){
+    open fun addDefaultEnchantments(stack: ItemStack){
         val enchantToAdd = Registry.ENCHANTMENT.get(this.fallbackId)
-        if (enchantToAdd != null){
+        if (enchantToAdd != null && !noFallback){
             if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
                 stack.addEnchantment(enchantToAdd,1)
+            }
+        }
+        defaultAugments.forEach {
+            if (EnchantmentHelper.getLevel(it,stack) == 0){
+                stack.addEnchantment(it,1)
             }
         }
     }

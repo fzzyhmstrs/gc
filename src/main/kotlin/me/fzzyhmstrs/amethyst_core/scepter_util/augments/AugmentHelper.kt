@@ -32,12 +32,15 @@ object AugmentHelper {
         val augmentConfig = ScepterAugment.Companion.AugmentStats()
         val type = stat.type
         augmentConfig.id = id
+        println(id)
         augmentConfig.cooldown = stat.cooldown
         augmentConfig.manaCost = stat.manaCost
         augmentConfig.minLvl = stat.minLvl
+        println(stat.minLvl)
         val tier = stat.bookOfLoreTier
         val item = stat.keyItem
-        val augmentAfterConfig = ScepterAugment.configAugment(this.javaClass.simpleName + ScepterAugment.augmentVersion +".json", augmentConfig)
+        val augmentAfterConfig = ScepterAugment.configAugment(augment.javaClass.simpleName + ScepterAugment.augmentVersion +".json", augmentConfig)
+        println(augmentAfterConfig.minLvl)
         return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
     }
 

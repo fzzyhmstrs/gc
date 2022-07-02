@@ -117,4 +117,8 @@ open class AugmentModifier(
     override fun compile(modifiers: List<AugmentModifier>, compiledData: AugmentModifier): CompiledModifiers {
         return CompiledModifiers(modifiers, compiledData)
     }
+
+    override fun getTranslationKey(): String {
+        return "scepter.modifier.${modifierId}"
+    }
 }
