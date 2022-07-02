@@ -12,11 +12,17 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.Identifier
 
+/**
+ * An abstract scepter integrated into the [Modifier][AbstractModifier] System.
+ *
+ * Does not provide any default functionality beyond gathering and initializing Modifiers for whatever use they are needed.
+ */
+
 abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterToolMaterial, settings: Settings): AbstractScepterItem(material, settings), Modifiable<T>{
 
     override val defaultModifiers: MutableList<Identifier> = mutableListOf()
 
-    fun withModifiers(defaultMods: List<AugmentModifier> = listOf()): ModifiableScepterItem<T>{
+    fun withModifiers(defaultMods: List<T> = listOf()): ModifiableScepterItem<T>{
         defaultMods.forEach {
             defaultModifiers.add(it.modifierId)
         }

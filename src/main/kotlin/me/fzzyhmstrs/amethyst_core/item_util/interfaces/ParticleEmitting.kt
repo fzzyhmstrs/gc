@@ -11,6 +11,15 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import java.util.function.Consumer
 
+/**
+ * helper interface for setting up an item that emits particles either based on events or based on chance.
+ *
+ * [registerParticleEmitter]: Used to register a client-side particle emitter that can be triggered from the server-side send method. Particles can be emitted in a server world, but emitting particles on a client is useful if you want to precisely position them on a players screen, as the client precisely tracks these positions while the server does not.
+ *
+ * [sendParticlePacket]: server-side call used to tell the registered emitter to emit particles as defined in its consumer.
+ *
+ * See [doSmoke][me.fzzyhmstrs.amethyst_core.item_util.DefaultScepterItem.Companion.doSmoke] in the [DefaultScepterItem][me.fzzyhmstrs.amethyst_core.item_util.DefaultScepterItem] for an example usage.
+ */
 interface ParticleEmitting{
     
     fun emitParticles(world: World, client: MinecraftClient, user: LivingEntity){

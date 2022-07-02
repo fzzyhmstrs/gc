@@ -8,11 +8,25 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
+/**
+ * helper interface for creating an item with custom flavor text, flavor textdecription, and/or glint (enchanted item effect).
+ *
+ * an item that extends Flavorful still needs to override appendTooltip, but can add its flavor text with a simple call to [addFlavorText] in appendTooltip.
+ *
+ * T is the type extending Flavorful
+ *
+ * Consider using a [CustomFlavorItem][me.fzzyhmstrs.amethyst_core.item_util.CustomFlavorItem] or [CustomFlavorToolItem][me.fzzyhmstrs.amethyst_core.item_util.CustomFlavorToolItem] for simple items with flavor text, otherwise use it as an example implementation.
+ */
 interface Flavorful<T: Flavorful<T>> {
 
     var glint: Boolean
     var flavor: String
     var flavorDesc: String
+
+    /**
+     * required when extended. Most of the time return "this" of the extending class. See [CustomFlavorItem][me.fzzyhmstrs.amethyst_core.item_util.CustomFlavorItem]
+     */
+    fun getFlavorItem():T
 
     fun withFlavor(flavorPath: String): T {
         getFlavorItem().flavor = flavorPath
@@ -56,6 +70,4 @@ interface Flavorful<T: Flavorful<T>> {
             }
         }
     }
-
-    fun getFlavorItem():T
 }

@@ -24,6 +24,14 @@ import net.minecraft.util.*
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
+/**
+ * The default Amethyst Imbuement style scepter.
+ *
+ * For the most basic implementation, extend this and set the fallback ID; that's it. Define characteristics in the [ScepterToolMaterial] as with any tool, and register! You have your very own AI style scepter fully compatible with Scepter Augments and with all the functionality AIs scepters come with.
+ *
+ * For more in depth implementations, this scepter is [Modifiable][me.fzzyhmstrs.amethyst_core.item_util.interfaces.Modifiable] and [ParticleEmitting], with all the functionality those interfaces offer.
+ */
+
 @Suppress("SameParameterValue", "unused", "USELESS_IS_CHECK")
 abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Settings):
     AugmentScepterItem(material,settings), ParticleEmitting{

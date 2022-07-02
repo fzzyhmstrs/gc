@@ -24,6 +24,11 @@ import net.minecraft.util.TypedActionResult
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
+/**
+ * used to define the augment books like Amethyst Imbuements Book of Lore. For all Augment tiers except Extreme Tier, there is a pre-existing book in Amethyst Imbuement.
+ *
+ * If you don't want to rely on Amethyst Imbuement, implementing your own augment books is as simple as extending this class and overriding [loreTier] with the proper tier.
+ */
 abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(settings) {
 
     abstract val loreTier: LoreTier

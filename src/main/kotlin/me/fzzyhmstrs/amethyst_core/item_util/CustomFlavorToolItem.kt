@@ -13,6 +13,11 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
+/**
+ * See [CustomFlavorItem]
+ *
+ * Version of that for ToolItems
+ */
 open class CustomFlavorToolItem(material: ToolMaterial,settings: Settings) : ToolItem(material, settings), Flavorful<CustomFlavorToolItem> {
 
     override var glint: Boolean = false

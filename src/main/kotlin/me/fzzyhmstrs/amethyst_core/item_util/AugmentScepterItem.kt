@@ -27,6 +27,15 @@ import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import kotlin.math.max
 
+/**
+ * Extended [ModifiableScepterItem] that integrates with the Scepter Augment System. This is the barebones scepter for use with [ScepterAugment]s.
+ *
+ * Adds builder methods for adding default augments that are applied on craft/initilization.
+ *
+ * Modifiers are specified to be [AugmentModifier] type in this class, which are codependent with Scepter Augments
+ *
+ * Adds the main [use] functionality for this style of scepter, including Augment selection, level checking, cooldown checking, and a separate [serverUse] and [clientUse] method for actions to take in those corresponding environments. By default calls the specified Augments [ScepterAugment.applyModifiableTasks] after determining and checking the compiled modifiers relevant to that augment.
+ */
 @Suppress("SameParameterValue", "unused", "USELESS_IS_CHECK")
 abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Settings):
     ModifiableScepterItem<AugmentModifier>(material, settings){
@@ -45,6 +54,9 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         return this
     }
 
+    /**
+     * when called during building, won't add the fallback augment when initializing a scepter. If no default augments are provided, this will result in an empty scepter (requires manually adding spells to function at all)
+     */
     fun withNoFallback(): AugmentScepterItem{
         noFallback = true
         return this
@@ -137,11 +149,11 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         return TypedActionResult.pass(stack)
     }
 
-    fun checkManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity): Boolean{
+    private fun checkManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity): Boolean{
         return (checkCanUse(stack,world,user, cost))
     }
 
-    fun applyManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity){
+    private fun applyManaCost(cost: Int, stack: ItemStack, world: World, user: PlayerEntity){
         manaDamage(stack, world, user, cost)
     }
 
@@ -199,6 +211,9 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     companion object{
 
+        /**
+         * A loot function that can be used in a loot pool builder to apply default augments to a scepter in a loot table.
+         */
         fun startingAugments(item: AugmentScepterItem): LootFunction.Builder{
             var builder = SetEnchantmentsLootFunction.Builder()
             if (item.defaultAugments.isEmpty()){

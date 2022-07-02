@@ -7,6 +7,9 @@ import net.minecraft.entity.EquipmentSlot
 import net.minecraft.item.*
 import net.minecraft.util.registry.Registry
 
+/**
+ * Helper object to generate a list of all acceptable items in the Item Registry as applicable to various enchantment targets.
+ */
 object AcceptableItemStacks {
     
     private val scepterAcceptableMap: MutableMap<Int,MutableList<ItemStack>> = mutableMapOf()

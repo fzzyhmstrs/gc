@@ -18,6 +18,13 @@ import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import java.util.*
 
+/**
+ * used with the Trinkets mod to create jewelry that interacts with Equipment Augments.
+ *
+ * the [AugmentTasks] interface is called in various Trinkets methods to apply Augment effects based on various actions.
+ *
+ * Notably absent from this default item is an implementation for activated abilities (abilities that might be turned on/off with use)
+ */
 open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings), AugmentTasks, Flavorful<AbstractAugmentJewelryItem> {
 
     override var glint: Boolean = false
