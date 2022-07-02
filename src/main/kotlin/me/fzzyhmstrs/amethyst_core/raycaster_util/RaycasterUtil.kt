@@ -15,14 +15,26 @@ import java.util.*
 import kotlin.math.acos
 import kotlin.math.min
 
+/**
+ * Utility for directionally locating various objects. Majority of methods aren't true raycasting, but rather directional box collision checking.
+ *
+ * The majority of the default methods are set up for SERVER collision detection, rather than true raycasting, which is usually clientside. There are mehtods that can be used to develop client-side methods though.
+ *
+ * General layout of the functions: distance: the range the raycaster will "reach" to; entity: the SOURCE entity (the player for example), includeFluids: whether raycasting will hit water/etc. or pass through it.
+ */
 
 object RaycasterUtil {
 
+    /**
+     * server-side general raycast in a direction. Will retrun any type of hitresult (block, entity, etc)
+     */
     fun raycastHit(distance: Double = 4.5,entity: Entity, includeFluids: Boolean = false): HitResult? {
         return raycasterServer(distance, entity, includeFluids)
     }
 
-    @Suppress("unused")
+    /**
+     * CLIENT-side raycaster for block detection
+     */
     fun raycastBlock(distance: Double = 4.5,entity: Entity, includeFluids: Boolean = false): BlockPos? {
         val hit = raycast(entity, distance, 1.0F, includeFluids, entity.getRotationVec(1.0F)) ?: return null
         return when(hit.type){
@@ -35,7 +47,10 @@ object RaycasterUtil {
         }
     }
 
-    fun raycastEntity(distance: Double = 4.5,entity: Entity, includeFluids: Boolean = false): Entity? {
+    /**
+     * server-side raycaster that returns a hit entity, or null
+     */
+    fun raycastEntity(distance: Double = 4.5, entity: Entity, includeFluids: Boolean = false): Entity? {
         val hit = raycasterServer(distance, entity, includeFluids) ?: return null
         return when(hit.type){
             HitResult.Type.MISS -> null
@@ -45,6 +60,13 @@ object RaycasterUtil {
         }
     }
 
+    /**
+     * will return all entities hit in the specified area. can be rotated arbitrarily if needed, otherwise searches with a grid-aligned box
+     *
+     * range in this case building a cubic serach box with each side length equal to distance.
+     *
+     * can also set a starting search point. If none is set, will be the source entities position.
+     */
     fun raycastEntityArea(distance: Double = 4.5,entity: Entity,pos: Vec3d? = null, rotation: Vec3d = Vec3d(1.0,0.0,0.0)): MutableList<Entity>{
         val pos2: Vec3d = pos ?: entity.pos
         if (entity.world.isClient) return mutableListOf()
@@ -56,6 +78,11 @@ object RaycasterUtil {
         }
     }
 
+    /**
+     * overload for entity area, non-rotatable, but the starting position is defined by a previous raycasting hit result.
+     *
+     * use case might include searching in an area around the position a spell effect will originate.
+     */
     fun raycastEntityArea(user: LivingEntity, hit: HitResult?, range: Double): Pair<BlockPos,MutableList<Entity>>{
         val blockPos: BlockPos
         val entityList: MutableList<Entity> = if (hit == null) {
@@ -77,6 +104,9 @@ object RaycasterUtil {
         return Pair(blockPos,entityList)
     }
 
+    /**
+     * overload of the rotated collider that makes a perfectly cubic shaped search box that is gravity contrained (the box is aligned as if the direction of gravity is "down" for it, and the shape has no roll, just pitch and yaw. The standard orientation for the player head etc.)
+     */
     private fun raycastEntityRotatedArea(iterable : Iterable<Entity>,
                                          entityToExclude: Entity?,
                                          center: Vec3d,
@@ -87,6 +117,17 @@ object RaycasterUtil {
         return raycastEntityRotatedArea(iterable,entityToExclude, center, flatRotation,flatPerpendicular, size,size,size)
     }
 
+    /**
+     * general collision searching utility that can search with an arbitrarily sized and rotated box.
+     *
+     * allows an entity to be exlcuded (often the player)
+     *
+     * LengthAlongRotation will be the box length in the direction of the angle vector given. FOr example, if you give the palyer rortation vec as the rotation, this length will be how far in the direction the player is looking the collider will check
+     *
+     * LengthAlongPerpendicular in a gravity-framed sense would be considered the "z" dimension to the above lengths "x". In an arbitrary rotation, it is not that, but in most cases it is beneficiel to clamp this direction to a horizontal plane
+     *
+     * LengthPerpendicularToBoth is the length filling out the cuboid "height". In the gravity-constrained example, this is the "y"
+     */
     fun raycastEntityRotatedArea(iterable : Iterable<Entity>,
                                  entityToExclude: Entity?,
                                  center: Vec3d,
@@ -200,6 +241,11 @@ object RaycasterUtil {
         )
     }
 
+    /**
+     * simple function for quickly finding vectors perpendicular to the given one, in a certain plane.
+     *
+     * Common use case is for finding the "z" vector based on an entities "x" line-of-sight rotation vector.
+     */
     fun perpendicularVector(rotation: Vec3d, inPlane: InPlane): Vec3d{
         return when (inPlane) {
             InPlane.XY -> {
