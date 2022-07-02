@@ -11,12 +11,13 @@ import net.minecraft.util.Identifier
 object SyncedConfigRegistry {
 
     private val SYNC_CONFIG_PACKET = Identifier(AC.MOD_ID,"sync_config_packet")
-    private val configs : MutableList<SyncedConfigHelper.SyncedConfig> = mutableListOf()
+    private val configs : MutableMap<String,SyncedConfigHelper.SyncedConfig> = mutableMapOf()
 
     internal fun registerClient() {
         ClientPlayNetworking.registerGlobalReceiver(SYNC_CONFIG_PACKET) { _, _, buf, _ ->
-            configs.forEach {
-                it.readFromServer(buf)
+            val id = buf.readString()
+            if (configs.containsKey(id)){
+                configs[id]?.readFromServer(buf)
             }
         }
     }
@@ -26,13 +27,14 @@ object SyncedConfigRegistry {
             val player = handler.player
             configs.forEach {
                 val buf = PacketByteBufs.create()
-                it.writeToClient(buf)
+                buf.writeString(it.key)
+                it.value.writeToClient(buf)
                 ServerPlayNetworking.send(player, SYNC_CONFIG_PACKET, buf)
             }
         }
     }
 
-    fun registerConfig(config: SyncedConfigHelper.SyncedConfig){
-        configs.add(config)
+    fun registerConfig(id: String,config: SyncedConfigHelper.SyncedConfig){
+        configs[id] = config
     }
 }

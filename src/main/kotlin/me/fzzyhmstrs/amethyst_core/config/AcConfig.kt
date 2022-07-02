@@ -27,7 +27,7 @@ object AcConfig: SyncedConfigHelper.SyncedConfig {
     }
 
     override fun initConfig() {
-        SyncedConfigRegistry.registerConfig(this)
+        SyncedConfigRegistry.registerConfig(AC.MOD_ID,this)
     }
 
     class Flavors{

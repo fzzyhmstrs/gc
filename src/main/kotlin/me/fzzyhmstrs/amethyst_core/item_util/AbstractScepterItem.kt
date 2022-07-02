@@ -18,6 +18,8 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         val stack = user.getStackInHand(hand)
+
+        if (world.isClient()) return TypedActionResult.pass(stack)
         val nbt = stack.orCreateNbt
         if (needsInitialization(stack, nbt)){
             initializeScepter(stack, nbt)
@@ -55,7 +57,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     }
 
     open fun needsInitialization(stack: ItemStack, scepterNbt: NbtCompound): Boolean{
-        return false
+        return ManaHelper.needsInitialization(stack)
     }
     
     //removes cooldown on the item if you switch item

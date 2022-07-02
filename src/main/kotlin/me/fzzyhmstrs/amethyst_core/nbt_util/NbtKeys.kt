@@ -22,6 +22,11 @@ enum class NbtKeys {
             return "scepter_id"
         }
     },
+    ITEM_STACK_ID{
+        override fun str(): String {
+            return "item_stack_id"
+        }
+    },
     LORE_KEY{
         override fun str(): String {
             return "book_of_lore_augment"

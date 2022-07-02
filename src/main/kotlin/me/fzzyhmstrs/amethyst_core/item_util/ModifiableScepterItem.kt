@@ -45,11 +45,11 @@ abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterTo
     }
 
     override fun needsInitialization(stack: ItemStack, scepterNbt: NbtCompound): Boolean {
-        return super.needsInitialization(stack, scepterNbt) || modifiersNeedInit(scepterNbt)
+        return super.needsInitialization(stack, scepterNbt) || modifiersNeedInit(scepterNbt) || Nbt.getItemStackId(scepterNbt) == -1L
     }
 
     private fun modifiersNeedInit(scepterNbt: NbtCompound): Boolean{
-        return defaultModifiers.isNotEmpty() && !scepterNbt.contains(NbtKeys.MODIFIERS.str())
+        return (defaultModifiers.isNotEmpty() && !scepterNbt.contains(NbtKeys.MODIFIERS.str()))
     }
 
 

@@ -22,4 +22,8 @@ object ManaHelper {
         return ticker.isReady()
     }
 
+    fun needsInitialization(stack: ItemStack): Boolean{
+        return !scepterHealTickers.containsKey(stack)
+    }
+
 }

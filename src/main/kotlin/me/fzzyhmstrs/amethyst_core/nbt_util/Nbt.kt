@@ -1,9 +1,11 @@
 package me.fzzyhmstrs.amethyst_core.nbt_util
 
+import me.fzzyhmstrs.amethyst_core.AC
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.math.BlockPos
+import java.util.*
 import java.util.function.Predicate
 
 object Nbt {
@@ -65,6 +67,32 @@ object Nbt {
             nbtList2.add(el)
         }
         baseNbt.put(listKey, nbtList2)
+    }
+
+    fun makeItemStackId(stack: ItemStack): Long{
+        val nbt = stack.orCreateNbt
+        return if (!nbt.contains(NbtKeys.ITEM_STACK_ID.str())){
+            val long = (AC.acRandom.nextDouble() * Long.MAX_VALUE).toLong()
+            writeLongNbt(NbtKeys.ITEM_STACK_ID.str(),long,nbt)
+            long
+        } else {
+            getItemStackId(nbt)
+        }
+    }
+    fun getItemStackId(stack: ItemStack): Long{
+        val nbt = stack.orCreateNbt
+        return if (nbt.contains(NbtKeys.ITEM_STACK_ID.str())){
+            readLongNbt(NbtKeys.ITEM_STACK_ID.str(), nbt)
+        } else {
+            -1L
+        }
+    }
+    fun getItemStackId(nbt: NbtCompound): Long{
+        return if (nbt.contains(NbtKeys.ITEM_STACK_ID.str())){
+            readLongNbt(NbtKeys.ITEM_STACK_ID.str(), nbt)
+        } else {
+            -1L
+        }
     }
 
     /**
