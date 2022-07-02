@@ -13,11 +13,15 @@ import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.world.World
 
+/**
+ * An item that extends ManaItem can be damaged and repaired in an item-safe way. Using the heal and damage methods here won't break an item.
+ *
+ * Additional functionality for checking if a Mana Item has enough mana to do a specified action.
+ */
 interface ManaItem {
 
     fun getRepairTime(): Int
 
-    //interface used for type comparison
     fun healDamage(amount: Int, stack: ItemStack): Int{
         val healedAmount = min(amount,stack.damage)
         stack.damage = max(0,stack.damage - amount)
@@ -52,6 +56,9 @@ interface ManaItem {
         }
     }
 
+    /**
+     * a method for "burning out" enchantments on a ManaItem. A burned out enchantment will be removed from the item. Useful for something like a timed enchantment, or perhaps an augment with limited uses.
+     */
     fun burnOutHandler(
         stack: ItemStack,
         aug: Enchantment,
@@ -70,12 +77,16 @@ interface ManaItem {
         EnchantmentHelper.set(newEnchantList, stack)
     }
 
+    /**
+     * calling with the [unbreakingFlag] set to true will apply unbreaking to mana damage. By default a mana item is not affected by unbreaking (parameter defaults to false)
+     */
     fun manaDamage(
         stack: ItemStack,
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: Text = TranslatableText("augment_damage.damage"), unbreakingFlag: Boolean = false): Boolean {
+        message: Text = TranslatableText("augment_damage.damage"),
+        unbreakingFlag: Boolean = false): Boolean {
         val currentDmg = stack.damage
         val maxDmg = stack.maxDamage
         var newCurrentDmg = currentDmg
