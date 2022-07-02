@@ -1,5 +1,13 @@
 package me.fzzyhmstrs.amethyst_core.coding_util
 
+/**
+ * simple data classes that store various primitives as well as scaling factors, and return the result of scaling the base value by the defined number of scaling levels.
+ *
+ * Example: A [PerLvlI] with a base of 10 and a perLevel of 1 will output 14 with a level input of 4 and output 8 with a level of -2
+ *
+ * these classes can be added together with the plus method.
+ */
+
 data class PerLvlI(val base: Int = 0, val perLevel: Int = 0, val percent: Int = 0){
     fun value(level: Int): Int{
         return (base + perLevel * level) * (100 + percent) / 100
