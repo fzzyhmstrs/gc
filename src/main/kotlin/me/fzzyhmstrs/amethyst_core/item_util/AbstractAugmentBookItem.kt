@@ -10,6 +10,7 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -46,8 +47,10 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
                 tooltip.add(TranslatableText("lore_book.${type.str()}").formatted(type.fmt()).append(LiteralText(lvl.toString())))
             }
             val item = AugmentHelper.getAugmentItem(bola)
-            val itemText = item.name.shallowCopy().formatted(Formatting.WHITE)
-            tooltip.add(TranslatableText("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
+            if (item != Items.AIR) {
+                val itemText = item.name.shallowCopy().formatted(Formatting.WHITE)
+                tooltip.add(TranslatableText("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
+            }
             val xpLevels = AugmentHelper.getAugmentImbueLevel(bola)
             tooltip.add(TranslatableText("lore_book.xp_level").formatted(Formatting.WHITE).append(xpLevels.toString()))
             val cooldown = AugmentHelper.getAugmentCooldown(bola).toFloat() / 20.0F
