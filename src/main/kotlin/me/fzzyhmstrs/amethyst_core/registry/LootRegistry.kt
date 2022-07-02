@@ -7,6 +7,9 @@ import net.minecraft.loot.LootManager
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 
+/**
+ * simple registry for adding a custom [AbstractModLoot] loot pool to a pre-existing loot table.
+ */
 object LootRegistry {
 
     private val modLoots: MutableList<AbstractModLoot> = mutableListOf()
@@ -21,6 +24,9 @@ object LootRegistry {
         })
     }
 
+    /**
+     * register your custom loot pool with this method.
+     */
     @Suppress("MemberVisibilityCanBePrivate")
     fun registerModLoot(modLoot: AbstractModLoot){
         modLoots.add(modLoot)

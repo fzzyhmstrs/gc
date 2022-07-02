@@ -10,10 +10,19 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.util.Identifier
 
+/**
+ * registers Modifiers. Comes with a short list of default modifiers and debugging modifiers for use with Augment-style Scepters
+ *
+ * This registry accepts any modifier based on the [AbstractModifier] system, and provides methods for interacting with specific Modifier types.
+ */
+
 @Suppress("MemberVisibilityCanBePrivate")
 object ModifierRegistry {
     private val registry: MutableMap<Identifier, AbstractModifier<*>> = mutableMapOf()
 
+    /**
+     * example harmful [AugmentConsumer] that applies wither to targets specified to receive Harmful effects in the [ScepterAugment] implementation.
+     */
     private val DEBUG_NECROTIC_CONSUMER = AugmentConsumer({ list: List<LivingEntity> -> necroticConsumer(list)}, AugmentConsumer.Type.HARMFUL)
     private fun necroticConsumer(list: List<LivingEntity>){
         list.forEach {
@@ -22,6 +31,10 @@ object ModifierRegistry {
             )
         }
     }
+
+    /**
+     * example beneficial augment consumer that applies regeneration to targets specified to receive beneficial effects. Most commonly, this will be the player than cast the ScepterAugment, but may also be other targets of an, for example, mass healing spell.
+     */
     private val DEBUG_HEALING_CONSUMER = AugmentConsumer({ list: List<LivingEntity> -> healingConsumer(list)}, AugmentConsumer.Type.BENEFICIAL)
     private fun healingConsumer(list: List<LivingEntity>){
         list.forEach {
@@ -31,6 +44,9 @@ object ModifierRegistry {
         }
     }
 
+    /**
+     * built-in modifiers. Attuned and Thrifty are provided with Imbuing recipes for use with Amethyst Imbuement by default.
+     */
     val GREATER_ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"greater_attuned"), cooldownModifier = -22.5)
     val ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"attuned"), cooldownModifier = -15.0).withDescendant(GREATER_ATTUNED)
     val LESSER_ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"lesser_attuned"), cooldownModifier = -7.5).withDescendant(ATTUNED)
@@ -52,8 +68,11 @@ object ModifierRegistry {
         register(MODIFIER_DEBUG_2)
         register(MODIFIER_DEBUG_3)
     }
-    
-    fun register(modifier: AugmentModifier){
+
+    /**
+     * register a modifier with this.
+     */
+    fun register(modifier: AbstractModifier<*>){
         val id = modifier.modifierId
         if (registry.containsKey(id)){throw IllegalStateException("AbstractModifier with id $id already present in ModififerRegistry")}
         registry[id] = modifier
@@ -74,6 +93,9 @@ object ModifierRegistry {
         return this.get(id) != null
     }
 
+    /**
+     * get method that wraps in a type check, simplifying retrieval of only the relevant modifier type.
+     */
     inline fun <reified T> getByType(id: Identifier): T?{
         val mod = get(id)
         return if (mod is T){

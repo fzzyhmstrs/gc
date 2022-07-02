@@ -8,6 +8,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.util.Identifier
 
+/**
+ * Register a [SyncedConfigHelper.SyncedConfig] here. Syncd configs will automatically syncronize config data between the clients and server. See KDoc for the SyncedConfig for instructions on setting one up.
+ */
+
 object SyncedConfigRegistry {
 
     private val SYNC_CONFIG_PACKET = Identifier(AC.MOD_ID,"sync_config_packet")
@@ -34,6 +38,15 @@ object SyncedConfigRegistry {
         }
     }
 
+    /**
+     * register your config with this.
+     *
+     * Recommended implementation is to call this method within the overridden initConfig() method of [SyncedConfigHelper.SyncedConfig]
+     *
+     * initConfig() must then be called in your ModIntializer in order to complete the registration.
+     *
+     * [id] is a unique identifier for your config. The Mod ID is a typical choice.
+     */
     fun registerConfig(id: String,config: SyncedConfigHelper.SyncedConfig){
         configs[id] = config
     }
