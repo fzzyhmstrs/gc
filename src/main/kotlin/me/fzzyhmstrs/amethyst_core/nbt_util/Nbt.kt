@@ -8,6 +8,9 @@ import net.minecraft.util.math.BlockPos
 import java.util.*
 import java.util.function.Predicate
 
+/**
+ * simple functions that arrange Nbt functions in a way I prefer and add some functionalities vanilla nbt doens't make as easy
+ */
 object Nbt {
 
     fun writeBoolNbt(key: String, state: Boolean, nbt: NbtCompound) {
@@ -34,6 +37,10 @@ object Nbt {
     fun readStringNbt(key: String, nbt: NbtCompound): String {
         return nbt.getString(key)
     }
+
+    /**
+     * stores blockpos on the object as a long, and then back converts it. This method is used as opposed to an X/Y/Z three tag implementation for brevity.
+     */
     fun writeBlockPos(key: String, pos: BlockPos, nbt: NbtCompound){
         nbt.putLong(key,pos.asLong())
     }
@@ -44,6 +51,10 @@ object Nbt {
             BlockPos.ORIGIN
         }
     }
+
+    /**
+     * NbtList tools. Read a list, add a component to a list, or remove a component
+     */
     fun readNbtList(nbt: NbtCompound, key: String): NbtList {
         return if (nbt.contains(key)){
             nbt.getList(key,10)
@@ -69,6 +80,9 @@ object Nbt {
         baseNbt.put(listKey, nbtList2)
     }
 
+    /**
+     * utility for providing an itemstack with a unique and relatively immutable identifier. This allows for an itemstack to be uniquely tracked even across crafting, enchanting, etc. etc.
+     */
     fun makeItemStackId(stack: ItemStack): Long{
         val nbt = stack.orCreateNbt
         return if (!nbt.contains(NbtKeys.ITEM_STACK_ID.str())){

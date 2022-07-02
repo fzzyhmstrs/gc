@@ -1,5 +1,8 @@
 package me.fzzyhmstrs.amethyst_core.nbt_util
 
+/**
+ * various Nbt keys used by Amethyst Imbuement and other Amethyst mods. Use at your own risk!
+ */
 enum class NbtKeys {
 
     TOTEM{
