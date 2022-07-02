@@ -23,6 +23,8 @@ object PersistentEffectHelper {
                 val newDur = it.duration - it.delay
                 if (newDur <= 0){
                     DUSTBIN.markDirty(it)
+                } else {
+                    it.duration = newDur
                 }
             }
         }
@@ -37,7 +39,7 @@ object PersistentEffectHelper {
         persistentEffectsFlag = true
     }
 
-    private data class PersistentEffectInstance(val ticker: EventRegistry.Ticker, val delay: Int, val duration: Int, val augment: PersistentEffect, val data: PersistentEffectData)
+    private data class PersistentEffectInstance(val ticker: EventRegistry.Ticker, val delay: Int, var duration: Int, val augment: PersistentEffect, val data: PersistentEffectData)
 
     interface PersistentEffect {
 

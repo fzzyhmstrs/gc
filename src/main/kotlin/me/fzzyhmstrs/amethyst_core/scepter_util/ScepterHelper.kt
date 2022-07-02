@@ -5,11 +5,9 @@ package me.fzzyhmstrs.amethyst_core.scepter_util
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.item_util.AugmentScepterItem
-import me.fzzyhmstrs.amethyst_core.mana_util.ManaItem
 import me.fzzyhmstrs.amethyst_core.modifier_util.*
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
-import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentDatapoint
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
@@ -20,9 +18,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.MinecraftServer
@@ -34,7 +30,6 @@ import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
-import kotlin.NoSuchElementException
 import kotlin.math.max
 
 object ScepterHelper {
@@ -158,7 +153,7 @@ object ScepterHelper {
             val identifier = if (newEnchant != null) {
                 Registry.ENCHANTMENT.getId(newEnchant)
             } else {
-                item.addDefaultEnchantment(stack)
+                item.addDefaultEnchantments(stack)
                 item.fallbackId
             }
             if (identifier != null) {

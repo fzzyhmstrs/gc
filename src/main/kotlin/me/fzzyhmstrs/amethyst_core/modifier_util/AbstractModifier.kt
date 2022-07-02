@@ -21,6 +21,8 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
 
     abstract fun compile(modifiers: List<T>, compiledData: T): CompiledModifiers
 
+    abstract fun getTranslationKey(): String
+
     fun hasDescendant(): Boolean{
         return hasDesc
     }
