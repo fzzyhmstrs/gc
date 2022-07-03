@@ -62,20 +62,7 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         tooltip.add(LiteralText(graceText).formatted(SpellType.GRACE.fmt()))
         val witText = TranslatableText("scepter.wit.lvl").string + stats[2].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
         tooltip.add(LiteralText(witText).formatted(SpellType.WIT.fmt()))
-        val modifierList = ModifierHelper.getModifiers(stack)
-        if (modifierList.isNotEmpty()){
-            val modifierText = TranslatableText("scepter.modifiers").formatted(Formatting.GOLD)
-
-            val itr = modifierList.asIterable().iterator()
-            while(itr.hasNext()){
-                val mod = itr.next()
-                modifierText.append(TranslatableText("scepter.modifiers.${mod}").formatted(Formatting.GOLD))
-                if (itr.hasNext()){
-                    modifierText.append(commaText)
-                }
-            }
-            tooltip.add(modifierText)
-        }
+        addModifierTooltip(stack, tooltip)
     }
 
     override fun resetCooldown(

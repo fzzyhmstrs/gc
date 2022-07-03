@@ -97,10 +97,10 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         }
     }
 
-    open fun initializeModifiers(stack: ItemStack, scepterNbt: NbtCompound){
-        if (scepterNbt.contains(NbtKeys.MODIFIERS.str())){
+    open fun initializeModifiers(stack: ItemStack, nbt: NbtCompound){
+        if (nbt.contains(NbtKeys.MODIFIERS.str())){
             val id = Nbt.makeItemStackId(stack)
-            initializeModifiers(scepterNbt, id)
+            initializeModifiers(nbt, id)
             DUSTBIN.markDirty(stack)
             DUSTBIN.clean()
         }

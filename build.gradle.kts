@@ -40,7 +40,6 @@ dependencies {
     modImplementation("dev.emi:trinkets:3.3.0"){
         exclude("net.fabricmc.fabric-api")
     }
-    include("dev.emi:trinkets:3.3.0")
     
 }
 tasks {

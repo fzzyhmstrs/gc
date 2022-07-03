@@ -17,9 +17,9 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
         addModifierToNbt(modifier, nbt)
     }
 
-    override fun initializeModifiers(stack: ItemStack, scepterNbt: NbtCompound) {
-        super.initializeModifiers(stack, scepterNbt)
-        initializeForAttunedEnchant(stack, scepterNbt)
+    override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound) {
+        super.initializeModifiers(stack, nbt)
+        initializeForAttunedEnchant(stack, nbt)
     }
 
     @Deprecated("Removing after modifiers are released for long enough. Target end of 2022.")
