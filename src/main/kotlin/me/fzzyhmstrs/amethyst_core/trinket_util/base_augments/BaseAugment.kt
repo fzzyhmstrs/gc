@@ -12,7 +12,19 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.item.*
 import java.util.*
 
-
+/**
+ * the base class for Trinket- or other equipment-based augments.
+ *
+ * See [AbstractAugmentJewelryItem][me.fzzyhmstrs.amethyst_core.item_util.AbstractAugmentJewelryItem] for information on building a Trinket Item suitable for use with these augments.
+ *
+ * [specialEffect]: For use in special circumstances not covered by the usual items. Recommended for use when you need to have a custom code implementation, in a Mixin for example.
+ *
+ * [equipEffect]: Called by Jewelry Items when equipped to a player.
+ *
+ * [unequipEffect]: Called by Jewelry Items when unEquipped from a player.
+ *
+ * [attributeModifier]: Add Minecraft [attribute modifiers][net.minecraft.entity.attribute.EntityAttributeModifier] to apply here.
+ */
 open class BaseAugment(weight: Rarity, val mxLvl: Int = 1, val target: EnchantmentTarget, vararg slot: EquipmentSlot): Enchantment(weight, target ,slot) {
 
     open fun specialEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY): Boolean{

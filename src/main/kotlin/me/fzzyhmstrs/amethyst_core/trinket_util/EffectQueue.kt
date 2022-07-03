@@ -4,11 +4,21 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.entity.effect.StatusEffectInstance
 
+/**
+ * A queue for consistently applying multiple status effects to entities in a centralized way.
+ *
+ * Avoid issues with objects that are constantly reapplying status effects that causes the status effect list to bounce around or change order distractingly.
+ *
+ * Effects in this queue are applied on a tick signal, not immediately. The maximum delay to application is one tick.
+ */
 object EffectQueue {
 
     private val effectQueue: MutableMap<LivingEntity,MutableMap<StatusEffect,MutableList<Pair<Int,Int>>>> = mutableMapOf()
     private var checkEffects: Boolean = false
 
+    /**
+     * call this to apply a status effect to the specified [livingEntity]
+     */
     fun addStatusToQueue(livingEntity: LivingEntity, effect: StatusEffect, duration: Int, amplifier: Int){
         if (effectQueue.containsKey(livingEntity)) {
             if (effectQueue[livingEntity]?.containsKey(effect) != true) {

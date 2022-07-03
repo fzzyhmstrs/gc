@@ -4,6 +4,9 @@ import dev.emi.trinkets.api.TrinketsApi
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
 
+/**
+ * simple util to check for the Trinket items equipped to a LivingEntity.
+ */
 object TrinketUtil {
 
     fun getTrinketStacks(user: LivingEntity): List<ItemStack>{

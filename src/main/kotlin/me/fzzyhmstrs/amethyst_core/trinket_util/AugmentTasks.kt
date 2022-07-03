@@ -1,8 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.trinket_util
 
-import com.google.common.collect.Maps
 import com.google.common.collect.Multimap
-import com.google.common.collect.Multimaps
 import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.AbstractActiveAugment
 import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.AbstractPassiveAugment
 import me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.AbstractUsedActiveAugment
@@ -14,13 +12,19 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
-import java.util.ArrayList
 
+/**
+ * interface for use with an item that wants to interact with [Equipment Augments][BaseAugment]. Some methods below interact with any extension of the BaseAugment itself, some are more specialized.
+ *
+ * Provides a series of helper methods for accessing the effects of equipment augments without any custom boilerplate.
+ */
 interface AugmentTasks {
 
     //not covered by this interface are "specialEffect" methods. Those need to be called specifically from
 
-    //used with "ActiveAugment" for accessing the activateEffect method
+    /**
+     * used with an [AbstractActiveAugment] for accessing the activateEffect method
+     */
     fun activeEnchantmentTasks(stack: ItemStack, world: World, entity: Entity){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
@@ -32,7 +36,9 @@ interface AugmentTasks {
         }
     }
 
-    //used with "ActiveAugment" for deactivating any effects that need that via the deactivateEffect method
+    /**
+     * used with an [AbstractActiveAugment] for deactivating any currently active effects via the deactivateEffect method
+     */
     fun inactiveEnchantmentTasks(stack: ItemStack,world: World, entity: Entity){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
@@ -44,7 +50,9 @@ interface AugmentTasks {
         }
     }
 
-    //used with "UsedActiveAugment" for accessing the useEffect method
+    /**
+     * used with an [AbstractUsedActiveAugment] for accessing the useEffect method
+     */
     fun usageEnchantmentTasks(stack: ItemStack,world: World,entity: Entity){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
@@ -56,7 +64,9 @@ interface AugmentTasks {
         }
     }
 
-    //used with "PassiveAugment" for accessing the tickEffect method
+    /**
+     * used with [AbstractPassiveAugment] for accessing the tickEffect method
+     */
     fun passiveEnchantmentTasks(stack: ItemStack,world: World,entity: Entity){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
@@ -68,7 +78,9 @@ interface AugmentTasks {
         }
     }
 
-    //used with "PassiveAugment" for accessing the unequipEffect method
+    /**
+     * used with [BaseAugment] for accessing the equipEffect method
+     */
     fun equipEnchantmentTasks(stack: ItemStack,world: World,entity: Entity){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
@@ -81,7 +93,9 @@ interface AugmentTasks {
         }
     }
 
-    //used with "PassiveAugment" for accessing the unequipEffect method
+    /**
+     * used with [BaseAugment] for accessing the unequipEffect method
+     */
     fun unequipEnchantmentTasks(stack: ItemStack,world: World,entity: Entity){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)
@@ -94,7 +108,9 @@ interface AugmentTasks {
         }
     }
 
-    //used with "PassiveAugment" for accessing the tickEffect method
+    /**
+     * used with [BaseAugment] for accessing the attributeModifier method
+     */
     fun modifierEnchantmentTasks(stack: ItemStack,world: World,entity: Entity, map: Multimap<EntityAttribute, EntityAttributeModifier>){
         if (entity !is LivingEntity) return
         val enchants = EnchantmentHelper.get(stack)

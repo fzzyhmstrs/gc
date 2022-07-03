@@ -19,7 +19,9 @@ import net.minecraft.world.World
 import java.util.*
 
 /**
- * used with the Trinkets mod to create jewelry that interacts with Equipment Augments.
+ * used with the Trinkets mod to create jewelry that interacts with [Equipment Augments][me.fzzyhmstrs.amethyst_core.trinket_util.base_augments.BaseAugment].
+ *
+ * An item built using this class will be "modular". It will not be limited to one pre-defined effect, rather it can be enchanted/imbued with a variety of Augment effects to provide a custom trinket to the player.
  *
  * the [AugmentTasks] interface is called in various Trinkets methods to apply Augment effects based on various actions.
  *
