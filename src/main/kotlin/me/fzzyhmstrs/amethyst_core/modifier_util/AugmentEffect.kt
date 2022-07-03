@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.Addable
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlD
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlF
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
@@ -7,22 +8,38 @@ import net.minecraft.entity.LivingEntity
 import java.util.function.Consumer
 import kotlin.math.max
 
+/**
+ * A data container for [AugmentModifier] instances. The majority of the modifications spells make to their effect happen via the AugmentEffect itself.
+ *
+ * AugmentEffect is a level-based bucket, allowing spells to have scaling effects as they level up.
+ *
+ * [damage]: straightforward, this bucket holds a modifiable damage value. A [ScepterAugment][me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment] will have default values in its builtin AugmentEffect, and then [Augment Modifiers][AugmentModifier] pass modifications to that base through their compiled effect.
+ *
+ * [amplifier]: bucket for effects that have various levels of effect power. The simplest case for this is a spell that applies status effects.
+ *
+ * [duration]: bucket for holding the duration of an effect. Useful for status effects, or something like setting fire ticks.
+ *
+ * [range]: bucket for range of effect. Might be size of a effect cloud, or search range when selecting targets.
+ *
+ * [consumers]: advanced effects go here. Spells will pass a list of LivingEntity to the [accept] method and all compiled consumers will apply to that list. See the [ModifierRegistry][me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry] for example consumers.
+ */
 data class AugmentEffect(
     private var damageData: PerLvlF = PerLvlF(),
     private var amplifierData: PerLvlI = PerLvlI(),
     private var durationData: PerLvlI = PerLvlI(),
     private var rangeData: PerLvlD = PerLvlD()
-){
+): Addable<AugmentEffect>{
     private var goodConsumers: MutableList<AugmentConsumer> = mutableListOf()
     private var badConsumers: MutableList<AugmentConsumer> = mutableListOf()
 
-    fun plus(ae: AugmentEffect){
-        damageData = damageData.plus(ae.damageData)
-        amplifierData = amplifierData.plus(ae.amplifierData)
-        durationData = durationData.plus(ae.durationData)
-        rangeData = rangeData.plus(ae.rangeData)
-        goodConsumers.addAll(ae.goodConsumers)
-        badConsumers.addAll(ae.badConsumers)
+    override fun plus(other: AugmentEffect): AugmentEffect {
+        damageData = damageData.plus(other.damageData)
+        amplifierData = amplifierData.plus(other.amplifierData)
+        durationData = durationData.plus(other.durationData)
+        rangeData = rangeData.plus(other.rangeData)
+        goodConsumers.addAll(other.goodConsumers)
+        badConsumers.addAll(other.badConsumers)
+        return this
     }
     fun damage(level: Int = 0): Float{
         return max(0.0F, damageData.value(level))

@@ -8,25 +8,51 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import java.util.function.Predicate
 
+/**
+ * The basis of the modifier system. Modifiers are an alternative to enchantments that internalize their functionality. See Piercing and Multishot in the [Crossbow Item][net.minecraft.item.CrossbowItem] for two examples of how Enchantments are externalized.
+ *
+ * See [AbstractModifierHelper] for information on building a helper to add remove, compile, and get modifiers for stacks.
+ *
+ * See the [wiki](https://github.com/fzzyhmstrs/ac/wiki/Modifier-Framework) for more details on implementation and usage; see the builtin implementation [AugmentModifier] for a thorough example of this in action.
+ *
+ * The underlying intention of a Modifier is:
+ *
+ * 1) Any modifier of a given type will perform its entire intended function with non-specific call(s). No special external implementation should be needed for any one Modifier.
+ *
+ * 2) Modifiers are [Addable]. The plus function adds together whichever members of a Modifier class for compilation
+ *
+ * 3) Modifiers are ["Compilable"][CompiledModifiers]. Any number of modifiers of a given type can be compiled together into a set of CompiledModifiers that a single point of contact can use to execute all relevant effects.
+ */
 abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Addable<T> {
 
+    /**
+     * Defines the descendant, if any for the modifier, and the lineage of the modifier family.
+     *
+     * See the [wiki](https://github.com/fzzyhmstrs/ac/wiki/Modifier-Framework) for details.
+     */
     private var descendant: Identifier = ModifierDefaults.BLANK_ID
     private val lineage: List<Identifier> by lazy { generateLineage() }
+
+
     private var objectsToAffect: Predicate<Identifier>? = null
 
     private var hasDesc: Boolean = false
     private var hasObjectToAffect: Boolean = false
 
+    /**
+     * called to access a type-specific compiler. See [AugmentModifier] for an example.
+     */
     abstract fun compiler(): Compiler
 
-    abstract fun compile(modifiers: List<T>, compiledData: T): CompiledModifiers
-
+    /**
+     * defines the lang translation key for [TranslatableText][net.minecraft.text.TranslatableText].
+     */
     abstract fun getTranslationKey(): String
 
     fun hasDescendant(): Boolean{
         return hasDesc
     }
-    fun addDescendant(modifier: AbstractModifier<*>){
+    fun addDescendant(modifier: AbstractModifier<T>){
         val id = modifier.modifierId
         descendant = id
         hasDesc = true

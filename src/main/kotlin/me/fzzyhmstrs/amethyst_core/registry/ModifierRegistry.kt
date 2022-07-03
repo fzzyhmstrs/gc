@@ -21,7 +21,7 @@ object ModifierRegistry {
     private val registry: MutableMap<Identifier, AbstractModifier<*>> = mutableMapOf()
 
     /**
-     * example harmful [AugmentConsumer] that applies wither to targets specified to receive Harmful effects in the [ScepterAugment] implementation.
+     * example harmful [AugmentConsumer] that applies wither to targets specified to receive Harmful effects in the [ScepterAugment][me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment] implementation.
      */
     private val DEBUG_NECROTIC_CONSUMER = AugmentConsumer({ list: List<LivingEntity> -> necroticConsumer(list)}, AugmentConsumer.Type.HARMFUL)
     private fun necroticConsumer(list: List<LivingEntity>){
@@ -33,7 +33,7 @@ object ModifierRegistry {
     }
 
     /**
-     * example beneficial augment consumer that applies regeneration to targets specified to receive beneficial effects. Most commonly, this will be the player than cast the ScepterAugment, but may also be other targets of an, for example, mass healing spell.
+     * example beneficial [AugmentConsumer] that applies regeneration to targets specified to receive beneficial effects. Most commonly, this will be the player than cast the [ScepterAugment][me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment], but may also be other targets of, for example, a mass healing spell.
      */
     private val DEBUG_HEALING_CONSUMER = AugmentConsumer({ list: List<LivingEntity> -> healingConsumer(list)}, AugmentConsumer.Type.BENEFICIAL)
     private fun healingConsumer(list: List<LivingEntity>){
@@ -45,7 +45,7 @@ object ModifierRegistry {
     }
 
     /**
-     * built-in modifiers. Attuned and Thrifty are provided with Imbuing recipes for use with Amethyst Imbuement by default.
+     * built-in modifiers. Attuned and Thrifty are provided with Imbuing recipes for use with _Amethyst Imbuement_ by default.
      */
     val GREATER_ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"greater_attuned"), cooldownModifier = -22.5)
     val ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"attuned"), cooldownModifier = -15.0).withDescendant(GREATER_ATTUNED)
@@ -96,10 +96,26 @@ object ModifierRegistry {
     /**
      * get method that wraps in a type check, simplifying retrieval of only the relevant modifier type.
      */
-    inline fun <reified T> getByType(id: Identifier): T?{
+    inline fun <reified T: AbstractModifier<T>> getByType(id: Identifier): T?{
         val mod = get(id)
         return if (mod is T){
             mod
+        } else {
+            null
+        }
+    }
+
+    /**
+     * Alternative get-by-type that does reflective class checking.
+     */
+    fun <T: AbstractModifier<T>>getByType(id: Identifier, classType: Class<T>): T?{
+        val mod = get(id)
+        return if (mod?.javaClass?.isInstance(classType) == true){
+            try {
+                mod as T
+            } catch(e: ClassCastException){
+                return null
+            }
         } else {
             null
         }

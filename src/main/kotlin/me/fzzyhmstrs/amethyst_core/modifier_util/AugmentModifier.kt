@@ -5,10 +5,27 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.*
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import java.util.function.Consumer
 import java.util.function.Predicate
 
+/**
+ * An [AbstractModifier] implementation purpose-built to work with the [ScepterAugment][me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment] and [AugmentScepterItem][me.fzzyhmstrs.amethyst_core.item_util.AugmentScepterItem] system.
+ *
+ * [levelModifier]: [Scepter Augments][me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment] have a leveling system. This modifier alters the level an affected spell casts as.
+ *
+ * [cooldownModifier]: Alters the cooldown of the affected spell. Operates as a percentage (cooldownModifier = 20.0 will add 20% to the spell cooldown, -20.0 will shorten the cooldown 20%, and so on).
+ *
+ * [manaCostModifier]: Alters the mana cost of the affected spell. Operates as a percentage.
+ *
+ * [effects]: Holds a [AugmentEffect] instance for passing to the affected spell.
+ *
+ * [xpModifier]: holds a [XpModifiers] instance that modifies how the affected Scepters statistics are incremented.
+ *
+ * [secondaryEffect]: a secondary [ScepterAugment] that the affected spell will attempt to cast in addition to its normal effect.
+ */
 open class AugmentModifier(
     modifierId: Identifier = ModifierDefaults.BLANK_ID,
     open var levelModifier: Int = 0,
@@ -114,11 +131,11 @@ open class AugmentModifier(
         return Compiler(mutableListOf(), AugmentModifier())
     }
 
-    override fun compile(modifiers: List<AugmentModifier>, compiledData: AugmentModifier): CompiledModifiers {
-        return CompiledModifiers(modifiers, compiledData)
-    }
-
     override fun getTranslationKey(): String {
         return "scepter.modifier.${modifierId}"
+    }
+
+    override fun getName(): Text {
+        return TranslatableText(getTranslationKey())
     }
 }

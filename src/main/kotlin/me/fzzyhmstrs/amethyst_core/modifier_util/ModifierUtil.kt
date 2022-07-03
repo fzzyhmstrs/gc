@@ -9,6 +9,9 @@ import java.util.function.Consumer
 @Suppress("MemberVisibilityCanBePrivate", "CanBeParameter")
     //alternative version with the AugmentEffect directly included
 
+/**
+ * default and blank properties for initialization etc.
+ */
 object ModifierDefaults{
     val BLANK_ID = Identifier(AC.MOD_ID,"blank_modifier")
     val BLANK_AUG_MOD = AugmentModifier(BLANK_ID)
@@ -18,6 +21,13 @@ object ModifierDefaults{
 
 }
 
+/**
+ * container for [AugmentModifier] scepter experience modification.
+ *
+ * By default, [Scepters][me.fzzyhmstrs.amethyst_core.item_util.AugmentScepterItem] increment the relevant [SpellType][me.fzzyhmstrs.amethyst_core.scepter_util.SpellType] statistic by 1 per spell cast. The three constructor parameters modify that 1 by the stored value.
+ *
+ * For example, if [furyXpMod] stores a value of 3, Fury spells will gain a scepter 4 Fury experience per spell cast rather than 1.
+ */
 data class XpModifiers(var furyXpMod: Int = 0, var witXpMod: Int = 0, var graceXpMod: Int = 0){
     fun plus(xpMods: XpModifiers?){
         if(xpMods == null) return
@@ -44,6 +54,9 @@ data class XpModifiers(var furyXpMod: Int = 0, var witXpMod: Int = 0, var graceX
     }
 }
 
+/**
+ * a simple container that holds a consumer and a type notation for sorting.
+ */
 data class AugmentConsumer(val consumer: Consumer<List<LivingEntity>>, val type: Type) {
     enum class Type {
         HARMFUL,
