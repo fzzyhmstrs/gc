@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util
 
+import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType.*
 import net.minecraft.util.Formatting
 
 /**

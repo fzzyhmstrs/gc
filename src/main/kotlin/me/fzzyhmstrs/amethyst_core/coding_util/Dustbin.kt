@@ -1,7 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.coding_util
 
+import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import java.util.function.Consumer
-import me.fzzyhmstrs.amethyst_core.registry.*
 
 /**
  * a lightweight "mark dirty" class that accepts members of a defined type into an internal list, and then applies a consumer to each element to "clean" the list.

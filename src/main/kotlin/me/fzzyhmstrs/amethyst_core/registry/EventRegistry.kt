@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.registry
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.PersistentEffectHelper
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting
+import me.fzzyhmstrs.amethyst_core.registry.EventRegistry.Ticker
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.trinket_util.EffectQueue
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents

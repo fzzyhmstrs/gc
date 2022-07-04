@@ -5,7 +5,8 @@ package me.fzzyhmstrs.amethyst_core.scepter_util
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem
 import me.fzzyhmstrs.amethyst_core.item_util.AugmentScepterItem
-import me.fzzyhmstrs.amethyst_core.modifier_util.*
+import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
+import me.fzzyhmstrs.amethyst_core.modifier_util.XpModifiers
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentDatapoint

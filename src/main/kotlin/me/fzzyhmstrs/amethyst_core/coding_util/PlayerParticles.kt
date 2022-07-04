@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.coding_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient

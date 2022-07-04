@@ -1,7 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.entity_util
 
-import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.registry.RegisterBaseEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType

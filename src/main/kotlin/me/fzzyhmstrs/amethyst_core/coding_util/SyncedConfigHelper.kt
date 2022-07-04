@@ -3,6 +3,10 @@ package me.fzzyhmstrs.amethyst_core.coding_util
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.OldClass
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.SyncedConfig
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreateUpdated
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.network.PacketByteBuf
 import java.io.File

@@ -1,7 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
-import me.fzzyhmstrs.amethyst_core.scepter_util.*
+import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack

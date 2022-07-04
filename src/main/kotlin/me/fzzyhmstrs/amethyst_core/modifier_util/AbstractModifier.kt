@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import me.fzzyhmstrs.amethyst_core.coding_util.Addable
+import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier.CompiledModifiers
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import net.minecraft.item.ItemStack
 import net.minecraft.text.LiteralText

@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util.interfaces
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting.Companion.registerParticleEmitter
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking

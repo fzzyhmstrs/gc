@@ -1,17 +1,16 @@
 package me.fzzyhmstrs.amethyst_core.mana_util
 
-import net.minecraft.item.ItemStack
-import kotlin.math.max
-import kotlin.math.min
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.ItemStack
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.world.World
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * An item that extends ManaItem can be damaged and repaired in an item-safe way. Using the heal and damage methods here won't break an item.

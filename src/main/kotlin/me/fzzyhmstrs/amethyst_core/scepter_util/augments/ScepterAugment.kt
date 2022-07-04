@@ -1,11 +1,10 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
+import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity

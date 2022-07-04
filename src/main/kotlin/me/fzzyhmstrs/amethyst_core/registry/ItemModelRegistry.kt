@@ -19,8 +19,6 @@ import net.minecraft.resource.SynchronousResourceReloader
 import net.minecraft.util.Identifier
 import java.util.*
 import java.util.function.Consumer
-import kotlin.NoSuchElementException
-import kotlin.collections.HashMap
 
 /**
  * Registry for custom item models. Use this if you want to implement items that appear different in different [ModelTransformation.Mode].
