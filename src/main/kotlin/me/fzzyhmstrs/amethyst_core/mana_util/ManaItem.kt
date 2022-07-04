@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.world.World
 import kotlin.math.max
 import kotlin.math.min
@@ -32,7 +31,7 @@ interface ManaItem {
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: Text = TranslatableText("augment_damage.check_can_use")
+        message: Text = Text.translatable("augment_damage.check_can_use")
     ): Boolean {
         val damage = stack.damage
         val maxDamage = stack.maxDamage
@@ -40,7 +39,7 @@ interface ManaItem {
         return if (damageLeft >= amount) {
             true
         } else {
-            if (message.asString() != "") {
+            if (message.toString() != "") {
                 world.playSound(
                     null,
                     entity.blockPos,
@@ -62,7 +61,7 @@ interface ManaItem {
         stack: ItemStack,
         aug: Enchantment,
         entity: PlayerEntity,
-        message: Text = TranslatableText("augment_damage.burnout").append(aug.getName(1))) {
+        message: Text = Text.translatable("augment_damage.burnout").append(aug.getName(1))) {
         val enchantList = EnchantmentHelper.get(stack)
         val newEnchantList: MutableMap<Enchantment, Int> = mutableMapOf()
         for (enchant in enchantList.keys) {
@@ -70,7 +69,7 @@ interface ManaItem {
                 newEnchantList[enchant] = enchantList[enchant] ?: 0
             }
         }
-        if (message.asString() != "") {
+        if (message.toString() != "") {
             entity.sendMessage(message,false)
         }
         EnchantmentHelper.set(newEnchantList, stack)
@@ -84,7 +83,7 @@ interface ManaItem {
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: Text = TranslatableText("augment_damage.damage"),
+        message: Text = Text.translatable("augment_damage.damage"),
         unbreakingFlag: Boolean = false): Boolean {
         val currentDmg = stack.damage
         val maxDmg = stack.maxDamage
@@ -111,7 +110,7 @@ interface ManaItem {
                     1.0F,
                     1.0F
                 )
-                if (message.asString() != "") {
+                if (message.toString() != "") {
                     entity.sendMessage(message,false)
                 }
             }
@@ -121,7 +120,7 @@ interface ManaItem {
                 } else {
                     unbreakingDamage(stack,entity,newCurrentDmg - currentDmg)
                 }
-                if (message.asString() != "") {
+                if (message.toString() != "") {
                     world.playSound(
                         null,
                         entity.blockPos,

@@ -129,14 +129,28 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     fun getModifiers(stack: ItemStack): List<Identifier>{
         val nbt = stack.orCreateNbt
-        val id = Nbt.getItemStackId(nbt)
-        if (id == -1L) return listOf()
+        val id = Nbt.makeItemStackId(stack)
         if (!modifiers.containsKey(id)) {
-            if (stack.nbt?.contains(NbtKeys.MODIFIERS.str()) == true) {
+            if (nbt.contains(NbtKeys.MODIFIERS.str())) {
                 initializeModifiers(nbt, id)
             }
         }
         return modifiers[id] ?: listOf()
+    }
+
+    fun getModifiersFromNbt(stack: ItemStack): List<Identifier>{
+        val nbt = stack.orCreateNbt
+        val list: MutableList<Identifier> = mutableListOf()
+        if (nbt.contains(NbtKeys.MODIFIERS.str())){
+            val nbtList = Nbt.readNbtList(nbt, NbtKeys.MODIFIERS.str())
+            nbtList.forEach {
+                val nbtCompound = it as NbtCompound
+                if (nbtCompound.contains(NbtKeys.MODIFIER_ID.str())){
+                    list.add(Identifier(Nbt.readStringNbt(NbtKeys.MODIFIER_ID.str(), nbtCompound)))
+                }
+            }
+        }
+        return list
     }
 
     fun getActiveModifiers(stack: ItemStack): AbstractModifier<T>.CompiledModifiers {

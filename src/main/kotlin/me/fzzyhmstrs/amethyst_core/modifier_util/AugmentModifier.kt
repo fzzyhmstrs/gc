@@ -6,7 +6,6 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.minecraft.entity.LivingEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -136,6 +135,6 @@ open class AugmentModifier(
     }
 
     override fun getName(): Text {
-        return TranslatableText(getTranslationKey())
+        return Text.translatable(getTranslationKey())
     }
 }

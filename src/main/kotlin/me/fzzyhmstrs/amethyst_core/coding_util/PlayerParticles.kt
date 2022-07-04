@@ -32,8 +32,8 @@ object PlayerParticles {
         } else {
             user.getYaw(client.tickDelta)
         }
-        val fov = MathHelper.clamp(client.options.fov,30.0,110.0)
-        return scepterParticlePos(pos, width, yaw, perspective, fov)
+        val fov = MathHelper.clamp(client.options.fov.value,30,110)
+        return scepterParticlePos(pos, width, yaw, perspective, fov.toDouble())
     }
 
     private fun scepterParticlePos(pos: Vec3d, width: Float, yaw: Float, perspective: Perspective, fov: Double): Vec3d {
