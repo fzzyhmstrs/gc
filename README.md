@@ -6,7 +6,12 @@ see the [wiki](https://github.com/fzzyhmstrs/ac/wiki) for more detailed informat
 ### Including AC in your project
 Amethyst Core is stored on Modrinth, so you can easily grab it from there with the following maven and dependencies notation:
 
-**Current Latest Version: 0.1.0+1.18.2**
+**Current Latest Versions:**
+
+MC Version | AC Version
+---|----
+1.18.2 | 0.1.0+1.18.2
+1.19 | 0.1.0+1.19
 
 repositories:
 ```
