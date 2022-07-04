@@ -28,19 +28,16 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         val nbt = stack.orCreateNbt
         return addModifier(modifier, stack, nbt)
     }
-    protected fun addModifier(modifier: Identifier, scepter: ItemStack, nbt: NbtCompound): Boolean{
-        val id = Nbt.getItemStackId(nbt)
-        if (id == -1L){
-            initializeModifiers(scepter,nbt)
-        }
+    protected fun addModifier(modifier: Identifier, stack: ItemStack, nbt: NbtCompound): Boolean{
+        val id = Nbt.makeItemStackId(stack)
         if (!modifiers.containsKey(id)) {
-            modifiers[id] = mutableListOf()
+            initializeModifiers(nbt, id)
         }
-        val highestModifier = checkDescendant(modifier,scepter)
+        val highestModifier = checkDescendant(modifier,stack)
         if (highestModifier != null){
             val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
             return if (mod?.hasDescendant() == true){
-                val highestDescendantPresent: Int = checkModifierLineage(mod, scepter)
+                val highestDescendantPresent: Int = checkModifierLineage(mod, stack)
                 if (highestDescendantPresent < 0){
                     false
                 } else {
@@ -49,8 +46,8 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
                     val currentGeneration = lineage[max(highestDescendantPresent - 1,0)]
                     modifiers[id]?.add(newDescendant)
                     addModifierToNbt(newDescendant, nbt)
-                    removeModifier(scepter, currentGeneration, nbt)
-                    DUSTBIN.markDirty(scepter)
+                    removeModifier(stack, currentGeneration, nbt)
+                    DUSTBIN.markDirty(stack)
                     true
                 }
             } else {
@@ -59,7 +56,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         }
         addModifierToNbt(modifier, nbt)
         modifiers[id]?.add(modifier)
-        DUSTBIN.markDirty(scepter)
+        DUSTBIN.markDirty(stack)
         return true
 
     }
@@ -131,6 +128,9 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     fun getActiveModifiers(stack: ItemStack): AbstractModifier<T>.CompiledModifiers {
         val id = Nbt.getItemStackId(stack)
+        if (id != -1L && !activeModifiers.containsKey(id)){
+            initializeModifiers(stack, stack.orCreateNbt)
+        }
         val compiledData = activeModifiers[id]
         return  compiledData ?: fallbackData
     }
