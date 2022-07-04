@@ -214,20 +214,5 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     companion object{
 
-        /**
-         * A loot function that can be used in a loot pool builder to apply default augments to a scepter in a loot table.
-         */
-        fun startingAugments(item: AugmentScepterItem): LootFunction.Builder{
-            var builder = SetEnchantmentsLootFunction.Builder()
-            if (item.defaultAugments.isEmpty()){
-                return builder
-            } else {
-                item.defaultAugments.forEach {
-                    builder = builder.enchantment(it, ConstantLootNumberProvider.create(1.0F))
-                }
-            }
-            return builder
-        }
-
     }
 }

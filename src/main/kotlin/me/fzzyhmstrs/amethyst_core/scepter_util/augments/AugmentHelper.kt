@@ -1,10 +1,14 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
+import me.fzzyhmstrs.amethyst_core.item_util.AugmentScepterItem
 import me.fzzyhmstrs.amethyst_core.scepter_util.LoreTier
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.item.Item
 import net.minecraft.item.Items
+import net.minecraft.loot.function.LootFunction
+import net.minecraft.loot.function.SetEnchantmentsLootFunction
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import kotlin.math.max
 
 /**
@@ -89,6 +93,24 @@ object AugmentHelper {
     fun getAugmentTier(id: String): LoreTier {
         if (!augmentStats.containsKey(id)) return (LoreTier.NO_TIER)
         return (augmentStats[id]?.bookOfLoreTier) ?: LoreTier.NO_TIER
+    }
+
+    /**
+     * A loot function that can be used in a loot pool builder to apply default augments to a scepter in a loot table.
+     */
+    fun augmentsLootFunctionBuilder(item: AugmentScepterItem, augments: List<ScepterAugment> = listOf()): LootFunction.Builder{
+        var builder = SetEnchantmentsLootFunction.Builder()
+        if (item.defaultAugments.isEmpty() && augments.isEmpty()){
+            return builder
+        } else {
+            item.defaultAugments.forEach {
+                builder = builder.enchantment(it, ConstantLootNumberProvider.create(1.0F))
+            }
+            augments.forEach {
+                builder = builder.enchantment(it, ConstantLootNumberProvider.create(1.0F))
+            }
+        }
+        return builder
     }
 
 }

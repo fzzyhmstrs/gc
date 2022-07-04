@@ -52,7 +52,7 @@ object Nbt {
     }
 
     /**
-     * NbtList tools. Read a list, add a component to a list, or remove a component
+     * Returns a [NbtList] if the compound contains it, or makes a new list and passes it back. Failure can be checked with [NbtList.isEmpty]
      */
     fun readNbtList(nbt: NbtCompound, key: String): NbtList {
         return if (nbt.contains(key)){
@@ -61,11 +61,19 @@ object Nbt {
             NbtList()
         }
     }
+
+    /**
+     * adds a Nbtcompound into an [NbtList] at the specified key. Will create an empty list and add the [newNbt] as the first entry if needed.
+     */
     fun addNbtToList(newNbt: NbtCompound, listKey: String, baseNbt: NbtCompound){
         val nbtList = readNbtList(baseNbt, listKey)
         nbtList.add(newNbt)
         baseNbt.put(listKey,nbtList)
     }
+
+    /**
+     * searches through an [NbtList] and removes elements specified by the [removalTest]. This test usually involves checking through the NbtCompounds in the list for a key of interest.
+     */
     fun removeNbtFromList(listKey: String, baseNbt: NbtCompound, removalTest: Predicate<NbtCompound>){
         val nbtList = readNbtList(baseNbt, listKey)
         val nbtList2 = NbtList()
@@ -80,7 +88,7 @@ object Nbt {
     }
 
     /**
-     * utility for providing an itemstack with a unique and relatively immutable identifier. This allows for an itemstack to be uniquely tracked even across crafting, enchanting, etc. etc.
+     * utility for providing an [ItemStack] with a unique and relatively immutable identifier. This allows for an ItemStack to be uniquely tracked even across crafting, enchanting, etc. etc.
      */
     fun makeItemStackId(stack: ItemStack): Long{
         val nbt = stack.orCreateNbt
@@ -92,6 +100,9 @@ object Nbt {
             getItemStackId(nbt)
         }
     }
+    /**
+     * utility for providing an [ItemStack] with a unique and relatively immutable identifier. This allows for an ItemStack to be uniquely tracked even across crafting, enchanting, etc. etc.
+     */
     fun getItemStackId(stack: ItemStack): Long{
         val nbt = stack.orCreateNbt
         return if (nbt.contains(NbtKeys.ITEM_STACK_ID.str())){
@@ -100,6 +111,9 @@ object Nbt {
             -1L
         }
     }
+    /**
+     * utility for providing an [ItemStack] with a unique and relatively immutable identifier. This allows for an ItemStack to be uniquely tracked even across crafting, enchanting, etc. etc.
+     */
     fun getItemStackId(nbt: NbtCompound): Long{
         return if (nbt.contains(NbtKeys.ITEM_STACK_ID.str())){
             readLongNbt(NbtKeys.ITEM_STACK_ID.str(), nbt)
@@ -113,7 +127,7 @@ object Nbt {
      *
      * does NOT transfer enchantments. Minecraft has methods for that.
      *
-     * useful for maintaining custom nbt between stacks. For example, when crafting an item into a new tier of that item, nbt can be maintained with this funciton.
+     * useful for maintaining custom nbt between stacks. For example, when crafting an item into a new tier of that item, nbt can be maintained with this function.
      */
     fun transferNbt(stack1: ItemStack, stack2: ItemStack){
         val nbt1 = stack1.nbt ?: return
