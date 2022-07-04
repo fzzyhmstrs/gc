@@ -1,7 +1,7 @@
 # Amethyst Core
 
 ### Library mod that powers the Amethyst Imbuement family of mods; can be used to create your very own Magic-themed Mod!
-see the wiki for more detailed information.
+see the [wiki](https://github.com/fzzyhmstrs/ac/wiki) for more detailed information.
 
 ### Including AC in your project
 Amethyst Core is stored on Modrinth, so you can easily grab it from there with the following maven and dependencies notation:
