@@ -33,16 +33,16 @@ maven {
 dependencies:
 ```
 //(build.gradle.kts)
-modImplementation("maven.modrinth:UbOpZw7q:[VERSION]")
+modImplementation("maven.modrinth:amethyst-core:[VERSION]")
 ```
 ```
 //(build.gradle)
-modImplementation "maven.modrinth:UbOpZw7q:[VERSION]"
+modImplementation "maven.modrinth:amethyst-core:[VERSION]"
 ```
 
 optional:
 ```
-include("maven.modrinth:UbOpZw7q:[VERSION])
+include("maven.modrinth:amethyst-core:[VERSION])
 //or
-include "maven.modrinth:UbOpZw7q:[VERSION]
+include "maven.modrinth:amethyst-core:[VERSION]
 ```
