@@ -96,7 +96,7 @@ object AugmentHelper {
     }
 
     /**
-     * A loot function that can be used in a loot pool builder to apply default augments to a scepter in a loot table.
+     * A [LootFunction.Builder] that can be used in a loot pool builder to apply default augments to a scepter, the provided list of augments, or both.
      */
     fun augmentsLootFunctionBuilder(item: AugmentScepterItem, augments: List<ScepterAugment> = listOf()): LootFunction.Builder{
         var builder = SetEnchantmentsLootFunction.Builder()

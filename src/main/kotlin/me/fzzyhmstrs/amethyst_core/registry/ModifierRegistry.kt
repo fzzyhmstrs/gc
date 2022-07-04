@@ -10,6 +10,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.loot.condition.LootCondition
 import net.minecraft.loot.function.LootFunction
 import net.minecraft.loot.function.SetEnchantmentsLootFunction
@@ -130,6 +131,9 @@ object ModifierRegistry {
         }
     }
 
+    /**
+     * [LootFunction.Builder] usable with loot pool building that will add default modifiers, a provided list of modifiers, or both.
+     */
     fun modifiersLootFunctionBuilder(item: Item, modifiers: List<AbstractModifier<*>> = listOf(), helper: AbstractModifierHelper<*>): LootFunction.Builder{
         val modList = NbtList()
         if (item is Modifiable<*>) {
@@ -142,9 +146,11 @@ object ModifierRegistry {
                     modList.add(nbtEl)
                 }
                 modifiers.forEach {
-                    val nbtEl = NbtCompound()
-                    Nbt.writeStringNbt(NbtKeys.MODIFIER_ID.str(),it.toString(),nbtEl)
-                    modList.add(nbtEl)
+                    if (it.isAcceptableItem(ItemStack(item))) {
+                        val nbtEl = NbtCompound()
+                        Nbt.writeStringNbt(NbtKeys.MODIFIER_ID.str(), it.toString(), nbtEl)
+                        modList.add(nbtEl)
+                    }
                 }
             }
         } else if (modifiers.isEmpty()) {
