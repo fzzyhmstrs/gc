@@ -7,6 +7,8 @@ import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
+import net.fabricmc.api.EnvType
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.EnchantmentHelper
@@ -14,6 +16,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
@@ -36,7 +39,13 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
     AugmentScepterItem(material,settings), ParticleEmitting{
 
     init{
-        ParticleEmitting.registerParticleEmitter(smokePacketId) { client -> doSmoke(client) }
+        if(FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
+            try {
+                ParticleEmitting.registerParticleEmitter(smokePacketId) { client -> doSmoke(client) }
+            } catch (e: Exception) {
+                println("oops!")
+            }
+        }
     }
 
     override fun appendTooltip(
@@ -77,7 +86,6 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
     }
 
     companion object{
-        val commaText: MutableText = Text.literal(", ").formatted(Formatting.GOLD)
         private const val smokePacketId = "scepter_smoke_emitter"
 
         private fun doSmoke(client: MinecraftClient){
