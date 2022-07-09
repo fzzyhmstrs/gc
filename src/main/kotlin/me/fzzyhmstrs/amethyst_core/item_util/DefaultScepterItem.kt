@@ -7,6 +7,8 @@ import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
+import net.fabricmc.api.EnvType
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.EnchantmentHelper
@@ -15,15 +17,15 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.LiteralText
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
+import net.minecraft.text.LiteralText
+import net.minecraft.text.TranslatableText
 
 /**
  * The default Amethyst Imbuement style scepter.
@@ -38,7 +40,13 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
     AugmentScepterItem(material,settings), ParticleEmitting{
 
     init{
-        ParticleEmitting.registerParticleEmitter(smokePacketId) { client -> doSmoke(client) }
+        if(FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
+            try {
+                ParticleEmitting.registerParticleEmitter(smokePacketId) { client -> doSmoke(client) }
+            } catch (e: Exception) {
+                println("oops!")
+            }
+        }
     }
 
     override fun appendTooltip(
