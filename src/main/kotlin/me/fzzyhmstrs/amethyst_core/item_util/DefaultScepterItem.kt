@@ -56,9 +56,9 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         val nbt = stack.orCreateNbt
         val activeSpell = if (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) {
             val activeEnchantId = Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
-            Text.translatable("enchantment.amethyst_imbuement.${Identifier(activeEnchantId).path}")
+            Text.translatable("enchantment.${Identifier(activeEnchantId).namespace}.${Identifier(activeEnchantId).path}")
         } else {
-            Text.translatable("enchantment.amethyst_imbuement.none")
+            Text.translatable("enchantment.amethyst_core.none")
         }
         tooltip.add(Text.translatable("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell.formatted(Formatting.GOLD)))
         val stats = ScepterHelper.getScepterStats(stack)
