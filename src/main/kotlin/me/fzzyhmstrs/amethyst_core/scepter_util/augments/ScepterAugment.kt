@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
+import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
 import net.minecraft.enchantment.Enchantment
@@ -47,6 +48,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
                     it.getSecondaryEffect()?.applyModifiableTasks(world, user, hand, level, listOf(), null)
                 }
             }
+            effectModifiers.accept(user,AugmentConsumer.Type.AUTOMATIC)
         }
         return bl
     }
