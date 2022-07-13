@@ -1,5 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.Multimap
 import me.fzzyhmstrs.amethyst_core.coding_util.Addable
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlD
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlF
@@ -29,16 +31,20 @@ data class AugmentEffect(
     private var durationData: PerLvlI = PerLvlI(),
     private var rangeData: PerLvlD = PerLvlD()
 ): Addable<AugmentEffect>{
-    private var goodConsumers: MutableList<AugmentConsumer> = mutableListOf()
-    private var badConsumers: MutableList<AugmentConsumer> = mutableListOf()
+/*    private var goodConsumers: MutableList<AugmentConsumer> = mutableListOf()
+    private var badConsumers: MutableList<AugmentConsumer> = mutableListOf()*/
+    private var consumers: Multimap<AugmentConsumer.Type,AugmentConsumer> = ArrayListMultimap.create()
 
     override fun plus(other: AugmentEffect): AugmentEffect {
         damageData = damageData.plus(other.damageData)
         amplifierData = amplifierData.plus(other.amplifierData)
         durationData = durationData.plus(other.durationData)
         rangeData = rangeData.plus(other.rangeData)
-        goodConsumers.addAll(other.goodConsumers)
-        badConsumers.addAll(other.badConsumers)
+        for (key in consumers.keys()){
+            consumers[key].addAll(other.consumers.get(key))
+        }
+        //goodConsumers.addAll(other.goodConsumers)
+        //badConsumers.addAll(other.badConsumers)
         return this
     }
     fun damage(level: Int = 0): Float{
@@ -55,12 +61,20 @@ data class AugmentEffect(
     }
     fun consumers(): MutableList<AugmentConsumer>{
         val list = mutableListOf<AugmentConsumer>()
-        list.addAll(goodConsumers)
-        list.addAll(badConsumers)
+        for (key in consumers.keys()){
+            consumers[key].forEach {
+                list.add(it)
+            }
+        }
+        //list.addAll(goodConsumers)
+        //list.addAll(badConsumers)
         return list
     }
     fun accept(list: List<LivingEntity>, type: AugmentConsumer.Type? = null){
-        when (type){
+        consumers[type].forEach {
+            it.consumer.accept(list)
+        }
+        /*when (type){
             AugmentConsumer.Type.BENEFICIAL ->{
                 goodConsumers.forEach {
                     it.consumer.accept(list)
@@ -79,7 +93,7 @@ data class AugmentEffect(
                     it.consumer.accept(list)
                 }
             }
-        }
+        }*/
     }
     fun accept(entity: LivingEntity, type: AugmentConsumer.Type? = null){
         accept(listOf(entity), type)
@@ -138,30 +152,35 @@ data class AugmentEffect(
         return this
     }
     fun addConsumer(consumer: Consumer<List<LivingEntity>>, type: AugmentConsumer.Type){
-        if (type == AugmentConsumer.Type.BENEFICIAL){
+        consumers[type].add(AugmentConsumer(consumer, type))
+        /*if (type == AugmentConsumer.Type.BENEFICIAL){
             goodConsumers.add(AugmentConsumer(consumer, type))
         } else {
             badConsumers.add(AugmentConsumer(consumer, type))
-        }
+        }*/
     }
     fun addConsumers(list: List<AugmentConsumer>){
         list.forEach {
-            if (it.type == AugmentConsumer.Type.BENEFICIAL){
+            consumers[it.type].add(AugmentConsumer(it.consumer, it.type))
+            /*if (it.type == AugmentConsumer.Type.BENEFICIAL){
                 goodConsumers.add(AugmentConsumer(it.consumer, it.type))
             } else {
                 badConsumers.add(AugmentConsumer(it.consumer, it.type))
-            }
+            }*/
         }
     }
     fun setConsumers(list: MutableList<AugmentConsumer>, type: AugmentConsumer.Type){
-        if (type == AugmentConsumer.Type.BENEFICIAL){
+        consumers[type].clear()
+        consumers[type].addAll(list)
+        /*if (type == AugmentConsumer.Type.BENEFICIAL){
             goodConsumers = list
         } else {
             badConsumers = list
-        }
+        }*/
     }
     fun setConsumers(ae: AugmentEffect){
-        goodConsumers = ae.goodConsumers
-        badConsumers = ae.badConsumers
+        consumers = ae.consumers
+        //goodConsumers = ae.goodConsumers
+        //badConsumers = ae.badConsumers
     }
 }
