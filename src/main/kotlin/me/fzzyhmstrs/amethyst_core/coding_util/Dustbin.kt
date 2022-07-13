@@ -21,8 +21,8 @@ open class Dustbin<T>(private val consumer: Consumer<T>){
         val itr = dust.iterator()
         while (itr.hasNext()){
             consumer.accept(itr.next())
+            itr.remove()
         }
-        dust.clear()
         dirty = false
     }
 }
