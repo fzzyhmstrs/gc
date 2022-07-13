@@ -60,7 +60,8 @@ data class XpModifiers(var furyXpMod: Int = 0, var witXpMod: Int = 0, var graceX
 data class AugmentConsumer(val consumer: Consumer<List<LivingEntity>>, val type: Type) {
     enum class Type {
         HARMFUL,
-        BENEFICIAL
+        BENEFICIAL,
+        AUTOMATIC
     }
 }
 
