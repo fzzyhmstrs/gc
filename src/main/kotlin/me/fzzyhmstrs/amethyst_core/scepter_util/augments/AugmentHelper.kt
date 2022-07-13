@@ -75,7 +75,7 @@ object AugmentHelper {
     fun getAugmentManaCost(id: String, reduction: Double = 0.0): Int{
         if(!augmentStats.containsKey(id)) return (10 * (100.0 + reduction) / 100.0).toInt()
         val cost = (augmentStats[id]?.manaCost?.times(100.0 + reduction)?.div(100.0))?.toInt() ?: (10 * (100.0 + reduction) / 100.0).toInt()
-        return max(1,cost)
+        return max(0,cost)
     }
 
     fun getAugmentCooldown(id: String): Int{
