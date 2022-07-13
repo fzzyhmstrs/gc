@@ -86,7 +86,6 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
     }
 
     companion object{
-        val commaText: MutableText = LiteralText(", ").formatted(Formatting.GOLD)
         private const val smokePacketId = "scepter_smoke_emitter"
 
         private fun doSmoke(client: MinecraftClient){
