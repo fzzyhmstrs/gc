@@ -147,7 +147,7 @@ object ScepterHelper {
         }
         ModifierHelper.DUSTBIN.markDirty(stack)
         Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),newActiveEnchant, nbt)
-        val message = TranslatableText("scepter.new_active_spell").append(TranslatableText("enchantment.amethyst_imbuement.${Identifier(newActiveEnchant).path}"))
+        val message = TranslatableText("scepter.new_active_spell").append(TranslatableText("enchantment.${Identifier(newActiveEnchant).namespace}.${Identifier(newActiveEnchant).path}"))
         user.sendMessage(message,false)
     }
 
