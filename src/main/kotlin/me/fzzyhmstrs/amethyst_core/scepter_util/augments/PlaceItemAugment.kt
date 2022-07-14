@@ -61,7 +61,7 @@ abstract class PlaceItemAugment(tier: Int, maxLvl: Int,item: Item, vararg slot: 
         }
     }
 
-    private fun placeItemPacket(itemStack: ItemStack, hand: Hand, hit: BlockHitResult): PacketByteBuf{
+    protected fun placeItemPacket(itemStack: ItemStack, hand: Hand, hit: BlockHitResult): PacketByteBuf{
         val buf = PacketByteBufs.create()
         buf.writeItemStack(itemStack)
         buf.writeEnumConstant(hand)
@@ -75,7 +75,7 @@ abstract class PlaceItemAugment(tier: Int, maxLvl: Int,item: Item, vararg slot: 
 
     companion object{
 
-        private val PLACE_ITEM_PACKET = Identifier(AC.MOD_ID,"place_item_packet")
+        protected val PLACE_ITEM_PACKET = Identifier(AC.MOD_ID,"place_item_packet")
 
         fun registerServer(){
             ServerPlayNetworking.registerGlobalReceiver(PLACE_ITEM_PACKET)
