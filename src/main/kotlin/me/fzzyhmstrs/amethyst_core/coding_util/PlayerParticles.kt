@@ -20,7 +20,7 @@ import net.minecraft.util.math.Vec3d
  *
  * For your own implementation, follow along with how the scepterParticlePos is developed. The basic technique is 1) locate the player in space (first scepterParticlPos), 2) define the positional offsets needed (second scepterParticlePos), 3) apply that data to the playerParticlePos function.
  */
-
+@Deprecated("PlayerParticlesV2 tracks head pitch, this does not. Use is fine, but suboptimal")
 @Environment(value = EnvType.CLIENT)
 object PlayerParticles {
     fun scepterParticlePos(client: MinecraftClient, user: LivingEntity): Vec3d {
