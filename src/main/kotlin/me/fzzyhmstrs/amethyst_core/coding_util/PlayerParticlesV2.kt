@@ -31,8 +31,8 @@ object PlayerParticlesV2 {
         val yaw = getYaw(user, client, perspective)
         val pitch = getPitch(user, perspective)
         val width = user.width
-        val fov = MathHelper.clamp(client.options.fov,30.0,110.0)
-        val offsets = scepterOffset(perspective, fov)
+        val fov = MathHelper.clamp(client.options.fov.value,30,110)
+        val offsets = scepterOffset(perspective, fov.toDouble())
         return playerParticlePos(pos, rot,yaw, pitch, width, offsets)
     }
 
