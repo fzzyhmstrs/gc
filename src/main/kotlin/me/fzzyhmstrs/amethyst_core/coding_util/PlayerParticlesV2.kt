@@ -19,7 +19,7 @@ import net.minecraft.util.math.Vec3d
  *
  * As seen below, the particles are perspective-dependent, so particles properly render in 1st or 3rd person.
  *
- * For your own implementation, follow along with how the scepterParticlePos is developed. The basic technique is 1) locate the player in space (first scepterParticlPos), 2) define the positional offsets needed (second scepterParticlePos), 3) apply that data to the playerParticlePos function.
+ * For your own implementation, follow along with how the scepterParticlePos is developed. The basic technique is 1) locate the player in space (first scepterParticlePos), 2) define the positional offsets needed (second scepterParticlePos), 3) apply that data to the playerParticlePos function.
  */
 
 @Environment(value = EnvType.CLIENT)
