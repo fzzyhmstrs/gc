@@ -10,8 +10,8 @@ Amethyst Core is stored on Modrinth, so you can easily grab it from there with t
 
 MC Version | AC Version
 ---|----
-1.18.2 | 0.1.0+1.18.2
-1.19 | 0.1.0+1.19
+1.18.2 | 0.1.1+1.18.2
+1.19 | 0.1.1+1.19
 
 repositories:
 ```
