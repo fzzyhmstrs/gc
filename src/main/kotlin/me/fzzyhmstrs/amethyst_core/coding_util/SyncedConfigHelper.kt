@@ -96,7 +96,7 @@ object SyncedConfigHelper {
                     throw RuntimeException("Old config not properly set up as an OldConfig: ${P::class.simpleName}")
                 }
             } else {
-                return readOrCreate(file, configClass = configClass)
+                return readOrCreate(file,child, base, configClass)
             }
         } catch (e: Exception) {
             println("Failed to read config file! Using default values: " + e.message)
