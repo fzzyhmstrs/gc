@@ -8,9 +8,9 @@
     "fzzyhmstrs"
   ],
   "contact": {
-    "homepage": "https://example.com/",
-    "issues": "https://example.com/",
-    "sources": "https://example.com/"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/amethyst-core",
+    "issues": "https://github.com/fzzyhmstrs/ac/issues",
+    "sources": "https://github.com/fzzyhmstrs/ac"
   },
   "license": "MIT License",
   "icon": "assets/amethyst_core/icon.png",
