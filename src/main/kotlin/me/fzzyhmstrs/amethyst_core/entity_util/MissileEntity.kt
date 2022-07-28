@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.entity_util
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.registry.RegisterBaseEntity
+import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
@@ -13,7 +14,9 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
+import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 
 /**
@@ -57,14 +60,14 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
             discard()
         }
         val vec3d = velocity
-        val hitResult = ProjectileUtil.getCollision(
+        /*val hitResult = ProjectileUtil.getCollision(
             this
         ) { entity: Entity ->
             canHit(
                 entity
             )
         }
-        onCollision(hitResult)
+        onCollision(hitResult)*/
         val x2 = vec3d.x
         val y2 = vec3d.y
         val z2 = vec3d.z
@@ -72,8 +75,7 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
         val e = this.y + y2
         val f = this.z + z2
         this.updateRotation()
-        val g = 0.999999
-        val h = 0.0
+        val g = drag.toDouble()
         addParticles(x2, y2, z2)
         val gg: Double = if (this.isTouchingWater) {
             0.95
@@ -82,7 +84,7 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
         }
         velocity = vec3d.multiply(gg)
         if (!hasNoGravity()) {
-            velocity = velocity.add(0.0, -h, 0.0)
+            velocity = velocity.add(0.0, -0.0, 0.0)
         }
         this.setPosition(d, e, f)
     }
@@ -111,6 +113,15 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
             }
         }
         discard()
+    }
+
+    override fun onBlockHit(blockHitResult: BlockHitResult) {
+        super.onBlockHit(blockHitResult)
+        onMissileBlockHit(blockHitResult)
+        discard()
+    }
+
+    open fun onMissileBlockHit(blockHitResult: BlockHitResult){
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
