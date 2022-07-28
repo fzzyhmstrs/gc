@@ -9,7 +9,12 @@ import java.util.function.Consumer
 open class Dustbin<T>(private val consumer: Consumer<T>){
     private var dirty: Boolean = false
     private val dust: MutableList<T> = mutableListOf()
+    private var needsRemoval: Boolean = false
     fun markDirty(newDust: T){
+        if (needsRemoval){
+            dust.clear()
+            needsRemoval = false
+        }
         dust.add(newDust)
         dirty = true
     }
@@ -18,12 +23,14 @@ open class Dustbin<T>(private val consumer: Consumer<T>){
     }
     fun clean(){
         if (!dirty) return
-        val itr = dust.iterator()
-        while (itr.hasNext()){
-            consumer.accept(itr.next())
-            itr.remove()
-        }
         dirty = false
+        val itr = dust.iterator()
+        while (itr.hasNext()) {
+            val currentDust = itr.next()
+            consumer.accept(currentDust)
+        }
+        needsRemoval = true
+
     }
 }
 
