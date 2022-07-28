@@ -43,9 +43,6 @@ abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterTo
 
     override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
         super.initializeScepter(stack, scepterNbt)
-        if (modifiersNeedInit(scepterNbt)){
-            writeDefaultNbt(stack, scepterNbt)
-        }
         ModifierHelper.initializeModifiers(stack, scepterNbt)
     }
 
