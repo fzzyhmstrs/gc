@@ -167,19 +167,24 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {
         super.writeDefaultNbt(stack, scepterNbt)
+        activeNbtCheck(scepterNbt)
+        ScepterHelper.getScepterStats(stack)
+    }
+
+    override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
+        super.initializeScepter(stack, scepterNbt)
+        addDefaultEnchantments(stack)
+    }
+
+    private fun activeNbtCheck(scepterNbt: NbtCompound){
         if(!scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
             val identifier = fallbackId
             Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), identifier.toString(), scepterNbt)
         }
     }
 
-    override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
-        super.initializeScepter(stack, scepterNbt)
-        if(!scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
-            val identifier = fallbackId
-            Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), identifier.toString(), scepterNbt)
-        }
-        addDefaultEnchantments(stack)
+    override fun needsInitialization(stack: ItemStack, scepterNbt: NbtCompound): Boolean {
+        return super.needsInitialization(stack, scepterNbt) || !scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())
     }
 
     open fun addDefaultEnchantments(stack: ItemStack){

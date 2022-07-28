@@ -63,7 +63,6 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
         if (world.isClient) return
         val nbt = stack.orCreateNbt
-        writeDefaultNbt(stack, nbt)
         initializeScepter(stack, nbt)
     }
 
@@ -81,6 +80,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
      * Remember to call super.
      */
     open fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound){
+        writeDefaultNbt(stack, scepterNbt)
         ManaHelper.initializeManaItem(stack)
     }
 
