@@ -14,7 +14,6 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     private val modifiers: MutableMap<Long ,MutableList<Identifier>> = mutableMapOf()
     private val activeModifiers: MutableMap<Long, AbstractModifier<T>.CompiledModifiers> = mutableMapOf()
     abstract val fallbackData: AbstractModifier<T>.CompiledModifiers
-    internal val DUSTBIN: TickingDustbin<ItemStack> = TickingDustbin { dirt: ItemStack -> gatherActiveModifiers(dirt) }
 
     abstract fun gatherActiveModifiers(stack: ItemStack)
 
@@ -50,7 +49,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
                     modifiers[id]?.add(newDescendant)
                     addModifierToNbt(newDescendant, nbt)
                     removeModifier(stack, currentGeneration, nbt)
-                    DUSTBIN.markDirty(stack)
+                    gatherActiveModifiers(stack)
                     true
                 }
             } else {
@@ -59,7 +58,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         }
         addModifierToNbt(modifier, nbt)
         modifiers[id]?.add(modifier)
-        DUSTBIN.markDirty(stack)
+        gatherActiveModifiers(stack)
         return true
 
     }
@@ -80,7 +79,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     protected fun removeModifier(scepter: ItemStack, modifier: Identifier, nbt: NbtCompound){
         val id = Nbt.getItemStackId(nbt)
         modifiers[id]?.remove(modifier)
-        DUSTBIN.markDirty(scepter)
+        gatherActiveModifiers(scepter)
         removeModifierFromNbt(modifier,nbt)
     }
 
@@ -108,9 +107,10 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     open fun initializeModifiers(stack: ItemStack, nbt: NbtCompound){
         if (nbt.contains(NbtKeys.MODIFIERS.str())){
+            println("initing")
             val id = Nbt.makeItemStackId(stack)
             initializeModifiers(nbt, id)
-            DUSTBIN.markDirty(stack)
+            gatherActiveModifiers(stack)
         }
     }
 
