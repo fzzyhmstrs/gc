@@ -111,7 +111,6 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
             val id = Nbt.makeItemStackId(stack)
             initializeModifiers(nbt, id)
             DUSTBIN.markDirty(stack)
-            DUSTBIN.clean()
         }
     }
 
@@ -175,7 +174,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     }
 
     inline fun <reified A:AbstractModifier<A>> gatherActiveAbstractModifiers(stack: ItemStack, objectToAffect: Identifier, compiler: AbstractModifier<A>.Compiler): AbstractModifier<A>.CompiledModifiers{
-        val id = Nbt.makeItemStackId(stack)
+        val id = Nbt.getItemStackId(stack)
         getModifiersById(id).forEach { identifier ->
             val modifier = ModifierRegistry.getByType<A>(identifier)
             if (modifier != null){
