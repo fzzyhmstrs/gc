@@ -183,6 +183,7 @@ object ScepterHelper {
 
     fun getScepterStat(scepterNbt: NbtCompound, activeEnchantId: String): Pair<Int,Int>{
         val spellKey = AugmentHelper.getAugmentType(activeEnchantId).name
+        if (!scepterNbt.contains(spellKey + "_lvl")) getStatsHelper(scepterNbt)
         val statLvl = Nbt.readIntNbt(spellKey + "_lvl",scepterNbt)
         val statXp = Nbt.readIntNbt(spellKey + "_xp",scepterNbt)
         return Pair(statLvl,statXp)
