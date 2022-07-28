@@ -2,6 +2,7 @@ package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.mana_util.ManaHelper
 import me.fzzyhmstrs.amethyst_core.mana_util.ManaItem
+import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
@@ -87,7 +88,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
      * function to define when a scepter needs post-crafting initialization. For states stored in memory, this will be at least once at the beginning of every game session (to repopulate a map or similar).
      */
     open fun needsInitialization(stack: ItemStack, scepterNbt: NbtCompound): Boolean{
-        return ManaHelper.needsInitialization(stack)
+        return ManaHelper.needsInitialization(stack) || Nbt.getItemStackId(scepterNbt) == -1L
     }
 
     /**
@@ -96,6 +97,10 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     //removes cooldown on the item if you switch item
     override fun inventoryTick(stack: ItemStack, world: World, entity: Entity, slot: Int, selected: Boolean) {
         if (world.isClient) return
+        val nbt = stack.orCreateNbt
+        if (needsInitialization(stack, nbt) && !world.isClient){
+            initializeScepter(stack, nbt)
+        }
         //slowly heal damage over time
         if (ManaHelper.tickHeal(stack)){
             healDamage(1,stack)
