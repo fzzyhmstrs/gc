@@ -34,7 +34,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
 
         if (world.isClient()) return TypedActionResult.pass(stack)
         val nbt = stack.orCreateNbt
-        if (needsInitialization(stack, nbt)){
+        if (needsInitialization(stack, nbt) && !world.isClient){
             initializeScepter(stack, nbt)
         }
         return super.use(world, user, hand)
@@ -60,6 +60,7 @@ abstract class AbstractScepterItem(material: ScepterToolMaterial, settings: Sett
     }
 
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
+        if (world.isClient) return
         val nbt = stack.orCreateNbt
         writeDefaultNbt(stack, nbt)
         initializeScepter(stack, nbt)
