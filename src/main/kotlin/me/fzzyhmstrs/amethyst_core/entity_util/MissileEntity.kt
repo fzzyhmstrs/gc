@@ -60,14 +60,14 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
             discard()
         }
         val vec3d = velocity
-        /*val hitResult = ProjectileUtil.getCollision(
+        val hitResult = ProjectileUtil.getCollision(
             this
         ) { entity: Entity ->
             canHit(
                 entity
             )
         }
-        onCollision(hitResult)*/
+        onCollision(hitResult)
         val x2 = vec3d.x
         val y2 = vec3d.y
         val z2 = vec3d.z
@@ -134,10 +134,6 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
 
     override fun damage(source: DamageSource, amount: Float): Boolean {
         return false
-    }
-
-    override fun canHit(entity: Entity): Boolean {
-        return super.canHit(entity) && !entity.noClip
     }
 
     override fun isBurning(): Boolean {
