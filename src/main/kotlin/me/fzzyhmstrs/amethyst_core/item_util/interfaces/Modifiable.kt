@@ -31,7 +31,7 @@ interface Modifiable<T: Addable<T>> {
             val itr = modifierList.asIterable().iterator()
             while(itr.hasNext()){
                 val mod = itr.next()
-                modifierText.append(TranslatableText("scepter.modifiers.${mod}").formatted(Formatting.GOLD))
+                modifierText.append(TranslatableText("scepter.modifier.${mod}").formatted(Formatting.GOLD))
                 if (itr.hasNext()){
                     modifierText.append(commaText)
                 }
