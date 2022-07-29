@@ -10,13 +10,13 @@
 	"scepter.spells_not_activated": "Spells not activated yet...",
 	"scepter.new_active_spell": "New active spell: ",
 	"scepter.modifiers": "Modifiers: ",
-	"scepter.modifiers.amethyst_core:modifier_debug": "Debug 1",
-	"scepter.modifiers.amethyst_core:modifier_debug_2": "Debug 2",
-	"scepter.modifiers.amethyst_core:modifier_debug_3": "Debug 3",
-	"scepter.modifiers.amethyst_core:lesser_attuned": "Lesser Attuned",
-	"scepter.modifiers.amethyst_core:attuned": "Attuned",
-	"scepter.modifiers.amethyst_core:greater_attuned": "Greater Attuned",
-	"scepter.modifiers.amethyst_core:lesser_thrifty": "Lesser Thrifty",
-	"scepter.modifiers.amethyst_core:thrifty": "Thrifty",
-	"scepter.modifiers.amethyst_core:greater_thrifty": "Greater Thrifty"
+	"scepter.modifier.amethyst_core:modifier_debug": "Debug 1",
+	"scepter.modifier.amethyst_core:modifier_debug_2": "Debug 2",
+	"scepter.modifier.amethyst_core:modifier_debug_3": "Debug 3",
+	"scepter.modifier.amethyst_core:lesser_attuned": "Lesser Attuned",
+	"scepter.modifier.amethyst_core:attuned": "Attuned",
+	"scepter.modifier.amethyst_core:greater_attuned": "Greater Attuned",
+	"scepter.modifier.amethyst_core:lesser_thrifty": "Lesser Thrifty",
+	"scepter.modifier.amethyst_core:thrifty": "Thrifty",
+	"scepter.modifier.amethyst_core:greater_thrifty": "Greater Thrifty"
 }
