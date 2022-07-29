@@ -1,6 +1,5 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
-import me.fzzyhmstrs.amethyst_core.coding_util.TickingDustbin
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
@@ -161,7 +160,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         return  compiledData ?: fallbackData
     }
 
-    fun checkModifierLineage(modifier:Identifier, stack: ItemStack): Boolean{
+    fun checkModifierLineage(modifier: Identifier, stack: ItemStack): Boolean{
         val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
         return if (mod != null){
             checkModifierLineage(mod, stack) >= 0
@@ -185,6 +184,26 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         } else {
             -1
         }
+    }
+
+    fun getNextInLineage(modifier: Identifier, stack: ItemStack): Identifier{
+        val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
+        return if (mod != null){
+            val lineage = mod.getModLineage()
+            val nextInLineIndex = checkModifierLineage(mod, stack)
+            if (nextInLineIndex == -1){
+                modifier
+            } else {
+                lineage[nextInLineIndex]
+            }
+        } else {
+            modifier
+        }
+    }
+
+    fun getMaxInLineage(modifier: Identifier): Identifier{
+        val mod = ModifierRegistry.getByType<AugmentModifier>(modifier)
+        return mod?.getModLineage()?.last() ?: return modifier
     }
 
     inline fun <reified A:AbstractModifier<A>> gatherActiveAbstractModifiers(stack: ItemStack, objectToAffect: Identifier, compiler: AbstractModifier<A>.Compiler): AbstractModifier<A>.CompiledModifiers{
