@@ -14,6 +14,7 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
 
     fun addModifierForREI(modifier: Identifier, stack: ItemStack){
         val nbt = stack.orCreateNbt
+        Nbt.makeItemStackId(stack)
         addModifierToNbt(modifier, nbt)
     }
 
