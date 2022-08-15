@@ -162,8 +162,8 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
                 world.addParticle(
                     ParticleTypes.BUBBLE,
                     this.x + x2 * (world.random.nextFloat()-0.5f),
-                    this.y + x2 * (world.random.nextFloat()-0.5f),
-                    this.z + x2 * (world.random.nextFloat()-0.5f),
+                    this.y + y2 * (world.random.nextFloat()-0.5f),
+                    this.z + z2 * (world.random.nextFloat()-0.5f),
                     0.0,
                     0.0,
                     0.0
@@ -174,8 +174,8 @@ open class MissileEntity(entityType: EntityType<out MissileEntity?>, world: Worl
                 world.addParticle(
                     particleType,
                     this.x + x2 * (world.random.nextFloat()-0.5f),
-                    this.y + x2 * (world.random.nextFloat()-0.5f),
-                    this.z + x2 * (world.random.nextFloat()-0.5f),
+                    this.y + y2 * (world.random.nextFloat()-0.5f),
+                    this.z + z2 * (world.random.nextFloat()-0.5f),
                     0.0,
                     0.0,
                     0.0
