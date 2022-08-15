@@ -40,3 +40,13 @@ interface TravelerAugment
  * Augments related to Blood/Spirit magic.
  */
 interface SoulAugment
+
+/**
+ * Augments related to ice magic.
+ */
+interface IceAugment
+
+/**
+ * Augments related to elemental magic.
+ */
+interface ElementalAugment
