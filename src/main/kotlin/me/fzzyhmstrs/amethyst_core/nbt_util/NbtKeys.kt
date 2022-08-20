@@ -40,6 +40,11 @@ enum class NbtKeys {
             return "active_enchant_id"
         }
     },
+    INITIALIZED{
+        override fun str(): String {
+            return "initialized"
+        }
+    },
     LAST_USED{
         override fun str(): String {
             return "_last_used"

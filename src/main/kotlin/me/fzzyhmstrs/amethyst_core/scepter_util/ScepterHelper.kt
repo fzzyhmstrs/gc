@@ -159,7 +159,7 @@ object ScepterHelper {
             val identifier = if (newEnchant != null) {
                 Registry.ENCHANTMENT.getId(newEnchant)
             } else {
-                item.addDefaultEnchantments(stack)
+                item.addDefaultEnchantments(stack, nbt)
                 item.fallbackId
             }
             if (identifier != null) {

@@ -162,7 +162,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     override fun onCraft(stack: ItemStack, world: World, player: PlayerEntity) {
         super.onCraft(stack, world, player)
-        addDefaultEnchantments(stack)
+        addDefaultEnchantments(stack, stack.orCreateNbt)
     }
 
     override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {
@@ -173,7 +173,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
         super.initializeScepter(stack, scepterNbt)
-        addDefaultEnchantments(stack)
+        addDefaultEnchantments(stack, scepterNbt)
     }
 
     private fun activeNbtCheck(scepterNbt: NbtCompound){
@@ -187,7 +187,8 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         return super.needsInitialization(stack, scepterNbt) || !scepterNbt.contains(NbtKeys.ACTIVE_ENCHANT.str())
     }
 
-    open fun addDefaultEnchantments(stack: ItemStack){
+    open fun addDefaultEnchantments(stack: ItemStack, scepterNbt: NbtCompound){
+        if (scepterNbt.contains(NbtKeys.INITIALIZED.str())) return
         val enchantToAdd = Registry.ENCHANTMENT.get(this.fallbackId)
         if (enchantToAdd != null && !noFallback){
             if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
@@ -199,6 +200,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
                 stack.addEnchantment(it,1)
             }
         }
+        Nbt.writeBoolNbt(NbtKeys.INITIALIZED.str(),true,scepterNbt)
     }
 
     open fun resetCooldown(stack: ItemStack, world: World, user: PlayerEntity, activeEnchant: String): TypedActionResult<ItemStack>{
