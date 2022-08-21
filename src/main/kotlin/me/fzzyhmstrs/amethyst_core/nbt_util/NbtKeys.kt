@@ -34,6 +34,12 @@ enum class NbtKeys {
         override fun str(): String {
             return "book_of_lore_augment"
         }
+    }
+    ,
+    LORE_TYPE{
+        override fun str(): String {
+            return "lore_type"
+        }
     },
     ACTIVE_ENCHANT{
         override fun str(): String {
