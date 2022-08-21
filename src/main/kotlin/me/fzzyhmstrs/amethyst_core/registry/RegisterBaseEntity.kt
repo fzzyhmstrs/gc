@@ -22,7 +22,7 @@ object RegisterBaseEntity {
                 entityType,
                 world
             )
-        }.dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
+        }.dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).build()
     )
 
     internal fun registerAll(){}
