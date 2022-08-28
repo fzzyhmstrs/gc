@@ -31,8 +31,6 @@ data class AugmentEffect(
     private var durationData: PerLvlI = PerLvlI(),
     private var rangeData: PerLvlD = PerLvlD()
 ): Addable<AugmentEffect>{
-/*    private var goodConsumers: MutableList<AugmentConsumer> = mutableListOf()
-    private var badConsumers: MutableList<AugmentConsumer> = mutableListOf()*/
     private var consumers: Multimap<AugmentConsumer.Type,AugmentConsumer> = ArrayListMultimap.create()
 
     override fun plus(other: AugmentEffect): AugmentEffect {
@@ -40,11 +38,9 @@ data class AugmentEffect(
         amplifierData = amplifierData.plus(other.amplifierData)
         durationData = durationData.plus(other.durationData)
         rangeData = rangeData.plus(other.rangeData)
-        for (key in consumers.keys()){
-            consumers[key].addAll(other.consumers.get(key))
+        for (key in other.consumers.keys()){
+            consumers.putAll(key,other.consumers.get(key))
         }
-        //goodConsumers.addAll(other.goodConsumers)
-        //badConsumers.addAll(other.badConsumers)
         return this
     }
     fun damage(level: Int = 0): Float{
@@ -66,34 +62,12 @@ data class AugmentEffect(
                 list.add(it)
             }
         }
-        //list.addAll(goodConsumers)
-        //list.addAll(badConsumers)
         return list
     }
     fun accept(list: List<LivingEntity>, type: AugmentConsumer.Type? = null){
         consumers[type].forEach {
             it.consumer.accept(list)
         }
-        /*when (type){
-            AugmentConsumer.Type.BENEFICIAL ->{
-                goodConsumers.forEach {
-                    it.consumer.accept(list)
-                }
-            }
-            AugmentConsumer.Type.HARMFUL ->{
-                badConsumers.forEach {
-                    it.consumer.accept(list)
-                }
-            }
-            else->{
-                goodConsumers.forEach {
-                    it.consumer.accept(list)
-                }
-                badConsumers.forEach {
-                    it.consumer.accept(list)
-                }
-            }
-        }*/
     }
     fun accept(entity: LivingEntity, type: AugmentConsumer.Type? = null){
         accept(listOf(entity), type)
@@ -152,35 +126,20 @@ data class AugmentEffect(
         return this
     }
     fun addConsumer(consumer: Consumer<List<LivingEntity>>, type: AugmentConsumer.Type){
-        consumers[type].add(AugmentConsumer(consumer, type))
-        /*if (type == AugmentConsumer.Type.BENEFICIAL){
-            goodConsumers.add(AugmentConsumer(consumer, type))
-        } else {
-            badConsumers.add(AugmentConsumer(consumer, type))
-        }*/
+        consumers.put(type,AugmentConsumer(consumer, type))
     }
     fun addConsumers(list: List<AugmentConsumer>){
         list.forEach {
-            consumers[it.type].add(AugmentConsumer(it.consumer, it.type))
-            /*if (it.type == AugmentConsumer.Type.BENEFICIAL){
-                goodConsumers.add(AugmentConsumer(it.consumer, it.type))
-            } else {
-                badConsumers.add(AugmentConsumer(it.consumer, it.type))
-            }*/
+            consumers.put(it.type,AugmentConsumer(it.consumer, it.type))
+
+
         }
     }
     fun setConsumers(list: MutableList<AugmentConsumer>, type: AugmentConsumer.Type){
         consumers[type].clear()
-        consumers[type].addAll(list)
-        /*if (type == AugmentConsumer.Type.BENEFICIAL){
-            goodConsumers = list
-        } else {
-            badConsumers = list
-        }*/
+        consumers.putAll(type,list)
     }
     fun setConsumers(ae: AugmentEffect){
         consumers = ae.consumers
-        //goodConsumers = ae.goodConsumers
-        //badConsumers = ae.badConsumers
     }
 }
