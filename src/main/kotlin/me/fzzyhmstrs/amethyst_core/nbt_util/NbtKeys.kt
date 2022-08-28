@@ -20,6 +20,21 @@ enum class NbtKeys {
             return "altar_used"
         }
     },
+    ALTAR_KEY_1{
+        override fun str(): String {
+            return "altar_used_1"
+        }
+    },
+    MAX_XP{
+        override fun str(): String {
+            return "max_xp"
+        }
+    },
+    MAX_XP_1{
+        override fun str(): String {
+            return "max_xp_1"
+        }
+    },
     SCEPTER_ID{
         override fun str(): String {
             return "scepter_id"

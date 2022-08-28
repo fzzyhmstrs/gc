@@ -106,7 +106,6 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     open fun initializeModifiers(stack: ItemStack, nbt: NbtCompound){
         if (nbt.contains(NbtKeys.MODIFIERS.str())){
-            println("initing")
             val id = Nbt.makeItemStackId(stack)
             initializeModifiers(nbt, id)
             gatherActiveModifiers(stack)

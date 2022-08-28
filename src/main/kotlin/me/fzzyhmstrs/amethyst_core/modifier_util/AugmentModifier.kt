@@ -38,7 +38,6 @@ open class AugmentModifier(
     private var secondaryEffect: ScepterAugment? = null
 
     private var hasSecondEffect: Boolean = false
-    private var hasDesc: Boolean = false
 
     override fun plus(other: AugmentModifier): AugmentModifier {
         levelModifier += other.levelModifier
