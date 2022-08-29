@@ -83,10 +83,12 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         val stack = user.getStackInHand(hand)
+        val item = stack.item
+        if (item !is AbstractAugmentBookItem) return TypedActionResult.fail(stack)
         //if (world !is ServerWorld) return TypedActionResult.fail(stack)
         val nbt = stack.orCreateNbt
         if(!nbt.contains(NbtKeys.LORE_KEY.str())){
-            val aug = getRandomBookAugment(loreTier.list())
+            val aug = getRandomBookAugment(loreTier.list(), user, hand)
             Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(),aug,nbt)
             val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
             val type = AugmentHelper.getAugmentType(bola)
@@ -96,7 +98,7 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
             world.playSound(null,user.blockPos,SoundEvents.ITEM_BOOK_PAGE_TURN,SoundCategory.NEUTRAL,0.7f,1.0f)
             return TypedActionResult.success(stack)
         } else if (Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).namespace == "minecraft") {
-            val aug = getRandomBookAugment(loreTier.list())
+            val aug = getRandomBookAugment(loreTier.list(), user, hand)
             Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(),aug,nbt)
             val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
             val type = AugmentHelper.getAugmentType(bola)
@@ -109,21 +111,19 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
         return TypedActionResult.pass(stack)
     }
 
+    open fun getRandomBookAugment(list: List<String>, user: PlayerEntity, hand: Hand): String{
+        if (list.isEmpty()) return AC.fallbackId.toString()
+        val rndMax = list.size
+        val rndIndex = AC.acRandom.nextInt(rndMax)
+        return list[rndIndex]
+    }
+
     companion object{
-
-        private fun getRandomBookAugment(list: List<String>): String{
-            if (list.isEmpty()) return AC.fallbackId.toString()
-            val rndMax = list.size
-            val rndIndex = AC.acRandom.nextInt(rndMax)
-            return list[rndIndex]
-        }
-
         fun addLoreKeyForREI(stack: ItemStack,augment: String){
             val nbt = stack.orCreateNbt
             if(!nbt.contains(NbtKeys.LORE_KEY.str())) {
                 Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(),augment,nbt)
             }
         }
-
     }
 }
