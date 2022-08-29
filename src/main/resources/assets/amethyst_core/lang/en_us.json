@@ -18,5 +18,9 @@
 	"scepter.modifier.amethyst_core:greater_attuned": "Greater Attuned",
 	"scepter.modifier.amethyst_core:lesser_thrifty": "Lesser Thrifty",
 	"scepter.modifier.amethyst_core:thrifty": "Thrifty",
-	"scepter.modifier.amethyst_core:greater_thrifty": "Greater Thrifty"
+	"scepter.modifier.amethyst_core:greater_thrifty": "Greater Thrifty",
+	"death.attack.soul": "%1$s had their soul destroyed",
+	"death.attack.soul.player": "%1$s had their soul destroyed by %2$s",
+	"death.attack.smite": "%1$s was smited",
+	"death.attack.smite.player": "%1$s was smited by %2$s"
 }
