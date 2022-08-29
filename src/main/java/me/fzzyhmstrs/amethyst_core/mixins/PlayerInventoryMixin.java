@@ -2,7 +2,7 @@ package me.fzzyhmstrs.amethyst_core.mixins;
 
 import me.fzzyhmstrs.amethyst_core.item_util.AbstractScepterItem;
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper;
-import net.minecraft.entity.EntityPose;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.Hand;
@@ -24,8 +24,9 @@ public abstract class PlayerInventoryMixin {
     @Inject(at = @At("HEAD"), method = "scrollInHotbar", cancellable = true)
     private void scrollInHotbar(double scrollAmount, CallbackInfo ci) {
         //System.out.println(player.getStackInHand(Hand.MAIN_HAND).getItem().toString());
-        if (player.getStackInHand(Hand.MAIN_HAND).getItem() instanceof AbstractScepterItem){
-            if (player.getPose().equals(EntityPose.CROUCHING)){
+        if (player.getStackInHand(Hand.MAIN_HAND).getItem() instanceof AbstractScepterItem && player.world.isClient){
+            ClientPlayerEntity entity = (ClientPlayerEntity) player;
+            if (entity.input.sneaking){
                 ScepterHelper.INSTANCE.sendScepterUpdateFromClient(scrollAmount < 0.0D);
                 ci.cancel();
             }
