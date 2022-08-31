@@ -71,6 +71,18 @@ object AugmentHelper {
         if(!augmentStats.containsKey(id)) return 1
         return augmentStats[id]?.minLvl?:1
     }
+    
+    fun getAugmentCurrentLevel(scepterLevel: Int, augmentId: Identifier, augment: ScepterAugment): Int{
+        val minLvl = getAugmentMinLvl(augmentId)
+        val maxLevel = (augment.getAugmentMaxLevel()) + minLvl - 1
+        var testLevel = 1
+        if (scetperLevel >= minLvl){
+            testLevel = level
+            if (testLevel > maxLevel) testLevel = maxLevel
+            testLevel -= (minLvl - 1)
+        }
+        return testLevel
+    }
 
     fun getAugmentManaCost(id: String, reduction: Double = 0.0): Int{
         if(!augmentStats.containsKey(id)) return (10 * (100.0 + reduction) / 100.0).toInt()
