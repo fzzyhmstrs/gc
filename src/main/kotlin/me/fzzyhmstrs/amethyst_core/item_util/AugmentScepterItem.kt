@@ -135,7 +135,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
             val level = max(1,testLevel + modifiers.compiledData.levelModifier)
             if (testEnchant.applyModifiableTasks(world, user, hand, level, modifiers.modifiers, modifiers.compiledData)) {
                 applyManaCost(manaCost,stack, world, user)
-                ScepterHelper.incrementScepterStats(stack.orCreateNbt, activeEnchantId, modifiers.compiledData.getXpModifiers())
+                ScepterHelper.incrementScepterStats(stack.orCreateNbt, stack, activeEnchantId, modifiers.compiledData.getXpModifiers())
                 user.itemCooldownManager.set(stack.item, cd)
                 TypedActionResult.success(stack)
             } else {
