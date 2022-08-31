@@ -169,7 +169,7 @@ object ScepterHelper {
         }
     }
 
-    fun incrementScepterStats(scepterNbt: NbtCompound, activeEnchantId: String, xpMods: XpModifiers? = null){
+    fun incrementScepterStats(scepterNbt: NbtCompound, scepter: ItemStack, activeEnchantId: String, xpMods: XpModifiers? = null){
         val spellKey = AugmentHelper.getAugmentType(activeEnchantId).name
         if(spellKey == SpellType.NULL.name) return
         val statLvl = Nbt.readIntNbt(spellKey + "_lvl",scepterNbt)
@@ -178,7 +178,29 @@ object ScepterHelper {
         Nbt.writeIntNbt(spellKey + "_xp",statXp,scepterNbt)
         if(checkXpForLevelUp(statXp,statLvl)){
             Nbt.writeIntNbt(spellKey + "_lvl",statLvl + 1,scepterNbt)
+            updateScepterAugments(scepter, scepterNbt)
         }
+    }
+    
+    private fun checkXpForLevelUp(xp:Int,lvl:Int): Boolean{
+        return (xp > (2 * lvl * lvl + 40 * lvl))
+    }
+    
+    private fun updateScepterAugments(scepter: ItemStack, scepterNbt: NbtCompound){
+        val enchantMap = EnchantmentHelper.get(scepter)
+        for (e in enchantMap){
+            val aug = e.key
+            if (aug is ScepterAugment){
+                val l = e.value
+                val maxL = aug.getAugmentMaxLevel()
+                if (l >= maxL) continue
+                val augId = Registry.ENCHANTMENT.getId(aug)?:continue
+                val scepterL = getScepterStat(scepterNbt,augId).first
+                val newAugL = AugmentHelper.getAugmentCurrentLevel(scepterL,augId, aug)
+                enchantMap[aug] = newAugL
+            }
+        }
+        EnchantmentHelper.set(enchantMap,scepter)
     }
 
     fun getScepterStat(scepterNbt: NbtCompound, activeEnchantId: String): Pair<Int,Int>{
@@ -236,10 +258,6 @@ object ScepterHelper {
     fun xpToNextLevel(xp: Int,lvl: Int): Int{
         val xpNext = (2 * lvl * lvl + 40 * lvl)
         return (xpNext - xp + 1)
-    }
-
-    private fun checkXpForLevelUp(xp:Int,lvl:Int): Boolean{
-        return (xp > (2 * lvl * lvl + 40 * lvl))
     }
 
     private fun getStatsHelper(nbt: NbtCompound): IntArray{
