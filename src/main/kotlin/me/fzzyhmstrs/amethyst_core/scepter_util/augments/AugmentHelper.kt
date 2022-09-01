@@ -9,6 +9,7 @@ import net.minecraft.item.Items
 import net.minecraft.loot.function.LootFunction
 import net.minecraft.loot.function.SetEnchantmentsLootFunction
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
+import net.minecraft.util.Identifier
 import kotlin.math.max
 
 /**
@@ -73,11 +74,11 @@ object AugmentHelper {
     }
     
     fun getAugmentCurrentLevel(scepterLevel: Int, augmentId: Identifier, augment: ScepterAugment): Int{
-        val minLvl = getAugmentMinLvl(augmentId)
+        val minLvl = getAugmentMinLvl(augmentId.toString())
         val maxLevel = (augment.getAugmentMaxLevel()) + minLvl - 1
         var testLevel = 1
-        if (scetperLevel >= minLvl){
-            testLevel = level
+        if (scepterLevel >= minLvl){
+            testLevel = scepterLevel
             if (testLevel > maxLevel) testLevel = maxLevel
             testLevel -= (minLvl - 1)
         }
