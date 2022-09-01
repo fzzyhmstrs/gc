@@ -195,7 +195,7 @@ object ScepterHelper {
                 val maxL = aug.getAugmentMaxLevel()
                 if (l >= maxL) continue
                 val augId = Registry.ENCHANTMENT.getId(aug)?:continue
-                val scepterL = getScepterStat(scepterNbt,augId).first
+                val scepterL = getScepterStat(scepterNbt,augId.toString()).first
                 val newAugL = AugmentHelper.getAugmentCurrentLevel(scepterL,augId, aug)
                 enchantMap[aug] = newAugL
             }
