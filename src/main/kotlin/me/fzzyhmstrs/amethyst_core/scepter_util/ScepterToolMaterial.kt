@@ -9,5 +9,7 @@ import net.minecraft.item.ToolMaterial
 abstract class ScepterToolMaterial: ToolMaterial, ManaItemMaterial {
    
   abstract fun scepterTier(): Int
+
+  abstract fun getAttackSpeed(): Double
   
 }

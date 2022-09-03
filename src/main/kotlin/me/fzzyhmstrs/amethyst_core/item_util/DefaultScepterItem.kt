@@ -1,5 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.Multimap
 import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
@@ -12,7 +14,11 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.EnchantmentHelper
+import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.particle.ParticleTypes
@@ -38,6 +44,8 @@ import net.minecraft.text.TranslatableText
 abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Settings):
     AugmentScepterItem(material,settings), ParticleEmitting{
 
+    private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifier>
+
     init{
         if(FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
             try {
@@ -46,6 +54,17 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
                 println("oops!")
             }
         }
+        val builder = ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>()
+        builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE,EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Weapon modifier",material.attackDamage.toDouble(), EntityAttributeModifier.Operation.ADDITION))
+        builder.put(EntityAttributes.GENERIC_ATTACK_SPEED,EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Weapon modifier", material.getAttackSpeed(), EntityAttributeModifier.Operation.ADDITION))
+        attributeModifiers = builder.build()
+    }
+
+    override fun getAttributeModifiers(slot: EquipmentSlot): Multimap<EntityAttribute, EntityAttributeModifier> {
+        if (slot == EquipmentSlot.MAINHAND) {
+            return attributeModifiers
+        }
+        return super.getAttributeModifiers(slot)
     }
 
     override fun appendTooltip(
