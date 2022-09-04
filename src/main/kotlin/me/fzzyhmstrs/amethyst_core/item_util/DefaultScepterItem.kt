@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
 import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.LinkedHashMultimap
 import com.google.common.collect.Multimap
 import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting
@@ -43,6 +44,7 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
     AugmentScepterItem(material,settings), ParticleEmitting{
 
     private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifier>
+    private val damage: Double
 
     init{
         if(FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
@@ -52,14 +54,35 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
                 println("oops!")
             }
         }
-        val builder = ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>()
-        builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE,EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Weapon modifier",material.attackDamage.toDouble(), EntityAttributeModifier.Operation.ADDITION))
-        builder.put(EntityAttributes.GENERIC_ATTACK_SPEED,EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Weapon modifier", material.getAttackSpeed(), EntityAttributeModifier.Operation.ADDITION))
-        attributeModifiers = builder.build()
+        damage = material.attackDamage.toDouble()
+        if (damage > 0.0) {
+            val builder = ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>()
+            builder.put(
+                EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                EntityAttributeModifier(
+                    ATTACK_DAMAGE_MODIFIER_ID,
+                    "Weapon modifier",
+                    material.attackDamage.toDouble(),
+                    EntityAttributeModifier.Operation.ADDITION
+                )
+            )
+            builder.put(
+                EntityAttributes.GENERIC_ATTACK_SPEED,
+                EntityAttributeModifier(
+                    ATTACK_SPEED_MODIFIER_ID,
+                    "Weapon modifier",
+                    material.getAttackSpeed(),
+                    EntityAttributeModifier.Operation.ADDITION
+                )
+            )
+            attributeModifiers = builder.build()
+        } else {
+            attributeModifiers = LinkedHashMultimap.create()
+        }
     }
 
     override fun getAttributeModifiers(slot: EquipmentSlot): Multimap<EntityAttribute, EntityAttributeModifier> {
-        if (slot == EquipmentSlot.MAINHAND) {
+        if (slot == EquipmentSlot.MAINHAND && damage > 0) {
             return attributeModifiers
         }
         return super.getAttributeModifiers(slot)
