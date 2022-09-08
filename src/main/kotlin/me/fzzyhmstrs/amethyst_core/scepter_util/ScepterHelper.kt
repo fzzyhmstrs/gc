@@ -145,7 +145,6 @@ object ScepterHelper {
         } else{
             user.itemCooldownManager.set(stack.item, (cooldown - timeSinceLast).toInt())
         }
-        ModifierHelper.gatherActiveModifiers(stack)
         Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),newActiveEnchant, nbt)
         val message = TranslatableText("scepter.new_active_spell").append(TranslatableText("enchantment.${Identifier(newActiveEnchant).namespace}.${Identifier(newActiveEnchant).path}"))
         user.sendMessage(message,false)

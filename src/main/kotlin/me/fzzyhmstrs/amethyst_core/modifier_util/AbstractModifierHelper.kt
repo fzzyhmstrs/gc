@@ -193,18 +193,24 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     inline fun <reified A:AbstractModifier<A>> gatherActiveAbstractModifiers(stack: ItemStack, objectToAffect: Identifier, compiler: AbstractModifier<A>.Compiler): AbstractModifier<A>.CompiledModifiers{
         val id = Nbt.getItemStackId(stack)
+        println(objectToAffect)
+        println(getModifiersById(id))
         getModifiersById(id).forEach { identifier ->
             val modifier = ModifierRegistry.getByType<A>(identifier)
+            println(modifier)
             if (modifier != null){
                 if (!modifier.hasObjectToAffect()){
                     compiler.add(modifier)
                 } else {
                     if (modifier.checkObjectsToAffect(objectToAffect)){
+                        println("affecting this modifier")
                         compiler.add(modifier)
                     }
                 }
             }
         }
-        return compiler.compile()
+        val compiled = compiler.compile()
+        println(compiled.modifiers)
+        return compiled
     }
 }

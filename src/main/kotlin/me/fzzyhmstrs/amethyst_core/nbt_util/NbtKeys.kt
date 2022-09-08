@@ -61,9 +61,14 @@ enum class NbtKeys {
             return "active_enchant_id"
         }
     },
-    INITIALIZED{
+    ENCHANT_INIT{
         override fun str(): String {
-            return "initialized"
+            return "enchant_init_"
+        }
+    },
+    MOD_INIT{
+        override fun str(): String {
+            return "mod_init_"
         }
     },
     LAST_USED{

@@ -16,9 +16,6 @@ import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
-import net.minecraft.loot.function.LootFunction
-import net.minecraft.loot.function.SetEnchantmentsLootFunction
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
@@ -167,13 +164,9 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {
         super.writeDefaultNbt(stack, scepterNbt)
+        addDefaultEnchantments(stack, scepterNbt)
         activeNbtCheck(scepterNbt)
         ScepterHelper.getScepterStats(stack)
-    }
-
-    override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
-        super.initializeScepter(stack, scepterNbt)
-        addDefaultEnchantments(stack, scepterNbt)
     }
 
     private fun activeNbtCheck(scepterNbt: NbtCompound){
@@ -188,7 +181,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
     }
 
     open fun addDefaultEnchantments(stack: ItemStack, scepterNbt: NbtCompound){
-        if (scepterNbt.contains(NbtKeys.INITIALIZED.str())) return
+        if (scepterNbt.contains(NbtKeys.ENCHANT_INIT.str() + stack.translationKey)) return
         val enchantToAdd = Registry.ENCHANTMENT.get(this.fallbackId)
         if (enchantToAdd != null && !noFallback){
             if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
@@ -200,7 +193,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
                 stack.addEnchantment(it,1)
             }
         }
-        Nbt.writeBoolNbt(NbtKeys.INITIALIZED.str(),true,scepterNbt)
+        Nbt.writeBoolNbt(NbtKeys.ENCHANT_INIT.str() + stack.translationKey,true,scepterNbt)
     }
 
     open fun resetCooldown(stack: ItemStack, world: World, user: PlayerEntity, activeEnchant: String): TypedActionResult<ItemStack>{
@@ -217,9 +210,5 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
             initializeScepter(stack,nbt)
             Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
         }
-    }
-
-    companion object{
-
     }
 }

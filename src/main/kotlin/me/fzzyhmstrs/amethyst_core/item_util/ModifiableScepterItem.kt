@@ -6,10 +6,12 @@ import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.Identifier
+import net.minecraft.world.World
 
 /**
  * An abstract scepter integrated into the [Modifier][AbstractModifier] System.
@@ -28,17 +30,9 @@ abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterTo
         return this
     }
 
-    override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound){
+    override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {
         super.writeDefaultNbt(stack, scepterNbt)
-        if (!scepterNbt.contains(NbtKeys.MODIFIERS.str())) {
-            val nbtList = NbtList()
-            defaultModifiers.forEach {
-                val nbtEl = NbtCompound()
-                Nbt.writeStringNbt(NbtKeys.MODIFIER_ID.str(), it.toString(), nbtEl)
-                nbtList.add(nbtEl)
-            }
-            scepterNbt.put(NbtKeys.MODIFIERS.str(), nbtList)
-        }
+        addDefaultModifiers(stack, scepterNbt)
     }
 
     override fun initializeScepter(stack: ItemStack, scepterNbt: NbtCompound) {
@@ -54,6 +48,12 @@ abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterTo
         return (defaultModifiers.isNotEmpty() && !scepterNbt.contains(NbtKeys.MODIFIERS.str()))
     }
 
-
-
+    private fun addDefaultModifiers(stack: ItemStack, scepterNbt: NbtCompound){
+        if (!scepterNbt.contains(NbtKeys.MOD_INIT.str() + stack.translationKey)) {
+            defaultModifiers.forEach {
+                ModifierHelper.addModifier(it, stack)
+            }
+            scepterNbt.putBoolean(NbtKeys.MOD_INIT.str() + stack.translationKey,true)
+        }
+    }
 }
