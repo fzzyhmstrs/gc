@@ -140,17 +140,5 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
             val particlePos = scepterParticlePos(client, user)
             world.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,particlePos.x,particlePos.y,particlePos.z,user.velocity.x,user.velocity.y + 0.5,user.velocity.z)
         }
-
-        fun addDefaultEnchantment(stack: ItemStack){
-            val item = stack.item
-            if (item is AbstractScepterItem) {
-                val enchantToAdd = Registry.ENCHANTMENT.get(item.fallbackId)
-                if (enchantToAdd != null){
-                    if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
-                        stack.addEnchantment(enchantToAdd,1)
-                    }
-                }
-            }
-        }
     }
 }

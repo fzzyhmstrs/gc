@@ -51,6 +51,7 @@ object ScepterHelper {
             return null
         }
         //cooldown modifier is a percentage modifier, so 20% will boost cooldown by 20%. -20% will take away 20% cooldown
+        println(cdMod)
         val cooldown = (AugmentHelper.getAugmentCooldown(activeEnchantId).times(100.0+ cdMod).div(100.0)).toInt()
         val time = world.time
 
@@ -145,8 +146,8 @@ object ScepterHelper {
         } else{
             user.itemCooldownManager.set(stack.item, (cooldown - timeSinceLast).toInt())
         }
-        ModifierHelper.gatherActiveModifiers(stack)
         Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),newActiveEnchant, nbt)
+        ModifierHelper.gatherActiveModifiers(stack)
         val message = Text.translatable("scepter.new_active_spell").append(Text.translatable("enchantment.${Identifier(newActiveEnchant).namespace}.${Identifier(newActiveEnchant).path}"))
         user.sendMessage(message,false)
     }
