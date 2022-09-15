@@ -40,11 +40,23 @@ object AugmentHelper {
         registerAugmentStat(id,configAugmentStat(augment,id,imbueLevel),true)
     }
 
+    /**
+     * used to check if a registry or other initialization method should consider the provided augment.
+     */
+    fun checkIfAugmentEnabled(augment: ScepterAugment): Boolean{
+        val id = EnchantmentHelper.getEnchantmentId(augment)?.toString()?:throw NoSuchElementException("Enchantment ID for ${this.javaClass.canonicalName} not found!")
+        return configAugmentStat(augment, id).enabled
+    }
+
+    /**
+     * takes a provided ScepterAugment, scrapes it's current stats into an AugmentStat class and then runs that default set of stats through configAugment, which reads or creates a json config file to store and/or alter the base info.
+     */
     private fun configAugmentStat(augment: ScepterAugment, id: String, imbueLevel: Int = 1): AugmentDatapoint {
         val stat = augment.augmentStat(imbueLevel)
         val augmentConfig = ScepterAugment.Companion.AugmentStats()
         val type = stat.type
         augmentConfig.id = id
+        augmentConfig.enabled = stat.enabled
         augmentConfig.cooldown = stat.cooldown
         augmentConfig.manaCost = stat.manaCost
         augmentConfig.minLvl = stat.minLvl

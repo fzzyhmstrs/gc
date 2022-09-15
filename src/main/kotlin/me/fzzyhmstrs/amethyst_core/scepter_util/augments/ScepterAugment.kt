@@ -1,7 +1,9 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreateUpdated
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
@@ -130,23 +132,42 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
 
     companion object{
 
-        const val augmentVersion = "_v0"
+        const val augmentVersion = "_v1"
+        private const val oldAugmentVersion = "_v0"
 
         class AugmentStats {
             var id: String = AC.fallbackId.toString()
+            var enabled: Boolean = true
             var cooldown: Int = 20
             var manaCost: Int = 2
             var minLvl: Int = 1
         }
 
+        class AugmentStatsV0: SyncedConfigHelper.OldClass {
+            var id: String = AC.fallbackId.toString()
+            var cooldown: Int = 20
+            var manaCost: Int = 2
+            var minLvl: Int = 1
+            override fun generateNewClass(): Any {
+                val augmentStats = AugmentStats()
+                augmentStats.id = id
+                augmentStats.cooldown = cooldown
+                augmentStats.manaCost = manaCost
+                augmentStats.minLvl = minLvl
+                return augmentStats
+            }
+        }
+
         fun configAugment(file: String, configClass: AugmentStats): AugmentStats {
             val ns = Identifier(configClass.id).namespace
+            val oldFile = file.substring(0,file.length - 8) + oldAugmentVersion + ".json"
             val base = if(ns == "minecraft"){
                 AC.MOD_ID
             } else {
                 ns
             }
-            return readOrCreate(file,"augments", base) {configClass}
+            return readOrCreateUpdated(file, oldFile,"augments", base, configClass = {configClass}, previousClass = {AugmentStatsV0()})
+            //return readOrCreate(file,"augments", base) {configClass}
         }
     }
 }
