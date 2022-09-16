@@ -43,9 +43,8 @@ object AugmentHelper {
     /**
      * used to check if a registry or other initialization method should consider the provided augment.
      */
-    fun checkIfAugmentEnabled(augment: ScepterAugment): Boolean{
-        val id = EnchantmentHelper.getEnchantmentId(augment)?.toString()?:throw NoSuchElementException("Enchantment ID for ${this.javaClass.canonicalName} not found!")
-        return configAugmentStat(augment, id).enabled
+    fun checkIfAugmentEnabled(augment: ScepterAugment, id: Identifier): Boolean{
+        return configAugmentStat(augment, id.toString()).enabled
     }
 
     /**
