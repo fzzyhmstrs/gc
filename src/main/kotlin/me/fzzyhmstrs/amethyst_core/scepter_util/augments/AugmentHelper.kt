@@ -44,11 +44,14 @@ object AugmentHelper {
      * used to check if a registry or other initialization method should consider the provided augment.
      */
     fun checkIfAugmentEnabled(augment: ScepterAugment, id: Identifier): Boolean{
-        return configAugmentStat(augment, id.toString()).enabled
+        val augmentConfig = ScepterAugment.Companion.AugmentStats()
+        augmentConfig.id = id.toString()
+        val augmentAfterConfig = ScepterAugment.configAugment(augment.javaClass.simpleName + ScepterAugment.augmentVersion +".json", augmentConfig)
+        return augmentAfterConfig.enabled
     }
 
     /**
-     * takes a provided ScepterAugment, scrapes it's current stats into an AugmentStat class and then runs that default set of stats through configAugment, which reads or creates a json config file to store and/or alter the base info.
+     * takes a provided ScepterAugment, scrapes its current stats into an AugmentStat class and then runs that default set of stats through configAugment, which reads or creates a json config file to store and/or alter the base info.
      */
     private fun configAugmentStat(augment: ScepterAugment, id: String, imbueLevel: Int = 1): AugmentDatapoint {
         val stat = augment.augmentStat(imbueLevel)
