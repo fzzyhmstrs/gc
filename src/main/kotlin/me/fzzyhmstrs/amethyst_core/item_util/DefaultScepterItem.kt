@@ -112,7 +112,7 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
             TranslatableText("enchantment.amethyst_core.none")
         }
 
-        tooltip.add(TranslatableText("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell.formatted(Formatting.GOLD)))
+        tooltip.add(TranslatableText("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell))
         val stats = ScepterHelper.getScepterStats(stack)
         val furyText = TranslatableText("scepter.fury.lvl").string + stats[0].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[3],stats[0]).toString()
         tooltip.add(LiteralText(furyText).formatted(SpellType.FURY.fmt()))
