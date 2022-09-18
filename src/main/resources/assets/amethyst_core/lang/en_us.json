@@ -1,6 +1,8 @@
 {
 	"enchantment.amethyst_core.none": "None",
 	"enchantment.amethyst_imbuement.none.desc": "No Description.",
+	"scepter.augment.disabled": " (Disabled)",
+	"scepter.augment.disabled_message": "%1$s is disabled in the augment configs! :(",
 	"scepter.fury.lvl": "Fury: ",
 	"scepter.grace.lvl": "Grace: ",
 	"scepter.wit.lvl": "Wit: ",

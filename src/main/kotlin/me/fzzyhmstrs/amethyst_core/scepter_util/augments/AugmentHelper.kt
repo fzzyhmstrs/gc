@@ -121,6 +121,15 @@ object AugmentHelper {
         if (!augmentStats.containsKey(id)) return (LoreTier.NO_TIER)
         return (augmentStats[id]?.bookOfLoreTier) ?: LoreTier.NO_TIER
     }
+    fun getAugmentEnabled(id: String): Boolean {
+        if (!augmentStats.containsKey(id)) return false
+        return (augmentStats[id]?.enabled) ?: false
+    }
+
+    fun getAugmentDatapoint(id: String): AugmentDatapoint{
+        if (!augmentStats.containsKey(id)) return AugmentDatapoint()
+        return augmentStats[id]?:AugmentDatapoint()
+    }
 
     /**
      * A [LootFunction.Builder] that can be used in a loot pool builder to apply default augments to a scepter, the provided list of augments, or both.
