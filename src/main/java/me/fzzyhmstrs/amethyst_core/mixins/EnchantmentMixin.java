@@ -30,11 +30,11 @@ public abstract class EnchantmentMixin{
             Identifier id = Registry.ENCHANTMENT.getId(enchant);
             if (id != null){
                 if(!AugmentHelper.INSTANCE.getAugmentEnabled(id.toString())){
-                    MutableText mutableText = new TranslatableText(this.translationKey);
+                    MutableText mutableText = Text.translatable(this.translationKey);
                     if (level != 1 || this.getMaxLevel() != 1) {
-                        mutableText.append(" ").append(new TranslatableText("enchantment.level." + level));
+                        mutableText.append(" ").append(Text.translatable("enchantment.level." + level));
                     }
-                    mutableText.append(new TranslatableText("scepter.augment.disabled"));
+                    mutableText.append(Text.translatable("scepter.augment.disabled"));
                     mutableText.formatted(Formatting.DARK_RED).formatted(Formatting.STRIKETHROUGH);
                     cir.setReturnValue(mutableText);
                 }
