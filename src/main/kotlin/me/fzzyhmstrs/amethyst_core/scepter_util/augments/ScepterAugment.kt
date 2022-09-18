@@ -2,23 +2,30 @@ package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper
+import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.gson
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreateUpdated
+import me.fzzyhmstrs.amethyst_core.config.AcConfig
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.registry.SyncedConfigRegistry
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.network.PacketByteBuf
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**
@@ -40,6 +47,13 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
     abstract fun augmentStat(imbueLevel: Int = 1): AugmentDatapoint
 
     fun applyModifiableTasks(world: World, user: LivingEntity, hand: Hand, level: Int, modifiers: List<AugmentModifier> = listOf(), modifierData: AugmentModifier? = null): Boolean{
+        val aug = Registry.ENCHANTMENT.getId(this) ?: return false
+        if (!AugmentHelper.getAugmentEnabled(aug.toString())) {
+            if (user is PlayerEntity){
+                user.sendMessage(TranslatableText("scepter.augment.disabled_message", this.getName(1)), false)
+            }
+            return false
+        }
         val effectModifiers = AugmentEffect()
         effectModifiers.plus(modifierData?.getEffectModifier()?: AugmentEffect())
         effectModifiers.plus(baseEffect)
@@ -135,6 +149,32 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         const val augmentVersion = "_v1"
         private const val oldAugmentVersion = "_v0"
 
+        //small config class for syncing purposes
+        class AugmentConfig(val id: String, stats: AugmentStats): SyncedConfigHelper.SyncedConfig{
+
+            private var augmentStats: AugmentStats = stats
+
+            init{
+                initConfig()
+            }
+
+            override fun readFromServer(buf: PacketByteBuf) {
+                augmentStats = gson.fromJson(buf.readString(), AugmentStats::class.java)
+                val currentDataPoint = AugmentHelper.getAugmentDatapoint(augmentStats.id)
+                val newDataPoint = currentDataPoint.copy(cooldown = augmentStats.cooldown, manaCost = augmentStats.manaCost, minLvl = augmentStats.minLvl, enabled = augmentStats.enabled)
+                AugmentHelper.registerAugmentStat(augmentStats.id, newDataPoint,true)
+            }
+
+            override fun writeToClient(buf: PacketByteBuf) {
+                buf.writeString(gson.toJson(augmentStats))
+            }
+
+            override fun initConfig() {
+                SyncedConfigRegistry.registerConfig(id,this)
+            }
+        }
+
+
         class AugmentStats {
             var id: String = AC.fallbackId.toString()
             var enabled: Boolean = true
@@ -166,8 +206,9 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
             } else {
                 ns
             }
-            return readOrCreateUpdated(file, oldFile,"augments", base, configClass = {configClass}, previousClass = {AugmentStatsV0()})
-            //return readOrCreate(file,"augments", base) {configClass}
+            val configuredStats = readOrCreateUpdated(file, oldFile,"augments", base, configClass = {configClass}, previousClass = {AugmentStatsV0()})
+            val config = AugmentConfig(file,configuredStats)
+            return configuredStats
         }
     }
 }
