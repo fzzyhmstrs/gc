@@ -5,7 +5,6 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
