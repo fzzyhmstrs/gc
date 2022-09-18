@@ -10,6 +10,8 @@ import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
+import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.fabricmc.api.EnvType
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
@@ -100,10 +102,16 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         val nbt = stack.orCreateNbt
         val activeSpell = if (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) {
             val activeEnchantId = Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
-            TranslatableText("enchantment.${Identifier(activeEnchantId).namespace}.${Identifier(activeEnchantId).path}")
+            val text = TranslatableText("enchantment.${Identifier(activeEnchantId).namespace}.${Identifier(activeEnchantId).path}")
+            if(!AugmentHelper.getAugmentEnabled(activeEnchantId)){
+                text.formatted(Formatting.DARK_RED).formatted(Formatting.STRIKETHROUGH)
+            } else {
+                text.formatted(Formatting.GOLD)
+            }
         } else {
             TranslatableText("enchantment.amethyst_core.none")
         }
+
         tooltip.add(TranslatableText("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell.formatted(Formatting.GOLD)))
         val stats = ScepterHelper.getScepterStats(stack)
         val furyText = TranslatableText("scepter.fury.lvl").string + stats[0].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[3],stats[0]).toString()
