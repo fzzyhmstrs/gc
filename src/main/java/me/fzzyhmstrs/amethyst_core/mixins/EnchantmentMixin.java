@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Enchantment.class)
 public abstract class EnchantmentMixin{
 
-    @Shadow @Nullable protected String translationKey;
+    @Shadow protected abstract String getOrCreateTranslationKey();
 
     @Shadow public abstract int getMaxLevel();
 
@@ -29,13 +29,12 @@ public abstract class EnchantmentMixin{
             Identifier id = Registry.ENCHANTMENT.getId(enchant);
             if (id != null){
                 if(!AugmentHelper.INSTANCE.getAugmentEnabled(id.toString())){
-                    MutableText mutableText = Text.translatable(this.translationKey);
+                    MutableText mutableText = Text.translatable(getOrCreateTranslationKey());
                     if (level != 1 || this.getMaxLevel() != 1) {
                         mutableText.append(" ").append(Text.translatable("enchantment.level." + level));
                     }
                     mutableText.append(Text.translatable("scepter.augment.disabled"));
                     mutableText.formatted(Formatting.DARK_RED).formatted(Formatting.STRIKETHROUGH);
-                    System.out.println(mutableText);
                     cir.setReturnValue(mutableText);
                 }
             }

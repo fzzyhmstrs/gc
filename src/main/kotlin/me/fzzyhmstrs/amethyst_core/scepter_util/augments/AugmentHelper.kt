@@ -65,7 +65,7 @@ object AugmentHelper {
         val tier = stat.bookOfLoreTier
         val item = stat.keyItem
         val augmentAfterConfig = ScepterAugment.configAugment(augment.javaClass.simpleName + ScepterAugment.augmentVersion +".json", augmentConfig)
-        return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item)
+        return AugmentDatapoint(type,augmentAfterConfig.cooldown,augmentAfterConfig.manaCost,augmentAfterConfig.minLvl,imbueLevel,tier,item, augmentAfterConfig.enabled)
     }
 
     fun checkAugmentStat(id: String): Boolean{
