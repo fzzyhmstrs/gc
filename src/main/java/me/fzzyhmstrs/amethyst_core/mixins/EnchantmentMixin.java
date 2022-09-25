@@ -35,6 +35,7 @@ public abstract class EnchantmentMixin{
                     }
                     mutableText.append(Text.translatable("scepter.augment.disabled"));
                     mutableText.formatted(Formatting.DARK_RED).formatted(Formatting.STRIKETHROUGH);
+                    System.out.println(mutableText);
                     cir.setReturnValue(mutableText);
                 }
             }
