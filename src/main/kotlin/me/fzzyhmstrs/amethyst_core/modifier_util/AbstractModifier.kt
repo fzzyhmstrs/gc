@@ -1,10 +1,10 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.coding_util.Addable
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier.CompiledModifiers
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import net.minecraft.item.ItemStack
-import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import java.util.function.Predicate
@@ -78,7 +78,7 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
         return objectsToAffect?.test(id) ?: return false
     }
     open fun getName(): Text {
-        return LiteralText("$modifierId")
+        return AcText.literal("$modifierId")
     }
     open fun isAcceptableItem(stack: ItemStack): Boolean{
         acceptableItemStacks().forEach {

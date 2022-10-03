@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.LoreTier
@@ -11,12 +12,9 @@ import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
@@ -42,32 +40,32 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
         val nbt = stack.orCreateNbt
         if (nbt.contains(NbtKeys.LORE_KEY.str())){
             val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
-            tooltip.add(TranslatableText("lore_book.augment").formatted(Formatting.GOLD).append(TranslatableText("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}").formatted(Formatting.GOLD)))
-            tooltip.add(TranslatableText("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}.desc").formatted(Formatting.WHITE))
+            tooltip.add(AcText.translatable("lore_book.augment").formatted(Formatting.GOLD).append(AcText.translatable("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}").formatted(Formatting.GOLD)))
+            tooltip.add(AcText.translatable("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}.desc").formatted(Formatting.WHITE))
             val type = AugmentHelper.getAugmentType(bola)
             if (type == SpellType.NULL){
-                tooltip.add(TranslatableText("lore_book.${type.str()}").formatted(type.fmt()))
+                tooltip.add(AcText.translatable("lore_book.${type.str()}").formatted(type.fmt()))
             } else {
                 val lvl = AugmentHelper.getAugmentMinLvl(bola)
-                tooltip.add(TranslatableText("lore_book.${type.str()}").formatted(type.fmt()).append(LiteralText(lvl.toString())))
+                tooltip.add(AcText.translatable("lore_book.${type.str()}").formatted(type.fmt()).append(AcText.literal(lvl.toString())))
             }
             val item = AugmentHelper.getAugmentItem(bola)
             if (item != Items.AIR) {
                 val itemText = item.name.shallowCopy().formatted(Formatting.WHITE)
-                tooltip.add(TranslatableText("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
+                tooltip.add(AcText.translatable("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
             }
             val xpLevels = AugmentHelper.getAugmentImbueLevel(bola)
-            tooltip.add(TranslatableText("lore_book.xp_level").formatted(Formatting.WHITE).append(xpLevels.toString()))
+            tooltip.add(AcText.translatable("lore_book.xp_level").formatted(Formatting.WHITE).append(xpLevels.toString()))
             val cooldown = AugmentHelper.getAugmentCooldown(bola).toFloat() / 20.0F
-            tooltip.add(TranslatableText("lore_book.cooldown").formatted(Formatting.WHITE).append(LiteralText(cooldown.toString())).append(TranslatableText("lore_book.cooldown1").formatted(Formatting.WHITE)))
+            tooltip.add(AcText.translatable("lore_book.cooldown").formatted(Formatting.WHITE).append(AcText.literal(cooldown.toString())).append(AcText.translatable("lore_book.cooldown1").formatted(Formatting.WHITE)))
             val manaCost = AugmentHelper.getAugmentManaCost(bola)
-            tooltip.add(TranslatableText("lore_book.mana_cost").formatted(Formatting.WHITE).append(LiteralText(manaCost.toString())))
+            tooltip.add(AcText.translatable("lore_book.mana_cost").formatted(Formatting.WHITE).append(AcText.literal(manaCost.toString())))
             val bole = Registry.ENCHANTMENT.get(Identifier(bola))
             if (bole is ScepterAugment) {
                 val spellTier = bole.getTier()
                 tooltip.add(
-                    TranslatableText("lore_book.tier").formatted(Formatting.WHITE)
-                        .append(LiteralText(spellTier.toString()))
+                    AcText.translatable("lore_book.tier").formatted(Formatting.WHITE)
+                        .append(AcText.literal(spellTier.toString()))
                 )
             }
         } else {

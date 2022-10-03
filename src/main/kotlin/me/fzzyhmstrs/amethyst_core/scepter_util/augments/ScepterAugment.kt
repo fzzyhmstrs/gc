@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.gson
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreate
@@ -21,7 +22,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.TranslatableText
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
@@ -50,7 +50,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         val aug = Registry.ENCHANTMENT.getId(this) ?: return false
         if (!AugmentHelper.getAugmentEnabled(aug.toString())) {
             if (user is PlayerEntity){
-                user.sendMessage(TranslatableText("scepter.augment.disabled_message", this.getName(1)), false)
+                user.sendMessage(AcText.translatable("scepter.augment.disabled_message", this.getName(1)), false)
             }
             return false
         }

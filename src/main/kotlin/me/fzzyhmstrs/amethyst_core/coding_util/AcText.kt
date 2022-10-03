@@ -1,28 +1,29 @@
 package me.fzzyhmstrs.amethyst_core.coding_util
 
 
-import import net.minecraft.text.Text
-import import net.minecraft.text.MutableText
+import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
+import net.minecraft.text.MutableText
+import net.minecraft.text.TranslatableText
 
-class AcText(){
+object AcText{
 
-    fun translatable(key: String, vararg args: Object): MutableText{
-        return Text.translatable(key, *args)
+    fun translatable(key: String, vararg args: Any): MutableText{
+        return TranslatableText(key, *args)
     }
     
     fun literal(text: String): MutableText{
-        return Text.literal(text)
+        return LiteralText(text)
     }
     
     fun empty(): MutableText{
-        return Text.empty()
+        return LiteralText("")
     }
-    
-    fun appended(baseText: MutableText, vararg appenders: Text): MutableText{
-        val finalText = baseText
-        appenders.forEach{
-            finalText.append(it)
+
+    fun appended(baseText: MutableText, vararg appended: Text): MutableText {
+        appended.forEach {
+            baseText.append(it)
         }
-        return finalText
+        return baseText
     }
 }

@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.item_util
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.LinkedHashMultimap
 import com.google.common.collect.Multimap
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticles.scepterParticlePos
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.ParticleEmitting
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
@@ -30,10 +31,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
-import net.minecraft.text.LiteralText
-import net.minecraft.text.TranslatableText
 
 /**
  * The default Amethyst Imbuement style scepter.
@@ -102,24 +100,24 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         val nbt = stack.orCreateNbt
         val activeSpell = if (nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) {
             val activeEnchantId = Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
-            val text = TranslatableText("enchantment.${Identifier(activeEnchantId).namespace}.${Identifier(activeEnchantId).path}")
+            val text = AcText.translatable("enchantment.${Identifier(activeEnchantId).namespace}.${Identifier(activeEnchantId).path}")
             if(!AugmentHelper.getAugmentEnabled(activeEnchantId)){
                 text.formatted(Formatting.DARK_RED).formatted(Formatting.STRIKETHROUGH)
             } else {
                 text.formatted(Formatting.GOLD)
             }
         } else {
-            TranslatableText("enchantment.amethyst_core.none")
+            AcText.translatable("enchantment.amethyst_core.none")
         }
 
-        tooltip.add(TranslatableText("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell))
+        tooltip.add(AcText.translatable("scepter.active_spell").formatted(Formatting.GOLD).append(activeSpell))
         val stats = ScepterHelper.getScepterStats(stack)
-        val furyText = TranslatableText("scepter.fury.lvl").string + stats[0].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[3],stats[0]).toString()
-        tooltip.add(LiteralText(furyText).formatted(SpellType.FURY.fmt()))
-        val graceText = TranslatableText("scepter.grace.lvl").string + stats[1].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[4],stats[1]).toString()
-        tooltip.add(LiteralText(graceText).formatted(SpellType.GRACE.fmt()))
-        val witText = TranslatableText("scepter.wit.lvl").string + stats[2].toString() + TranslatableText("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
-        tooltip.add(LiteralText(witText).formatted(SpellType.WIT.fmt()))
+        val furyText = AcText.translatable("scepter.fury.lvl").string + stats[0].toString() + AcText.translatable("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[3],stats[0]).toString()
+        tooltip.add(AcText.literal(furyText).formatted(SpellType.FURY.fmt()))
+        val graceText = AcText.translatable("scepter.grace.lvl").string + stats[1].toString() + AcText.translatable("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[4],stats[1]).toString()
+        tooltip.add(AcText.literal(graceText).formatted(SpellType.GRACE.fmt()))
+        val witText = AcText.translatable("scepter.wit.lvl").string + stats[2].toString() + AcText.translatable("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
+        tooltip.add(AcText.literal(witText).formatted(SpellType.WIT.fmt()))
         addModifierTooltip(stack, tooltip)
     }
 
