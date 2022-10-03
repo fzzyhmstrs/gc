@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.mana_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.PlayerEntity
@@ -31,7 +32,7 @@ interface ManaItem {
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: Text = Text.translatable("augment_damage.check_can_use")
+        message: Text = AcText.translatable("augment_damage.check_can_use")
     ): Boolean {
         val damage = stack.damage
         val maxDamage = stack.maxDamage
@@ -61,7 +62,7 @@ interface ManaItem {
         stack: ItemStack,
         aug: Enchantment,
         entity: PlayerEntity,
-        message: Text = Text.translatable("augment_damage.burnout").append(aug.getName(1))) {
+        message: Text = AcText.translatable("augment_damage.burnout").append(aug.getName(1))) {
         val enchantList = EnchantmentHelper.get(stack)
         val newEnchantList: MutableMap<Enchantment, Int> = mutableMapOf()
         for (enchant in enchantList.keys) {
@@ -83,7 +84,7 @@ interface ManaItem {
         world: World,
         entity: PlayerEntity,
         amount: Int,
-        message: Text = Text.translatable("augment_damage.damage"),
+        message: Text = AcText.translatable("augment_damage.damage"),
         unbreakingFlag: Boolean = false): Boolean {
         val currentDmg = stack.damage
         val maxDmg = stack.maxDamage

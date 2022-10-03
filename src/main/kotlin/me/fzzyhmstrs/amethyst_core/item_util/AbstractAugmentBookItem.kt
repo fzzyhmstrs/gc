@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.scepter_util.LoreTier
@@ -40,32 +41,32 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
         val nbt = stack.orCreateNbt
         if (nbt.contains(NbtKeys.LORE_KEY.str())){
             val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
-            tooltip.add(Text.translatable("lore_book.augment").formatted(Formatting.GOLD).append(Text.translatable("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}").formatted(Formatting.GOLD)))
-            tooltip.add(Text.translatable("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}.desc").formatted(Formatting.WHITE))
+            tooltip.add(AcText.translatable("lore_book.augment").formatted(Formatting.GOLD).append(AcText.translatable("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}").formatted(Formatting.GOLD)))
+            tooltip.add(AcText.translatable("enchantment.${Identifier(bola).namespace}.${Identifier(bola).path}.desc").formatted(Formatting.WHITE))
             val type = AugmentHelper.getAugmentType(bola)
             if (type == SpellType.NULL){
-                tooltip.add(Text.translatable("lore_book.${type.str()}").formatted(type.fmt()))
+                tooltip.add(AcText.translatable("lore_book.${type.str()}").formatted(type.fmt()))
             } else {
                 val lvl = AugmentHelper.getAugmentMinLvl(bola)
-                tooltip.add(Text.translatable("lore_book.${type.str()}").formatted(type.fmt()).append(Text.literal(lvl.toString())))
+                tooltip.add(AcText.translatable("lore_book.${type.str()}").formatted(type.fmt()).append(AcText.literal(lvl.toString())))
             }
             val item = AugmentHelper.getAugmentItem(bola)
             if (item != Items.AIR) {
                 val itemText = item.name.copyContentOnly().formatted(Formatting.WHITE)
-                tooltip.add(Text.translatable("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
+                tooltip.add(AcText.translatable("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
             }
             val xpLevels = AugmentHelper.getAugmentImbueLevel(bola)
-            tooltip.add(Text.translatable("lore_book.xp_level").formatted(Formatting.WHITE).append(xpLevels.toString()))
+            tooltip.add(AcText.translatable("lore_book.xp_level").formatted(Formatting.WHITE).append(xpLevels.toString()))
             val cooldown = AugmentHelper.getAugmentCooldown(bola).toFloat() / 20.0F
-            tooltip.add(Text.translatable("lore_book.cooldown").formatted(Formatting.WHITE).append(Text.literal(cooldown.toString())).append(Text.translatable("lore_book.cooldown1").formatted(Formatting.WHITE)))
+            tooltip.add(AcText.translatable("lore_book.cooldown").formatted(Formatting.WHITE).append(AcText.literal(cooldown.toString())).append(AcText.translatable("lore_book.cooldown1").formatted(Formatting.WHITE)))
             val manaCost = AugmentHelper.getAugmentManaCost(bola)
-            tooltip.add(Text.translatable("lore_book.mana_cost").formatted(Formatting.WHITE).append(Text.literal(manaCost.toString())))
+            tooltip.add(AcText.translatable("lore_book.mana_cost").formatted(Formatting.WHITE).append(AcText.literal(manaCost.toString())))
             val bole = Registry.ENCHANTMENT.get(Identifier(bola))
             if (bole is ScepterAugment) {
                 val spellTier = bole.getTier()
                 tooltip.add(
-                    Text.translatable("lore_book.tier").formatted(Formatting.WHITE)
-                        .append(Text.literal(spellTier.toString()))
+                    AcText.translatable("lore_book.tier").formatted(Formatting.WHITE)
+                        .append(AcText.literal(spellTier.toString()))
                 )
             }
         } else {

@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.item_util.interfaces
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.coding_util.Addable
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
@@ -22,14 +23,14 @@ interface Modifiable<T: Addable<T>> {
     fun getActiveModifiers(stack: ItemStack): AbstractModifier<T>.CompiledModifiers
 
     fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
-        val commaText: MutableText = Text.literal(", ").formatted(Formatting.GOLD)
+        val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
         val modifierList = ModifierHelper.getModifiers(stack)
         if (modifierList.isNotEmpty()){
-            val modifierText = Text.translatable("scepter.modifiers").formatted(Formatting.GOLD)
+            val modifierText = AcText.translatable("scepter.modifiers").formatted(Formatting.GOLD)
             val itr = modifierList.asIterable().iterator()
             while(itr.hasNext()){
                 val mod = itr.next()
-                modifierText.append(Text.translatable("scepter.modifier.${mod}").formatted(Formatting.GOLD))
+                modifierText.append(AcText.translatable("scepter.modifier.${mod}").formatted(Formatting.GOLD))
                 if (itr.hasNext()){
                     modifierText.append(commaText)
                 }

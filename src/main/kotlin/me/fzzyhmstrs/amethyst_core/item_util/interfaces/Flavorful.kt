@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.item_util.interfaces
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.config.AcConfig
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.text.MutableText
@@ -53,10 +54,10 @@ interface Flavorful<T: Flavorful<T>> {
     }
 
     fun flavorText(): MutableText{
-        return Text.translatable(flavor).formatted(Formatting.WHITE, Formatting.ITALIC)
+        return AcText.translatable(flavor).formatted(Formatting.WHITE, Formatting.ITALIC)
     }
     fun flavorDescText(): MutableText{
-        return Text.translatable(flavorDesc).formatted(Formatting.WHITE)
+        return AcText.translatable(flavorDesc).formatted(Formatting.WHITE)
     }
 
     fun addFlavorText(tooltip: MutableList<Text>, context: TooltipContext){

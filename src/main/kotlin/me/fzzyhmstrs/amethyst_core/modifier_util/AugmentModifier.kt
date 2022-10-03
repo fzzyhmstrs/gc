@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
@@ -134,6 +135,6 @@ open class AugmentModifier(
     }
 
     override fun getName(): Text {
-        return Text.translatable(getTranslationKey())
+        return AcText.translatable(getTranslationKey())
     }
 }

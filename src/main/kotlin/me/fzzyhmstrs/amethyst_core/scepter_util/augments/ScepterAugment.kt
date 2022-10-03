@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.gson
 import me.fzzyhmstrs.amethyst_core.coding_util.SyncedConfigHelper.readOrCreateUpdated
@@ -48,7 +49,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
         val aug = Registry.ENCHANTMENT.getId(this) ?: return false
         if (!AugmentHelper.getAugmentEnabled(aug.toString())) {
             if (user is PlayerEntity){
-                user.sendMessage(Text.translatable("scepter.augment.disabled_message", this.getName(1)), false)
+                user.sendMessage(AcText.translatable("scepter.augment.disabled_message", this.getName(1)), false)
             }
             return false
         }

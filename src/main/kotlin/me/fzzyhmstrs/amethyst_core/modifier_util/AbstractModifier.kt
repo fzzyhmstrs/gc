@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.coding_util.Addable
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier.CompiledModifiers
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
@@ -77,7 +78,7 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
         return objectsToAffect?.test(id) ?: return false
     }
     open fun getName(): Text {
-        return Text.literal("$modifierId")
+        return AcText.literal("$modifierId")
     }
     open fun isAcceptableItem(stack: ItemStack): Boolean{
         acceptableItemStacks().forEach {

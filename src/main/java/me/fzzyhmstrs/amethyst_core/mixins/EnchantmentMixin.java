@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.mixins;
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText;
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper;
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment;
 import net.minecraft.enchantment.Enchantment;
@@ -29,11 +30,11 @@ public abstract class EnchantmentMixin{
             Identifier id = Registry.ENCHANTMENT.getId(enchant);
             if (id != null){
                 if(!AugmentHelper.INSTANCE.getAugmentEnabled(id.toString())){
-                    MutableText mutableText = Text.translatable(getOrCreateTranslationKey());
+                    MutableText mutableText = AcText.INSTANCE.translatable(getOrCreateTranslationKey());
                     if (level != 1 || this.getMaxLevel() != 1) {
-                        mutableText.append(" ").append(Text.translatable("enchantment.level." + level));
+                        mutableText.append(" ").append(AcText.INSTANCE.translatable("enchantment.level." + level));
                     }
-                    mutableText.append(Text.translatable("scepter.augment.disabled"));
+                    mutableText.append(AcText.INSTANCE.translatable("scepter.augment.disabled"));
                     mutableText.formatted(Formatting.DARK_RED).formatted(Formatting.STRIKETHROUGH);
                     cir.setReturnValue(mutableText);
                 }
