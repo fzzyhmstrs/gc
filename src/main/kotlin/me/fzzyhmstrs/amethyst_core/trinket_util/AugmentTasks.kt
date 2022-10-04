@@ -31,7 +31,7 @@ interface AugmentTasks {
         for (enchant in enchants.keys){
             if (enchant is AbstractActiveAugment){
                 val lvl = enchants[enchant] ?: 1
-                enchant.activateEffect(entity,lvl, stack)
+                enchant.baseActivateEffect(entity,lvl, stack)
             }
         }
     }
@@ -45,7 +45,7 @@ interface AugmentTasks {
         for (enchant in enchants.keys){
             if (enchant is AbstractActiveAugment){
                 val lvl = enchants[enchant] ?: 1
-                enchant.deactivateEffect(entity,lvl,stack)
+                enchant.baseDeactivateEffect(entity,lvl,stack)
             }
         }
     }
@@ -59,7 +59,7 @@ interface AugmentTasks {
         for (enchant in enchants.keys){
             if (enchant is AbstractUsedActiveAugment){
                 val lvl = enchants[enchant] ?: 1
-                enchant.useEffect(entity,lvl,stack)
+                enchant.baseUseEffect(entity,lvl,stack)
             }
         }
     }
@@ -73,7 +73,7 @@ interface AugmentTasks {
         for (enchant in enchants.keys){
             if (enchant is AbstractPassiveAugment){
                 val lvl = enchants[enchant] ?: 1
-                enchant.tickEffect(entity,lvl,stack)
+                enchant.baseTickEffect(entity,lvl,stack)
             }
         }
     }
@@ -88,7 +88,7 @@ interface AugmentTasks {
             val aug = enchant.key
             if (aug is BaseAugment){
                 val lvl = enchant.value
-                aug.equipEffect(entity,lvl,stack)
+                aug.baseEquipEffect(entity,lvl,stack)
             }
         }
     }
@@ -103,7 +103,7 @@ interface AugmentTasks {
             val aug = enchant.key
             if (aug is BaseAugment){
                 val lvl = enchant.value
-                aug.unequipEffect(entity,lvl,stack)
+                aug.baseUnequipEffect(entity,lvl,stack)
             }
         }
     }
@@ -116,7 +116,7 @@ interface AugmentTasks {
         val enchants = EnchantmentHelper.get(stack)
         for (enchant in enchants.keys){
             if (enchant is BaseAugment){
-                val modifier: Pair<EntityAttribute, EntityAttributeModifier> = enchant.attributeModifier(stack,entity.uuid)?:continue
+                val modifier: Pair<EntityAttribute, EntityAttributeModifier> = enchant.baseAttributeModifier(stack,entity.uuid)?:continue
                 map.put(modifier.first,modifier.second)
             }
         }
