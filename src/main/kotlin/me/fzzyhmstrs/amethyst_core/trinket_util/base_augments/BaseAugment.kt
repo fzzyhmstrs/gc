@@ -1,5 +1,6 @@
 package me.fzzyhmstrs.amethyst_core.trinket_util.base_augments
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AbstractConfigDisableEnchantment
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
@@ -23,18 +24,33 @@ import java.util.*
  *
  * [attributeModifier]: Add Minecraft [attribute modifiers][net.minecraft.entity.attribute.EntityAttributeModifier] to apply here.
  */
-open class BaseAugment(weight: Rarity, val mxLvl: Int = 1, val target: EnchantmentTarget, vararg slot: EquipmentSlot): Enchantment(weight, target ,slot) {
+abstract class BaseAugment(weight: Rarity, val mxLvl: Int = 1, val target: EnchantmentTarget, vararg slot: EquipmentSlot): AbstractConfigDisableEnchantment(weight, target ,*slot) {
 
     open fun specialEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY): Boolean{
         return true
+    }
+
+    internal fun baseEquipEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
+        if (!enabled) return
+        equipEffect(user, level, stack)
     }
 
     open fun equipEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
         return
     }
 
+    internal fun baseUnequipEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
+        if (!enabled) return
+        unequipEffect(user, level, stack)
+    }
+
     open fun unequipEffect(user: LivingEntity, level: Int, stack: ItemStack = ItemStack.EMPTY){
         return
+    }
+
+    internal fun baseAttributeModifier(stack: ItemStack, uuid: UUID): Pair<EntityAttribute,EntityAttributeModifier>? {
+        if (!enabled) return null
+        return attributeModifier(stack, uuid)
     }
 
     open fun attributeModifier(stack: ItemStack, uuid: UUID): Pair<EntityAttribute,EntityAttributeModifier>? {
