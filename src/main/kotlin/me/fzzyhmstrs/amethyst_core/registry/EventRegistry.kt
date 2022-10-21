@@ -31,6 +31,12 @@ object EventRegistry {
     fun registerTickUppable(ticker: TickUppable){
         tickers.add(ticker)
     }
+    fun removeTickUppable(ticker: TickUppable){
+        if (ticker == ticker_20) return
+        if (ticker == ticker_30) return
+        if (ticker == ticker_40) return
+        tickers.remove(ticker)
+    }
 
     internal fun registerAll(){
         registerTickUppable(ticker_20)
