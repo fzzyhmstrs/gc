@@ -19,7 +19,6 @@ object AC: ModInitializer {
         LootRegistry.registerAll()
         RegisterBaseEntity.registerAll()
         EventRegistry.registerAll()
-        PlaceItemAugment.registerServer()
         ModifierRegistry.registerAll()
     }
 }
@@ -31,5 +30,6 @@ object ACC: ClientModInitializer {
         RegisterBaseRenderer.registerAll()
         ItemModelRegistry.registerAll()
         EventRegistry.registerClient()
+        PlaceItemAugment.registerClient()
     }
 }
