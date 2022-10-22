@@ -6,18 +6,15 @@ import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.client.MinecraftClient
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.network.PacketByteBuf
-import net.minecraft.server.MinecraftServer
-import net.minecraft.server.network.ServerPlayNetworkHandler
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.sound.SoundCategory
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.BlockHitResult
@@ -35,33 +32,44 @@ abstract class PlaceItemAugment(tier: Int, maxLvl: Int,item: Item, vararg slot: 
         get() = super.baseEffect.withRange(4.5)
 
     override fun applyTasks(world: World, user: LivingEntity, hand: Hand, level: Int, effects: AugmentEffect): Boolean {
-        val bl = RaycasterUtil.raycastBlock(effects.range(level),entity = user) != null
+        if (user !is ServerPlayerEntity) return false
+        val hit = RaycasterUtil.raycastHit(effects.range(level),entity = user)
+        val bl = (hit != null && hit is BlockHitResult)
         if (bl){
-            effects.accept(user, AugmentConsumer.Type.BENEFICIAL)
+            return blockPlacing(hit as BlockHitResult,world, user, hand, level, effects)
         }
         return bl
     }
 
-    override fun clientTask(world: World, user: LivingEntity, hand: Hand, level: Int) {
-        if (user !is PlayerEntity) return
-        val hit = MinecraftClient.getInstance().crosshairTarget ?: return
-        if (hit.type != HitResult.Type.BLOCK) return
-        when (val testItem = itemToPlace(world,user).item) {
+    open fun blockPlacing(hit: BlockHitResult, world: World, user: ServerPlayerEntity, hand: Hand, level: Int, effects: AugmentEffect): Boolean{
+        val stack = itemToPlace(world,user)
+        when (val testItem = stack.item) {
             is BlockItem -> {
-                testItem.place(ItemPlacementContext(user, hand, ItemStack(testItem),hit as BlockHitResult))
-                ClientPlayNetworking.send(PLACE_ITEM_PACKET,placeItemPacket(ItemStack(testItem),hand,hit))
+                if (!testItem.place(ItemPlacementContext(user, hand, ItemStack(testItem),hit)).isAccepted) return false
+                val group = testItem.block.defaultState.soundGroup
+                val sound = group.placeSound
+                world.playSound(null,hit.blockPos,sound,SoundCategory.BLOCKS,(group.volume + 1.0f)/2.0f,group.pitch * 0.8f)
+                //sendItemPacket(user, stack, hand, hit)
+                effects.accept(user, AugmentConsumer.Type.BENEFICIAL)
+                return true
             }
             is BucketItem -> {
-                testItem.placeFluid(user,world,(hit as BlockHitResult).blockPos,hit)
-                ClientPlayNetworking.send(PLACE_ITEM_PACKET,placeItemPacket(ItemStack(testItem),hand,hit))
+                if (!testItem.placeFluid(user,world,hit.blockPos,hit)) return false
+                world.playSound(null,hit.blockPos,soundEvent(),SoundCategory.BLOCKS,1.0f,1.0f)
+                effects.accept(user, AugmentConsumer.Type.BENEFICIAL)
+                return true
             }
             else -> {
-                return
+                return false
             }
         }
     }
 
-    protected fun placeItemPacket(itemStack: ItemStack, hand: Hand, hit: BlockHitResult): PacketByteBuf{
+    protected fun sendItemPacket(user: ServerPlayerEntity,stack: ItemStack,hand: Hand,hit: BlockHitResult){
+        ServerPlayNetworking.send(user,PLACE_ITEM_PACKET,placeItemPacket(stack,hand,hit))
+    }
+
+    private fun placeItemPacket(itemStack: ItemStack, hand: Hand, hit: BlockHitResult): PacketByteBuf{
         val buf = PacketByteBufs.create()
         buf.writeItemStack(itemStack)
         buf.writeEnumConstant(hand)
@@ -77,17 +85,14 @@ abstract class PlaceItemAugment(tier: Int, maxLvl: Int,item: Item, vararg slot: 
 
         val PLACE_ITEM_PACKET = Identifier(AC.MOD_ID,"place_item_packet")
 
-        fun registerServer(){
-            ServerPlayNetworking.registerGlobalReceiver(PLACE_ITEM_PACKET)
-            { _: MinecraftServer,
-              serverPlayerEntity: ServerPlayerEntity,
-              _: ServerPlayNetworkHandler,
-              packetByteBuf: PacketByteBuf,
-              _: PacketSender ->
+        fun registerClient(){
+            ClientPlayNetworking.registerGlobalReceiver(PLACE_ITEM_PACKET)
+            { client,_,packetByteBuf,_ ->
+                val player = client.player?:return@registerGlobalReceiver
                 val stack = packetByteBuf.readItemStack()
                 val hand = packetByteBuf.readEnumConstant(Hand::class.java)
                 val hit = packetByteBuf.readBlockHitResult()
-                placeItem(serverPlayerEntity.world,serverPlayerEntity,stack, hand, hit)
+                placeItem(player.world,player,stack, hand, hit)
             }
         }
 
