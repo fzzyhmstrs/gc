@@ -9,7 +9,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +23,7 @@ public abstract class EnchantmentMixin{
     @Shadow public abstract int getMaxLevel();
 
     @Inject(method = "getName", at = @At(value = "HEAD"), cancellable = true)
-    private void disabledAugmentName(int level, CallbackInfoReturnable<Text> cir){
+    private void amethyst_core_disabledAugmentName(int level, CallbackInfoReturnable<Text> cir){
         Enchantment enchant = (Enchantment)(Object)this;
         if (enchant instanceof ScepterAugment) {
             Identifier id = Registry.ENCHANTMENT.getId(enchant);

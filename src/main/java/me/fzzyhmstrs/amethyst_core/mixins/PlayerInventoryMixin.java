@@ -22,7 +22,7 @@ public abstract class PlayerInventoryMixin {
     //@Shadow public abstract void scrollInHotbar(double scrollAmount);
 
     @Inject(at = @At("HEAD"), method = "scrollInHotbar", cancellable = true)
-    private void scrollInHotbar(double scrollAmount, CallbackInfo ci) {
+    private void amethyst_core_scrollInHotbar(double scrollAmount, CallbackInfo ci) {
         //System.out.println(player.getStackInHand(Hand.MAIN_HAND).getItem().toString());
         if (player.getStackInHand(Hand.MAIN_HAND).getItem() instanceof AbstractScepterItem && player.world.isClient){
             ClientPlayerEntity entity = (ClientPlayerEntity) player;
