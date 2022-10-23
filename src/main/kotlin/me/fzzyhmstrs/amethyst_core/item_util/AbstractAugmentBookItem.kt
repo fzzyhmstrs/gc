@@ -109,6 +109,10 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
             world.playSound(null,user.blockPos,SoundEvents.ITEM_BOOK_PAGE_TURN,SoundCategory.NEUTRAL,0.7f,1.0f)
             return TypedActionResult.success(stack)
         }
+        return useAfterWriting(stack, world, user, hand)
+    }
+
+    open fun useAfterWriting(stack: ItemStack, world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack>{
         return TypedActionResult.pass(stack)
     }
 
