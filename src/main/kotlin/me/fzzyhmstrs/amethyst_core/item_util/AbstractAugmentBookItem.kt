@@ -53,7 +53,7 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
             }
             val item = AugmentHelper.getAugmentItem(bola)
             if (item != Items.AIR) {
-                val itemText = item.name.copyContentOnly().formatted(Formatting.WHITE)
+                val itemText = item.name.copy().formatted(Formatting.WHITE)
                 tooltip.add(AcText.translatable("lore_book.key_item",itemText).formatted(Formatting.WHITE))
                 //tooltip.add(AcText.translatable("lore_book.key_item").formatted(Formatting.WHITE).append(itemText))
             }
