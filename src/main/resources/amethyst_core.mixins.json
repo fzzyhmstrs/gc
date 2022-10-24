@@ -7,7 +7,8 @@
   ],
   "client": [
     "ItemRendererMixin",
-    "PlayerInventoryMixin"
+    "PlayerInventoryMixin",
+    "ClientPlayNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
