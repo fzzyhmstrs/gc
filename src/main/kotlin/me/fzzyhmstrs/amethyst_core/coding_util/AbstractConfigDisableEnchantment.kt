@@ -11,8 +11,10 @@ import net.minecraft.util.registry.Registry
 
 open class AbstractConfigDisableEnchantment(weight: Rarity, target: EnchantmentTarget, vararg slot: EquipmentSlot): Enchantment(weight, target, slot) {
 
-    protected val enabled: Boolean by lazy {
-        checkEnabled()
+    protected var enabled: Boolean = checkEnabledInternal()
+
+    private fun checkEnabledInternal(): Boolean{
+        return checkEnabled()
     }
 
     open fun checkEnabled(): Boolean {
@@ -21,6 +23,10 @@ open class AbstractConfigDisableEnchantment(weight: Rarity, target: EnchantmentT
 
     fun isEnabled(): Boolean{
         return enabled
+    }
+
+    fun updateEnabled(){
+        enabled = checkEnabled()
     }
 
     override fun getName(level: Int): Text {
