@@ -73,14 +73,16 @@ object ScepterHelper {
 
     fun registerServer() {
         ServerPlayNetworking.registerGlobalReceiver(SCEPTER_SYNC_PACKET)
-        { _: MinecraftServer,
+        { server: MinecraftServer,
           serverPlayerEntity: ServerPlayerEntity,
           _: ServerPlayNetworkHandler,
           packetByteBuf: PacketByteBuf,
           _: PacketSender ->
             val stack = serverPlayerEntity.getStackInHand(Hand.MAIN_HAND)
             val up = packetByteBuf.readBoolean()
-            updateScepterActiveEnchant(stack,serverPlayerEntity,up)
+            server.execute {
+                updateScepterActiveEnchant(stack, serverPlayerEntity, up)
+            }
         }
     }
 
@@ -88,6 +90,15 @@ object ScepterHelper {
         val item = stack.item
         if (item !is AbstractScepterItem) return
         val nbt = stack.orCreateNbt
+        if (!stack.hasEnchantments()){
+            val enchant = Registry.ENCHANTMENT.get(item.fallbackId)
+            if (enchant != null) {
+                stack.addEnchantment(enchant,1)
+            } else {
+                return
+            }
+        }
+        println(stack.enchantments)
         if (!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
             item.initializeScepter(stack, nbt)
         }
