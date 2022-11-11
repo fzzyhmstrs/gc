@@ -50,9 +50,9 @@ abstract class SummonEntityAugment(tier: Int, maxLvl: Int, vararg slot: Equipmen
 
     open fun findSpawnPos(world: World,startPos: BlockPos, radius: Int, heightNeeded: Int, blockNeeded: Block = Blocks.AIR, tries: Int = 8): BlockPos{
         for (i in 1..tries){
-            val xPos = startPos.x + world.random.nextBetween(-radius,radius)
+            val xPos = startPos.x + world.random.nextInt(2 * radius + 1) - radius
             val yPos = startPos.up().y
-            val zPos = startPos.z + world.random.nextBetween(-radius,radius)
+            val zPos = startPos.z + world.random.nextInt(2 * radius + 1) - radius
             for (j in searchArray){
                 val testPos = BlockPos(xPos,yPos + j,zPos)
                 if (world.getBlockState(testPos).isOf(blockNeeded)){
