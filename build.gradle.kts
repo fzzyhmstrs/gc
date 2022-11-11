@@ -2,15 +2,18 @@ plugins {
     id("fabric-loom")
     val kotlinVersion: String by System.getProperties()
     kotlin("jvm").version(kotlinVersion)
+    id("com.modrinth.minotaur") version "2.+"
 }
 base {
     val archivesBaseName: String by project
     archivesName.set(archivesBaseName)
 }
+val log: File = file("changelog.md")
 val modVersion: String by project
 version = modVersion
 val mavenGroup: String by project
 group = mavenGroup
+println("## Changelog for Amethyst Core $modVersion \n\n" + log.readText())
 repositories {
     maven {
         name = "TerraformersMC"
@@ -66,4 +69,23 @@ tasks {
         targetCompatibility = javaVersion
         withSourcesJar()
     }
+}
+
+modrinth {
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set("amethyst-core")
+    versionNumber.set(modVersion)
+    versionName.set("${base.archivesName.get()}-$modVersion")
+    versionType.set("beta")
+    uploadFile.set(tasks.remapJar.get())
+    gameVersions.addAll("1.19","1.19.1","1.19.2")
+    loaders.addAll("fabric","quilt")
+    detectLoaders.set(false)
+    changelog.set("## Changelog for Amethyst Core $modVersion \n\n" + log.readText())
+    dependencies{
+        required.project("fabric-api")
+        required.project("fabric-language-kotlin")
+        optional.project("trinkets")
+    }
+    debugMode.set(true)
 }
