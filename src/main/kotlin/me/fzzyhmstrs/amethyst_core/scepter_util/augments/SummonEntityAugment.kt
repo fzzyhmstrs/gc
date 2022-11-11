@@ -3,6 +3,8 @@ package me.fzzyhmstrs.amethyst_core.scepter_util.augments
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
+import net.minecraft.block.Block
+import net.minecraft.block.Blocks
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
@@ -10,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 /**
@@ -43,6 +46,36 @@ abstract class SummonEntityAugment(tier: Int, maxLvl: Int, vararg slot: Equipmen
         effects.accept(user, AugmentConsumer.Type.BENEFICIAL)
         world.playSound(null, user.blockPos, soundEvent(), SoundCategory.PLAYERS, 1.0F, 1.0F)
         return true
+    }
+
+    open fun findSpawnPos(world: World,startPos: BlockPos, radius: Int, heightNeeded: Int, blockNeeded: Block = Blocks.AIR, tries: Int = 8): BlockPos{
+        for (i in 1..tries){
+            val xPos = startPos.x + world.random.nextBetween(-radius,radius)
+            val yPos = startPos.up().y
+            val zPos = startPos.z + world.random.nextBetween(-radius,radius)
+            for (j in searchArray){
+                val testPos = BlockPos(xPos,yPos + j,zPos)
+                if (world.getBlockState(testPos).isOf(blockNeeded)){
+                    if (heightNeeded > 1){
+                        var found2 = true
+                        for (k in 1 until heightNeeded){
+                            if (!world.getBlockState(testPos.up(k)).isOf(blockNeeded)){
+                                found2 = false
+                                break
+                            }
+                        }
+                        if (!found2) continue
+                    }
+
+                }
+                return testPos
+            }
+        }
+        return BlockPos.ORIGIN
+    }
+
+    companion object{
+        private val searchArray = intArrayOf(0,1,-1,2,-2,3,-3)
     }
 
 }
