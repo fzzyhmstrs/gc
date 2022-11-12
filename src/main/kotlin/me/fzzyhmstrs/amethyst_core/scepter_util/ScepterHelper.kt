@@ -99,7 +99,7 @@ object ScepterHelper {
                 return
             }
         }
-        println(stack.enchantments)
+        //println(stack.enchantments)
         if (!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())){
             item.initializeScepter(stack, nbt)
         }
