@@ -96,6 +96,10 @@ object EventRegistry {
         fun isNotReady(): Boolean{
             return !ready
         }
+
+        override fun toString(): String {
+            return "{Ticker| delay: $reset, tick: $tick, ready: $ready}"
+        }
     }
 
     /**
