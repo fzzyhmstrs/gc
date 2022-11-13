@@ -1,5 +1,5 @@
 ### Additions
-*
+* Added a toString() method to Ticker for better printlns
 
 ### Changes
 * 
