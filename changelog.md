@@ -1,9 +1,8 @@
 ### Additions
-* Added a toString() method to Ticker for better printlns
+*
 
 ### Changes
 * 
 
 ### Fixes
-* Removed some errant printlns
-* Fixed PersistentEffectHelper being not-thread-safe and liable to concurrent modification exceptions.
+* Fixed AcText.empty() giving the singleton LiteralText.EMPTY without copying, despite representing a functional approach like 1.19 that should be modification-safe.
