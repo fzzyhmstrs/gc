@@ -1,6 +1,5 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
-import com.google.common.collect.Lists
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Modifiable
 import me.fzzyhmstrs.amethyst_core.modifier_util.*
@@ -11,11 +10,9 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.loot.condition.LootCondition
 import net.minecraft.loot.function.LootFunction
 import net.minecraft.loot.function.SetEnchantmentsLootFunction
 import net.minecraft.loot.function.SetNbtLootFunction
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.Identifier

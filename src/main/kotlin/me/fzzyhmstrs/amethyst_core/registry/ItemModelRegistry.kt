@@ -10,6 +10,7 @@ import net.minecraft.client.model.Model
 import net.minecraft.client.model.ModelPart
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.client.render.entity.model.EntityModelLoader
+import net.minecraft.client.render.item.ItemRenderer
 import net.minecraft.client.render.model.json.ModelTransformation
 import net.minecraft.client.util.ModelIdentifier
 import net.minecraft.item.Item
@@ -30,7 +31,7 @@ import java.util.function.Consumer
 @Environment(value = EnvType.CLIENT)
 object ItemModelRegistry: SynchronousResourceReloader {
 
-    private val fallbackId = ModelIdentifier("minecraft:trident_in_hand#inventory")
+    private val fallbackId = ItemRenderer.TRIDENT_IN_HAND
     private val modelIdMap: HashMap<Item, ModelIdentifierPerModes> = HashMap()
     private val entityModelMap: HashMap<Item,CustomItemEntityModelLoader> = HashMap()
     private val entityModelLoader: EntityModelLoader by lazy { MinecraftClient.getInstance().entityModelLoader }

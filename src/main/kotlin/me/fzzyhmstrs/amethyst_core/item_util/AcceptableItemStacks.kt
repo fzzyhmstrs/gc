@@ -5,7 +5,7 @@ import net.minecraft.block.Block
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.item.*
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.Registries
 
 /**
  * Helper object to generate a list of all acceptable items in the Item Registry as applicable to various enchantment targets.
@@ -15,7 +15,7 @@ object AcceptableItemStacks {
     private val scepterAcceptableMap: MutableMap<Int,MutableList<ItemStack>> = mutableMapOf()
 
     fun baseAcceptableItemStacks(target: EnchantmentTarget?): MutableList<ItemStack>{
-        val entries = Registry.ITEM.indexedEntries
+        val entries = Registries.ITEM.indexedEntries
         val list: MutableList<ItemStack> = mutableListOf()
         return when(target){
             null->{
@@ -154,7 +154,7 @@ object AcceptableItemStacks {
         if (scepterAcceptableMap.containsKey(tier)){
             return scepterAcceptableMap[tier] ?: mutableListOf()
         } else {
-            val entries = Registry.ITEM.indexedEntries
+            val entries = Registries.ITEM.indexedEntries
             val list: MutableList<ItemStack> = mutableListOf()
             for (entry in entries){
                 val item = entry.value()

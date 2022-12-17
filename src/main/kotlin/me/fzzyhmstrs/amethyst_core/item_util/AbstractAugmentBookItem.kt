@@ -12,7 +12,7 @@ import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.server.world.ServerWorld
+import net.minecraft.registry.Registries
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
@@ -20,7 +20,6 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**
@@ -67,7 +66,7 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
             val manaCost = AugmentHelper.getAugmentManaCost(bola)
             tooltip.add(AcText.translatable("lore_book.mana_cost",manaCost.toString()).formatted(Formatting.WHITE))
             //tooltip.add(AcText.translatable("lore_book.mana_cost").formatted(Formatting.WHITE).append(AcText.literal(manaCost.toString())))
-            val bole = Registry.ENCHANTMENT.get(Identifier(bola))
+            val bole = Registries.ENCHANTMENT.get(Identifier(bola))
             if (bole is ScepterAugment) {
                 val spellTier = bole.getTier()
                 tooltip.add(

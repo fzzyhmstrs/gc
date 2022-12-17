@@ -1,12 +1,11 @@
 package me.fzzyhmstrs.amethyst_core.coding_util
 
-import me.fzzyhmstrs.amethyst_core.raycaster_util.RaycasterUtil
+import me.fzzyhmstrs.amethyst_core.coding_util.PlayerParticlesV2.scepterParticlePos
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.Perspective
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 
@@ -44,7 +43,7 @@ object PlayerParticlesV2 {
     fun scepterOffset(perspective: Perspective, fov: Double): Pair<Double, Double> {
         return when(perspective){
             Perspective.FIRST_PERSON -> {
-                val fpx = MathHelper.lerpFromProgress(fov,30.0,110.0,0.8,-0.2)
+                val fpx = MathHelper.map(fov,30.0,110.0,0.8,-0.2)
                 Pair(fpx, -0.05)
             }
             Perspective.THIRD_PERSON_FRONT -> {

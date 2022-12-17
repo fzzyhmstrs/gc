@@ -44,7 +44,7 @@ object PlayerParticles {
     fun scepterOffset(perspective: Perspective, fov: Double): Vec3d {
         return when(perspective){
             Perspective.FIRST_PERSON -> {
-                val fpx = MathHelper.lerpFromProgress(fov,30.0,110.0,1.4,-0.1)
+                val fpx = MathHelper.map(fov,30.0,110.0,1.4,-0.1)
                 Vec3d(fpx,-0.13,0.6)
             }
             Perspective.THIRD_PERSON_FRONT -> {

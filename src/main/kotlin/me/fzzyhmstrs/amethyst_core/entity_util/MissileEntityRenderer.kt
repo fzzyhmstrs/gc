@@ -12,7 +12,7 @@ import net.minecraft.entity.projectile.ShulkerBulletEntity
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3f
+import net.minecraft.util.math.RotationAxis
 
 /**
  * A prebuilt renderer for a missile-type entity. This can be used as a simple way to provide a rendered shape for your missile.
@@ -42,9 +42,9 @@ class MissileEntityRenderer(context: EntityRendererFactory.Context, val r: Float
         matrixStack.push()
         val k = missileEntity.age.toFloat() + h
         matrixStack.translate(0.0, 0.15, 0.0)
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.sin(k * 0.1f) * 180.0f))
-        matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(MathHelper.cos(k * 0.1f) * 180.0f))
-        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(MathHelper.sin(k * 0.15f) * 360.0f))
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.sin(k * 0.1f) * 180.0f))
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(MathHelper.cos(k * 0.1f) * 180.0f))
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(k * 0.15f) * 360.0f))
         matrixStack.scale(-downScale, -downScale, downScale)
         val vertexConsumer = vertexConsumerProvider.getBuffer(model.getLayer(TEXTURE))
         model.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, r, g, b, 1.0f)

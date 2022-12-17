@@ -6,14 +6,15 @@ import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilde
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 object RegisterBaseEntity {
 
     val MISSILE_ENTITY: EntityType<MissileEntity> = Registry.register(
-        Registry.ENTITY_TYPE,
+        Registries.ENTITY_TYPE,
         Identifier(AC.MOD_ID, "missile_entity"),
         FabricEntityTypeBuilder.create(
             SpawnGroup.MISC

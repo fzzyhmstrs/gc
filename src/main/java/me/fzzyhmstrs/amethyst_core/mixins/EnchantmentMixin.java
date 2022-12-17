@@ -4,11 +4,11 @@ import me.fzzyhmstrs.amethyst_core.coding_util.AcText;
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper;
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +26,7 @@ public abstract class EnchantmentMixin{
     private void amethyst_core_disabledAugmentName(int level, CallbackInfoReturnable<Text> cir){
         Enchantment enchant = (Enchantment)(Object)this;
         if (enchant instanceof ScepterAugment) {
-            Identifier id = Registry.ENCHANTMENT.getId(enchant);
+            Identifier id = Registries.ENCHANTMENT.getId(enchant);
             if (id != null){
                 if(!AugmentHelper.INSTANCE.getAugmentEnabled(id.toString())){
                     MutableText mutableText = AcText.INSTANCE.translatable(getOrCreateTranslationKey());

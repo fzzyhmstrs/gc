@@ -3,7 +3,6 @@ package me.fzzyhmstrs.amethyst_core.entity_util
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentConsumer
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentEffect
 import me.fzzyhmstrs.amethyst_core.registry.RegisterBaseEntity
-import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
@@ -16,7 +15,6 @@ import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
-import net.minecraft.util.hit.HitResult
 import net.minecraft.world.World
 
 /**

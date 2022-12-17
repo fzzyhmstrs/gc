@@ -23,14 +23,13 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayNetworkHandler
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.text.Text
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import kotlin.math.max
 
@@ -92,7 +91,7 @@ object ScepterHelper {
         if (item !is AbstractScepterItem) return
         val nbt = stack.orCreateNbt
         if (!stack.hasEnchantments()){
-            val enchant = Registry.ENCHANTMENT.get(item.fallbackId)
+            val enchant = Registries.ENCHANTMENT.get(item.fallbackId)
             if (enchant != null) {
                 stack.addEnchantment(enchant,1)
             } else {
@@ -105,7 +104,7 @@ object ScepterHelper {
         }
         val activeEnchantCheck = Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt)
 
-        val activeCheck = Registry.ENCHANTMENT.get(Identifier(activeEnchantCheck))
+        val activeCheck = Registries.ENCHANTMENT.get(Identifier(activeEnchantCheck))
         val activeEnchant = if (activeCheck != null) {
             if (EnchantmentHelper.getLevel(activeCheck, stack) == 0) {
                 fixActiveEnchantWhenMissing(stack)
@@ -123,7 +122,7 @@ object ScepterHelper {
         val augIndexes: MutableList<Int> = mutableListOf()
         for (i in 0..nbtEls.lastIndex){
             val identifier = EnchantmentHelper.getIdFromNbt(nbtEls[i] as NbtCompound)
-            val enchantCheck = Registry.ENCHANTMENT.get(identifier)?: Enchantments.VANISHING_CURSE
+            val enchantCheck = Registries.ENCHANTMENT.get(identifier)?: Enchantments.VANISHING_CURSE
             if(enchantCheck is ScepterAugment) {
                 augIndexes.add(i)
             }
@@ -159,7 +158,7 @@ object ScepterHelper {
         }
         Nbt.writeStringNbt(NbtKeys.ACTIVE_ENCHANT.str(),newActiveEnchant, nbt)
         ModifierHelper.gatherActiveModifiers(stack)
-        val name = Registry.ENCHANTMENT.get(Identifier(Identifier(newActiveEnchant).namespace,Identifier(newActiveEnchant).path))?.getName(1)?: AcText.translatable("enchantment.${Identifier(newActiveEnchant).namespace}.${Identifier(newActiveEnchant).path}")
+        val name = Registries.ENCHANTMENT.get(Identifier(Identifier(newActiveEnchant).namespace,Identifier(newActiveEnchant).path))?.getName(1)?: AcText.translatable("enchantment.${Identifier(newActiveEnchant).namespace}.${Identifier(newActiveEnchant).path}")
         val message = AcText.translatable("scepter.new_active_spell").append(name)
         user.sendMessage(message,false)
     }
@@ -170,7 +169,7 @@ object ScepterHelper {
         if (item is AugmentScepterItem) {
             val newEnchant = EnchantmentHelper.get(stack).keys.firstOrNull()
             val identifier = if (newEnchant != null) {
-                Registry.ENCHANTMENT.getId(newEnchant)
+                Registries.ENCHANTMENT.getId(newEnchant)
             } else {
                 item.addDefaultEnchantments(stack, nbt)
                 item.fallbackId
@@ -207,7 +206,7 @@ object ScepterHelper {
                 val l = e.value
                 val maxL = aug.getAugmentMaxLevel()
                 if (l >= maxL) continue
-                val augId = Registry.ENCHANTMENT.getId(aug)?:continue
+                val augId = Registries.ENCHANTMENT.getId(aug)?:continue
                 val scepterL = getScepterStat(scepterNbt,augId.toString()).first
                 val newAugL = AugmentHelper.getAugmentCurrentLevel(scepterL,augId, aug)
                 enchantMap[aug] = newAugL
@@ -237,7 +236,7 @@ object ScepterHelper {
     fun isAcceptableScepterItem(augment: ScepterAugment, stack: ItemStack, player: PlayerEntity): Boolean {
         val nbt = stack.orCreateNbt
         if (player.abilities.creativeMode) return true
-        val activeEnchantId = Registry.ENCHANTMENT.getId(augment)?.toString() ?: ""
+        val activeEnchantId = Registries.ENCHANTMENT.getId(augment)?.toString() ?: ""
         if (!AugmentHelper.checkAugmentStat(activeEnchantId)) return false
         val minLvl = AugmentHelper.getAugmentMinLvl(activeEnchantId)
         val curLvl = getScepterStat(nbt,activeEnchantId).first

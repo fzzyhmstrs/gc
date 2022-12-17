@@ -6,9 +6,9 @@
     "EnchantmentMixin"
   ],
   "client": [
+    "ClientPlayNetworkHandlerMixin",
     "ItemRendererMixin",
-    "PlayerInventoryMixin",
-    "ClientPlayNetworkHandlerMixin"
+    "PlayerInventoryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

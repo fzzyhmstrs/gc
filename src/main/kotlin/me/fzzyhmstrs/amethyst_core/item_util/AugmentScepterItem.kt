@@ -17,13 +17,13 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.Registries
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
 import net.minecraft.util.hit.HitResult
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import kotlin.math.max
 
@@ -71,7 +71,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         val stack = user.getStackInHand(hand)
         val nbt = stack.orCreateNbt
         val activeEnchantId: String = getActiveEnchant(stack)
-        val testEnchant: Enchantment = Registry.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
+        val testEnchant: Enchantment = Registries.ENCHANTMENT.get(Identifier(activeEnchantId))?: return resetCooldown(stack,world,user,activeEnchantId)
         if (testEnchant !is ScepterAugment) return resetCooldown(stack,world,user,activeEnchantId)
 
         //determine the level at which to apply the active augment, from 1 to the maximum level the augment can operate
@@ -182,7 +182,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
 
     open fun addDefaultEnchantments(stack: ItemStack, scepterNbt: NbtCompound){
         if (scepterNbt.contains(NbtKeys.ENCHANT_INIT.str() + stack.translationKey)) return
-        val enchantToAdd = Registry.ENCHANTMENT.get(this.fallbackId)
+        val enchantToAdd = Registries.ENCHANTMENT.get(this.fallbackId)
         if (enchantToAdd != null && !noFallback){
             if (EnchantmentHelper.getLevel(enchantToAdd,stack) == 0){
                 stack.addEnchantment(enchantToAdd,1)

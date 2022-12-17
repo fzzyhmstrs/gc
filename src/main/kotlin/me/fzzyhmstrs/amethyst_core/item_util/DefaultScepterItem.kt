@@ -12,12 +12,10 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
-import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.fabricmc.api.EnvType
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
-import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
@@ -31,7 +29,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**

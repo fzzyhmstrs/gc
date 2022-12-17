@@ -4,7 +4,7 @@ import me.fzzyhmstrs.amethyst_core.coding_util.AbstractConfigDisableEnchantment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,7 +20,7 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameJoin", at = @At("TAIL"))
     private void amethyst_core_recheckEnchantmentEnable(GameJoinS2CPacket packet, CallbackInfo ci){
         if (!client.isIntegratedServerRunning()) {
-            Registry.ENCHANTMENT.stream().sequential().forEach((enchant) -> {
+            Registries.ENCHANTMENT.stream().sequential().forEach((enchant) -> {
                 if (enchant instanceof AbstractConfigDisableEnchantment) {
                     ((AbstractConfigDisableEnchantment) enchant).updateEnabled();
                 }

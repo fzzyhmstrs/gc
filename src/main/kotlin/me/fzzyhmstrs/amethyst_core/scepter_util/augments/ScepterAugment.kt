@@ -18,13 +18,12 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**
@@ -46,7 +45,7 @@ abstract class ScepterAugment(private val tier: Int, private val maxLvl: Int, ta
     abstract fun augmentStat(imbueLevel: Int = 1): AugmentDatapoint
 
     fun applyModifiableTasks(world: World, user: LivingEntity, hand: Hand, level: Int, modifiers: List<AugmentModifier> = listOf(), modifierData: AugmentModifier? = null): Boolean{
-        val aug = Registry.ENCHANTMENT.getId(this) ?: return false
+        val aug = Registries.ENCHANTMENT.getId(this) ?: return false
         if (!AugmentHelper.getAugmentEnabled(aug.toString())) {
             if (user is PlayerEntity){
                 user.sendMessage(AcText.translatable("scepter.augment.disabled_message", this.getName(1)), false)
