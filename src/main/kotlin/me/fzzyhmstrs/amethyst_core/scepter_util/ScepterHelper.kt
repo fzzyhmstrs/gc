@@ -17,6 +17,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.advancement.criterion.Criteria
+import net.minecraft.advancement.criterion.TickCriterion
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.player.PlayerEntity
@@ -42,6 +44,8 @@ object ScepterHelper {
 
 
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
+    val CAST_SPELL = SpellCriterion(Identifier(AC.MOD_ID,"cast_spell"))
+    val USED_KNOWLEDGE_BOOK = TickCriterion(Identifier(AC.MOD_ID,"used_knowledge_book"))
 
     fun useScepter(activeEnchantId: String, activeEnchant: ScepterAugment, stack: ItemStack, world: World, cdMod: Double = 0.0): Int?{
         if (world !is ServerWorld){return null}
@@ -72,6 +76,8 @@ object ScepterHelper {
     }
 
     fun registerServer() {
+        Criteria.register(CAST_SPELL)
+        Criteria.register(USED_KNOWLEDGE_BOOK)
         ServerPlayNetworking.registerGlobalReceiver(SCEPTER_SYNC_PACKET)
         { server: MinecraftServer,
           serverPlayerEntity: ServerPlayerEntity,
