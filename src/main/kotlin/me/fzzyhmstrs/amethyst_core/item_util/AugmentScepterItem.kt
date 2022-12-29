@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
@@ -134,6 +135,9 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
                 applyManaCost(manaCost,stack, world, user)
                 ScepterHelper.incrementScepterStats(stack.orCreateNbt, stack, activeEnchantId, modifiers.compiledData.getXpModifiers())
                 user.itemCooldownManager.set(stack.item, cd)
+                if (user is ServerPlayerEntity) {
+                    ScepterHelper.CAST_SPELL.trigger(user, Identifier(activeEnchantId))
+                }
                 TypedActionResult.success(stack)
             } else {
                 resetCooldown(stack,world,user,activeEnchantId)
