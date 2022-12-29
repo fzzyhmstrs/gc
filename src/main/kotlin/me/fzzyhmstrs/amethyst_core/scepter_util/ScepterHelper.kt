@@ -45,7 +45,14 @@ object ScepterHelper {
 
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
     val CAST_SPELL = SpellCriterion(Identifier(AC.MOD_ID,"cast_spell"))
-    val USED_KNOWLEDGE_BOOK = TickCriterion(Identifier(AC.MOD_ID,"used_knowledge_book"))
+    val USED_KNOWLEDGE_BOOK = object: TickCriterion(){
+
+        override fun getId(): Identifier {
+            return Identifier(AC.MOD_ID,"used_knowledge_book")
+        }
+
+    }
+
 
     fun useScepter(activeEnchantId: String, activeEnchant: ScepterAugment, stack: ItemStack, world: World, cdMod: Double = 0.0): Int?{
         if (world !is ServerWorld){return null}
