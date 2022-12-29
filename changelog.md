@@ -1,9 +1,9 @@
 ### Additions
-* Added a toString() method to Ticker for better printlns
+* Added advancement criterion for casting scepter spells
+* Added advancement criterion for using knowledge books
 
 ### Changes
-* 
+* None.
 
 ### Fixes
-* Removed some errant printlns
-* Fixed PersistentEffectHelper being not-thread-safe and liable to concurrent modification exceptions.
+* None.
