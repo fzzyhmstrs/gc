@@ -14,6 +14,7 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentDatapoint
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -45,13 +46,7 @@ object ScepterHelper {
 
     private val SCEPTER_SYNC_PACKET = Identifier(AC.MOD_ID,"scepter_sync_packet")
     val CAST_SPELL = SpellCriterion(Identifier(AC.MOD_ID,"cast_spell"))
-    val USED_KNOWLEDGE_BOOK = object: TickCriterion(){
-
-        override fun getId(): Identifier {
-            return Identifier(AC.MOD_ID,"used_knowledge_book")
-        }
-
-    }
+    val USED_KNOWLEDGE_BOOK = CustomCriterion(Identifier(AC.MOD_ID,"used_knowledge_book"))
 
 
     fun useScepter(activeEnchantId: String, activeEnchant: ScepterAugment, stack: ItemStack, world: World, cdMod: Double = 0.0): Int?{
