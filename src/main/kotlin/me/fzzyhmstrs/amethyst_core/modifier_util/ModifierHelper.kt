@@ -1,11 +1,16 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.Registries
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.Identifier
 
 object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
@@ -44,6 +49,18 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
                 EnchantmentHelper.set(newEnchants,stack)
             }
         }
+    }
+
+    fun isInTag(id: Identifier,tag: TagKey<Enchantment>): Boolean{
+        val augment = Registries.ENCHANTMENT.get(id)?:return false
+        val opt = Registries.ENCHANTMENT.getEntry(Registries.ENCHANTMENT.getRawId(augment))
+        var bl = false
+        opt.ifPresent { entry -> bl = entry.isIn(tag) }
+        return bl
+    }
+
+    fun createAugmentTag(path: String): TagKey<Enchantment> {
+        return TagKey.of(RegistryKeys.ENCHANTMENT, Identifier(AC.MOD_ID,path))
     }
 
     override fun gatherActiveModifiers(stack: ItemStack){
