@@ -53,6 +53,8 @@ object ModifierRegistry {
 
     /**
      * built-in modifiers. Attuned and Thrifty are provided with Imbuing recipes for use with _Amethyst Imbuement_ by default.
+     *
+     * Amethyst Imbuement namespace kept for Reach and Enduring lineages to avoid breaking changes in-game
      */
     val GREATER_ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"greater_attuned"), cooldownModifier = -22.5)
     val ATTUNED = AugmentModifier(Identifier(AC.MOD_ID,"attuned"), cooldownModifier = -15.0).withDescendant(GREATER_ATTUNED)
@@ -60,6 +62,12 @@ object ModifierRegistry {
     val GREATER_THRIFTY = AugmentModifier(Identifier(AC.MOD_ID,"greater_thrifty"), manaCostModifier = -15.0)
     val THRIFTY = AugmentModifier(Identifier(AC.MOD_ID,"thrifty"), manaCostModifier = -10.0).withDescendant(GREATER_THRIFTY)
     val LESSER_THRIFTY = AugmentModifier(Identifier(AC.MOD_ID,"lesser_thrifty"), manaCostModifier = -5.0).withDescendant(THRIFTY)
+    val GREATER_REACH = AugmentModifier(Identifier("amethyst_imbuement","greater_reach")).withRange(rangePercent = 24.0)
+    val REACH = AugmentModifier(Identifier("amethyst_imbuement","reach")).withDescendant(GREATER_REACH).withRange(rangePercent = 16.0)
+    val LESSER_REACH = AugmentModifier(Identifier("amethyst_imbuement","lesser_reach")).withDescendant(REACH).withRange(rangePercent = 8.0)
+    val GREATER_ENDURING = AugmentModifier(Identifier("amethyst_imbuement","greater_enduring")).withDuration(durationPercent = 65)
+    val ENDURING = AugmentModifier(Identifier("amethyst_imbuement","enduring")).withDescendant(GREATER_ENDURING).withDuration(durationPercent = 30)
+    val LESSER_ENDURING = AugmentModifier(Identifier("amethyst_imbuement","lesser_enduring")).withDescendant(ENDURING).withDuration(durationPercent = 15)
     val MODIFIER_DEBUG = AugmentModifier(Identifier(AC.MOD_ID,"modifier_debug")).withDamage(2.0F,2.0F).withRange(2.75)
     val MODIFIER_DEBUG_2 = AugmentModifier(Identifier(AC.MOD_ID,"modifier_debug_2"), levelModifier = 1).withDuration(10, durationPercent = 15).withAmplifier(1)
     val MODIFIER_DEBUG_3 = AugmentModifier(Identifier(AC.MOD_ID,"modifier_debug_3")).withConsumer(DEBUG_HEALING_CONSUMER).withConsumer(DEBUG_NECROTIC_CONSUMER)
@@ -71,6 +79,12 @@ object ModifierRegistry {
         register(GREATER_THRIFTY)
         register(THRIFTY)
         register(LESSER_THRIFTY)
+        register(GREATER_REACH)
+        register(REACH)
+        register(LESSER_REACH)
+        register(GREATER_ENDURING)
+        register(ENDURING)
+        register(LESSER_ENDURING)
         register(MODIFIER_DEBUG)
         register(MODIFIER_DEBUG_2)
         register(MODIFIER_DEBUG_3)
