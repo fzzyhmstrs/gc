@@ -24,8 +24,7 @@ import net.minecraft.world.World
 /**
  * Simple template that places a block item into the world. can be implemented in an Item Registry with no extension by defining the [_item] in the constructor.
  */
-abstract class PlaceItemAugment(tier: Int, maxLvl: Int,item: Item, vararg slot: EquipmentSlot): ScepterAugment(tier,maxLvl, EnchantmentTarget.WEAPON, *slot),
-    BuilderAugment {
+abstract class PlaceItemAugment(tier: Int, maxLvl: Int,item: Item, vararg slot: EquipmentSlot): ScepterAugment(tier,maxLvl, EnchantmentTarget.WEAPON, *slot){
     private val _item = item
 
     override val baseEffect: AugmentEffect
