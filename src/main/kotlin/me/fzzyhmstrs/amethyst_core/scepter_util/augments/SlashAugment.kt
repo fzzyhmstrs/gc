@@ -30,8 +30,7 @@ import java.util.*
  */
 
 @Suppress("SameParameterValue")
-abstract class SlashAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): MiscAugment(tier, maxLvl, *slot),
-    SoulAugment {
+abstract class SlashAugment(tier: Int, maxLvl: Int, vararg slot: EquipmentSlot): MiscAugment(tier, maxLvl, *slot){
 
     override val baseEffect: AugmentEffect
         get() = super.baseEffect.withRange(2.5,0.25,0.0)
