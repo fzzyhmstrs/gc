@@ -8,10 +8,9 @@ import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.Registries
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.tag.TagKey
 import net.minecraft.util.Identifier
+import net.minecraft.util.registry.Registry
 
 object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
 
@@ -52,15 +51,15 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
     }
 
     fun isInTag(id: Identifier,tag: TagKey<Enchantment>): Boolean{
-        val augment = Registries.ENCHANTMENT.get(id)?:return false
-        val opt = Registries.ENCHANTMENT.getEntry(Registries.ENCHANTMENT.getRawId(augment))
+        val augment = Registry.ENCHANTMENT.get(id)?:return false
+        val opt = Registry.ENCHANTMENT.getEntry(Registry.ENCHANTMENT.getRawId(augment))
         var bl = false
         opt.ifPresent { entry -> bl = entry.isIn(tag) }
         return bl
     }
 
     fun createAugmentTag(path: String): TagKey<Enchantment> {
-        return TagKey.of(RegistryKeys.ENCHANTMENT, Identifier(AC.MOD_ID,path))
+        return TagKey.of(Registry.ENCHANTMENT_KEY, Identifier(AC.MOD_ID,path))
     }
 
     override fun gatherActiveModifiers(stack: ItemStack){
