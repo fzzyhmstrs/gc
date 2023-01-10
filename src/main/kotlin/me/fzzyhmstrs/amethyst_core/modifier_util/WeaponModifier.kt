@@ -24,6 +24,7 @@ class WeaponModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID,val pers
         attributeModifiers.putAll(other.attributeModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
         onUseConsumers.addAll(other.onUseConsumers)
+        tickConsumers.addAll(other.tickConsumers)
         return this
     }
 
@@ -32,7 +33,7 @@ class WeaponModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID,val pers
         return this
     }
 
-    fun withOnHit(onHit: WeaponConsumer): WeaponModifier{
+    fun withPostHit(onHit: WeaponConsumer): WeaponModifier{
         postHitConsumers.add(onHit)
         return this
     }
