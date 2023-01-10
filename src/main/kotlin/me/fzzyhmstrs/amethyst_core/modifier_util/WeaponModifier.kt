@@ -1,17 +1,13 @@
-package me.fzzyhmstrs.viscerae.modifier
+package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
-import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlF
-import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
-import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
-import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierDefaults
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
+import java.util.*
 
 class WeaponModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID,val persistent: Boolean = false, val randomSelectable: Boolean = false): AbstractModifier<WeaponModifier>(modifierId) {
 
@@ -28,7 +24,8 @@ class WeaponModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID,val pers
         return this
     }
 
-    fun withAttributeModifier(attribute: EntityAttribute, modifier: EntityAttributeModifier): WeaponModifier{
+    fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): WeaponModifier{
+        val modifier = EntityAttributeModifier(UUID.fromString(uuid), this::getTranslationKey,amount,operation)
         attributeModifiers.put(attribute,modifier)
         return this
     }
@@ -61,7 +58,8 @@ class WeaponModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID,val pers
         return "weapon.modifier.${modifierId}"
     }
 
-    interface WeaponConsumer{
+    @FunctionalInterface
+    fun interface WeaponConsumer{
         fun apply(stack: ItemStack, user: LivingEntity, target: LivingEntity?)
     }
 }

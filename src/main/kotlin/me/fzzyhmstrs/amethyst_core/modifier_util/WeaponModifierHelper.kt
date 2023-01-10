@@ -1,9 +1,10 @@
-package me.fzzyhmstrs.viscerae.modifier
+package me.fzzyhmstrs.amethyst_core.modifier
 
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierDefaults
+import me.fzzyhmstrs.amethyst_core.modifier_util.WeaponModifier
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
