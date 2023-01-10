@@ -94,31 +94,45 @@ abstract class AbstractAugmentBookItem(settings: Settings) : CustomFlavorItem(se
         val item = stack.item
         if (item !is AbstractAugmentBookItem) return TypedActionResult.fail(stack)
         //if (world !is ServerWorld) return TypedActionResult.fail(stack)
-        val nbt = stack.orCreateNbt
-        if(!nbt.contains(NbtKeys.LORE_KEY.str())){
-            val aug = getRandomBookAugment(loreTier.list(), user, hand)
-            Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(),aug,nbt)
-            val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
-            val type = AugmentHelper.getAugmentType(bola)
-            if (type != SpellType.NULL){
-                Nbt.writeStringNbt(NbtKeys.LORE_TYPE.str(),type.str(),nbt)
+        do {
+            val shouldOffer: Boolean
+            val stack2 = if (stack.count > 1) {
+                shouldOffer = true
+                stack.split(1)
+            } else {
+                shouldOffer = false
+                stack
             }
-            world.playSound(null,user.blockPos,SoundEvents.ITEM_BOOK_PAGE_TURN,SoundCategory.NEUTRAL,0.7f,1.0f)
-            return TypedActionResult.success(stack)
-        } else if (Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).namespace == "minecraft") {
-            val aug = getRandomBookAugment(loreTier.list(), user, hand)
-            Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(),aug,nbt)
-            val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(),nbt)).toString()
-            val type = AugmentHelper.getAugmentType(bola)
-            if (type != SpellType.NULL){
-                Nbt.writeStringNbt(NbtKeys.LORE_TYPE.str(),type.str(),nbt)
+            val nbt = stack2.orCreateNbt
+            if (!nbt.contains(NbtKeys.LORE_KEY.str())) {
+                val aug = getRandomBookAugment(loreTier.list(), user, hand)
+                Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(), aug, nbt)
+                val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(), nbt)).toString()
+                val type = AugmentHelper.getAugmentType(bola)
+                if (type != SpellType.NULL) {
+                    Nbt.writeStringNbt(NbtKeys.LORE_TYPE.str(), type.str(), nbt)
+                }
+                world.playSound(null, user.blockPos, SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.NEUTRAL, 0.7f, 1.0f)
+                if (shouldOffer){
+                    user.inventory.offerOrDrop(stack2)
+                }
+            } else if (Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(), nbt)).namespace == "minecraft") {
+                val aug = getRandomBookAugment(loreTier.list(), user, hand)
+                Nbt.writeStringNbt(NbtKeys.LORE_KEY.str(), aug, nbt)
+                val bola = Identifier(Nbt.readStringNbt(NbtKeys.LORE_KEY.str(), nbt)).toString()
+                val type = AugmentHelper.getAugmentType(bola)
+                if (type != SpellType.NULL) {
+                    Nbt.writeStringNbt(NbtKeys.LORE_TYPE.str(), type.str(), nbt)
+                }
+                world.playSound(null, user.blockPos, SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.NEUTRAL, 0.7f, 1.0f)
+                if (shouldOffer){
+                    user.inventory.offerOrDrop(stack2)
+                }
             }
-            world.playSound(null,user.blockPos,SoundEvents.ITEM_BOOK_PAGE_TURN,SoundCategory.NEUTRAL,0.7f,1.0f)
-            return TypedActionResult.success(stack)
-        }
-        if (user is ServerPlayerEntity) {
-            ScepterHelper.USED_KNOWLEDGE_BOOK.trigger(user)
-        }
+            if (user is ServerPlayerEntity) {
+                ScepterHelper.USED_KNOWLEDGE_BOOK.trigger(user)
+            }
+        } while (stack.count > 1)
         return useAfterWriting(stack, world, user, hand)
     }
 
