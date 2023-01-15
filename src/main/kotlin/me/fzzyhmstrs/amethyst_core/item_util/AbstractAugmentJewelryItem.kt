@@ -3,14 +3,19 @@ package me.fzzyhmstrs.amethyst_core.item_util
 import com.google.common.collect.Multimap
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.DamageTracking
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Flavorful
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.HitTracking
+import me.fzzyhmstrs.amethyst_core.item_util.interfaces.KillTracking
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentTasks
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.entity.damage.DamageSource
 import net.minecraft.item.ItemStack
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.world.World
 import java.util.*
@@ -24,7 +29,7 @@ import java.util.*
  *
  * Notably absent from this default item is an implementation for activated abilities (abilities that might be turned on/off with use)
  */
-open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings), AugmentTasks, Flavorful<AbstractAugmentJewelryItem> {
+open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings), AugmentTasks, Flavorful<AbstractAugmentJewelryItem>, HitTracking, DamageTracking, KillTracking {
 
     override var glint: Boolean = false
     override var flavor: String = ""
@@ -33,6 +38,10 @@ open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings)
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
         addFlavorText(tooltip, context)
+    }
+
+    override fun getFlavorItem(): AbstractAugmentJewelryItem {
+        return this
     }
 
     override fun getModifiers(
@@ -69,7 +78,13 @@ open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings)
         passiveEnchantmentTasks(stack,entity.world,entity)
     }
 
-    override fun getFlavorItem(): AbstractAugmentJewelryItem {
-        return this
+    override fun onWearerDamaged(stack: ItemStack, wearer: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float){
     }
+
+    override fun postWearerHit(stack: ItemStack, wearer: LivingEntity, target: LivingEntity){
+    }
+
+    override fun onWearerKilledOther(stack: ItemStack, wearer: LivingEntity, victim: LivingEntity, world: ServerWorld) {
+    }
+
 }
