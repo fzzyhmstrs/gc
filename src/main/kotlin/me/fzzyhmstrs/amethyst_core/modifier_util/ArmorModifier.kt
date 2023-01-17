@@ -9,57 +9,57 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
 import java.util.*
 
-class WeaponModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID,val persistent: Boolean = false, val randomSelectable: Boolean = false): AbstractModifier<WeaponModifier>(modifierId) {
+class ArmorModifier(modifierId: Identifier = ModifierDefaults.BLANK_ID, val persistent: Boolean = false, val randomSelectable: Boolean = false): AbstractModifier<ArmorModifier>(modifierId) {
 
     private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifier> = HashMultimap.create()
-    private val postHitConsumers: MutableList<WeaponConsumer> = mutableListOf()
-    private val onUseConsumers: MutableList<WeaponConsumer> = mutableListOf()
-    private val tickConsumers: MutableList<WeaponConsumer> = mutableListOf()
+    private val postHitConsumers: MutableList<ArmorConsumer> = mutableListOf()
+    private val onDamagedConsumers: MutableList<ArmorConsumer> = mutableListOf()
+    private val tickConsumers: MutableList<ArmorConsumer> = mutableListOf()
 
-    override fun plus(other: WeaponModifier): WeaponModifier {
+    override fun plus(other: ArmorModifier): ArmorModifier {
         attributeModifiers.putAll(other.attributeModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
-        onUseConsumers.addAll(other.onUseConsumers)
+        onDamagedConsumers.addAll(other.postHitConsumers)
         tickConsumers.addAll(other.tickConsumers)
         return this
     }
 
-    fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): WeaponModifier{
+    fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): ArmorModifier {
         val modifier = EntityAttributeModifier(UUID.fromString(uuid), this::getTranslationKey,amount,operation)
         attributeModifiers.put(attribute,modifier)
         return this
     }
 
-    fun withPostHit(onHit: WeaponConsumer): WeaponModifier{
+    fun withPostHit(onHit: ArmorConsumer): ArmorModifier {
         postHitConsumers.add(onHit)
         return this
     }
 
-    fun withOnUse(onUse: WeaponConsumer): WeaponModifier{
-        onUseConsumers.add(onUse)
+    fun withOnDamaged(onDamaged: ArmorConsumer): ArmorModifier {
+        onDamagedConsumers.add(onDamaged)
         return this
     }
 
-    fun withTick(tick: WeaponConsumer): WeaponModifier{
+    fun withTick(tick: ArmorConsumer): ArmorModifier {
         tickConsumers.add(tick)
         return this
     }
     
-    fun withDescendant(modifier: WeaponModifier): WeaponModifier {
+    fun withDescendant(modifier: ArmorModifier): ArmorModifier {
         addDescendant(modifier)
         return this
     }
 
     override fun compiler(): Compiler {
-        return Compiler(mutableListOf(), WeaponModifier())
+        return Compiler(mutableListOf(), ArmorModifier())
     }
 
     override fun getTranslationKey(): String {
-        return "weapon.modifier.${modifierId}"
+        return "armor.modifier.${modifierId}"
     }
 
     @FunctionalInterface
-    fun interface WeaponConsumer{
-        fun apply(stack: ItemStack, user: LivingEntity, target: LivingEntity?)
+    fun interface ArmorConsumer{
+        fun apply(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?)
     }
 }
