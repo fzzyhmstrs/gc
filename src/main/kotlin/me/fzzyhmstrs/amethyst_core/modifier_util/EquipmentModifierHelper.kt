@@ -43,7 +43,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (!modifier.randomSelectable) return
         val target = modifier.target
         val weight = modifier.weight
-        for (i = 1..weight{
+        for (i = 1..weight){
             targetMap.put(target,modifier)
         }
     }
