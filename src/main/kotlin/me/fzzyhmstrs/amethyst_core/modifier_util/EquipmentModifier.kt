@@ -17,7 +17,8 @@ import java.util.*
 class EquipmentModifier(
     modifierId: Identifier = ModifierDefaults.BLANK_ID, 
     val target: EquimentModifierTarget = EquipmentModifierTarget.ANY,
-    val weight: Int = 1,
+    val weight: Int = 10,
+    val rarity: Rarity = Rarity.COMMON
     val persistent: Boolean = false, 
     val randomSelectable: Boolean = false): AbstractModifier<EquipmentModifier>(modifierId) {
     
@@ -32,6 +33,8 @@ class EquipmentModifier(
     private val onDamagedFunctions: MutableList<DamageFunction> = mutableListOf()
     private val killOtherConsumers: MutableList<ToolConsumer> = mutableListOf()
     private val tickConsumers: MutableList<ToolConsumer> = mutableListOf()
+    private var durabilityModifier: PerLvlI = PerLvlI()
+    
     private var toll: LootNumberProvider = ConstantLootNumberProvider(5f)
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
@@ -42,6 +45,7 @@ class EquipmentModifier(
         onDamagedFunctions.addAll(other.onDamagedFunctions)
         killOtherConsumers.addAll(other.killOtherConsumers)
         tickConsumers.addAll(other.tickConsumers)
+        durabilityModifier.plus(other.durabilityModifier)
         return this
     }
 
@@ -53,6 +57,16 @@ class EquipmentModifier(
 
     fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifier>{
         return attributeModifiers
+    }
+    
+    fun withDurabilityMod(durabilityMod: PerLvlI): EquipmentModifier{
+        this.durabilityModifier = durabilityMod
+        return this
+    }
+    
+    fun modifyDurability(durability: Int): Int{
+        val dur = perLvlI(durability)
+        return dur.plus(durabilityModifier).value(0)
     }
 
     fun withPostHit(onHit: ToolConsumer): EquipmentModifier {
@@ -240,6 +254,14 @@ class EquipmentModifier(
         
         fun isAcceptableItem(stack: ItemStack): Boolean
         
+    }
+    
+    enum class Rarity(vararg formatting: Formatting){
+        BAD(Formatting.DARK_RED),
+        COMMON(Formatting.WHITE),
+        UNCOMMON(Formatting.GOLD),
+        RARE(Formatting.CYAN),
+        EPIC(Formatting.BOLD, Formatting.PURPLE)
     }
     
 }
