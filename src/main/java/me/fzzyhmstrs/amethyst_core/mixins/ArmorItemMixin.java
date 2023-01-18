@@ -49,9 +49,9 @@ public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, 
     }
 
     @Override
-    public void onWearerDamaged(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount) {
+    public float onWearerDamaged(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount) {
         AbstractModifier<EquipmentModifier>.CompiledModifiers modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().onDamaged(stack,wearer, attacker,source,amount);
+        return modifiers.getCompiledData().onDamaged(stack,wearer, attacker,source,amount);
     }
 
     @NotNull
