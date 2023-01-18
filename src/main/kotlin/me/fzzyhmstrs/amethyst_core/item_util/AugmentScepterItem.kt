@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
+import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
@@ -63,8 +64,8 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         return this
     }
 
-    override fun getActiveModifiers(stack: ItemStack): AbstractModifier<AugmentModifier>.CompiledModifiers {
-        return ModifierHelper.getActiveModifiers(stack)
+    override fun getModifierHelper(): AbstractModifierHelper<AugmentModifier> {
+        return ModifierHelper
     }
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {

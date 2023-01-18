@@ -119,7 +119,7 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         tooltip.add(AcText.literal(graceText).formatted(SpellType.GRACE.fmt()))
         val witText = AcText.translatable("scepter.wit.lvl").string + stats[2].toString() + AcText.translatable("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
         tooltip.add(AcText.literal(witText).formatted(SpellType.WIT.fmt()))
-        addModifierTooltip(stack, tooltip)
+        getModifierHelper().addModifierTooltip(stack, tooltip)
     }
 
     override fun resetCooldown(

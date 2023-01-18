@@ -45,10 +45,14 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
      */
     abstract fun compiler(): Compiler
 
+    abstract fun getModifierHelper(): AbstractModifierHelper<*>
+
     /**
      * defines the lang translation key for [TranslatableText][net.minecraft.text.Text.translatable].
      */
-    abstract fun getTranslationKey(): String
+    open fun getTranslationKey(): String{
+        return getModifierHelper().getTranslationKeyFromIdentifier(modifierId)
+    }
 
     fun hasDescendant(): Boolean{
         return hasDesc
