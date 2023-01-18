@@ -3,9 +3,9 @@ package me.fzzyhmstrs.amethyst_core.mixins;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketComponent;
 import dev.emi.trinkets.api.TrinketsApi;
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.DamageTracking;
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.HitTracking;
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.KillTracking;
+import me.fzzyhmstrs.amethyst_core.interfaces.DamageTracking;
+import me.fzzyhmstrs.amethyst_core.interfaces.HitTracking;
+import me.fzzyhmstrs.amethyst_core.interfaces.KillTracking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -30,34 +30,6 @@ public abstract class PlayerEntityMixin {
     @Shadow public abstract Iterable<ItemStack> getArmorItems();
     @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
-
-    @Inject(method = "attack",at = @At(value = "INVOKE", target = "net/minecraft/item/ItemStack.postHit (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/player/PlayerEntity;)V"))
-    private void amethyst_core_invokePostWearerHit(Entity target, CallbackInfo ci){
-        if (target instanceof LivingEntity livingEntity) {
-            Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent((LivingEntity) (Object) this);
-            if (optional.isPresent()) {
-                List<Pair<SlotReference, ItemStack>> stacks = optional.get().getAllEquipped();
-                for (Pair<SlotReference, ItemStack> entry : stacks) {
-                    if (entry.getRight().getItem() instanceof HitTracking hitTrackingItem) {
-                        hitTrackingItem.postWearerHit(entry.getRight(), (LivingEntity) (Object) this, livingEntity);
-                    }
-                }
-            }
-            this.getArmorItems().forEach(stack -> {
-                if (stack.getItem() instanceof HitTracking hitTrackingItem){
-                    hitTrackingItem.postWearerHit(stack, (LivingEntity) (Object) this, livingEntity);
-                }
-            });
-            ItemStack mainhand = this.getEquippedStack(EquipmentSlot.MAINHAND);
-            if (mainhand.getItem() instanceof HitTracking hitTrackingItem){
-                hitTrackingItem.postWearerHit(mainhand, (LivingEntity) (Object) this, livingEntity);
-            }
-            ItemStack offhand = this.getEquippedStack(EquipmentSlot.OFFHAND);
-            if (offhand.getItem() instanceof HitTracking hitTrackingItem){
-                hitTrackingItem.postWearerHit(offhand, (LivingEntity) (Object) this, livingEntity);
-            }
-        }
-    }
 
     @Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "net/minecraft/entity/damage/DamageTracker.onDamage (Lnet/minecraft/entity/damage/DamageSource;FF)V"))
     private void amethyst_core_invokeOnWearerDamaged(DamageSource source, float amount, CallbackInfo ci){

@@ -130,11 +130,11 @@ open class AugmentModifier(
         return Compiler(mutableListOf(), AugmentModifier())
     }
 
-    override fun getTranslationKey(): String {
-        return "scepter.modifier.${modifierId}"
-    }
-
     override fun getName(): Text {
         return AcText.translatable(getTranslationKey())
+    }
+
+    override fun getModifierHelper(): AbstractModifierHelper<*> {
+        return ModifierHelper
     }
 }

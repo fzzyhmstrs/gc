@@ -23,6 +23,10 @@ repositories {
         name = "Ladysnake Libs"
         url = uri("https://ladysnake.jfrog.io/artifactory/mods")
     }
+    maven {
+        name = "Jitpack"
+        url = uri("https://jitpack.io")
+    }
     flatDir {
         dirs("F:\\Documents\\Mod Development\\ai\\build\\libs")
     }
@@ -43,7 +47,12 @@ dependencies {
     modImplementation("dev.emi:trinkets:3.4.0"){
         exclude("net.fabricmc.fabric-api")
     }
-    
+
+
+    implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
+    include("com.github.LlamaLad7:MixinExtras:0.1.1")
+
 }
 tasks {
     val javaVersion = JavaVersion.VERSION_17
