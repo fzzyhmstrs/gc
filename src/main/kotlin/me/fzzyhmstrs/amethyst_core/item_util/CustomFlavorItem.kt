@@ -17,6 +17,24 @@ open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful<Cust
     override var glint = false
     override var flavor: String = ""
     override var flavorDesc: String = ""
+    
+    private val flavorText: MutableText by Lazy{
+        makeFlavorText()
+    }
+    
+    private val flavorTextDesc: MutableText by Lazy{
+        makeFlavorTextDesc()
+    }
+    
+    private fun makeFlavorText(): MutableText{
+        val id = Registry.ITEM.getId(this)
+        return AcText.translatable("item.${id.namespace}.${id.path}.flavor").formatted(Formatting.WHITE, Formatting.ITALIC)
+    }
+    
+    private fun makeFlavorTextDesc(): MutableText{
+        val id = Registry.ITEM.getId(this)
+        return AcText.translatable("item.${id.namespace}.${id.path}.flavor.desc").formatted(Formatting.WHITE)
+    }
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
         super.appendTooltip(stack, world, tooltip, context)
@@ -29,6 +47,13 @@ open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful<Cust
         } else {
             super.hasGlint(stack)
         }
+    }
+    
+    override fun flavorText(): MutableText{
+        return flavorText
+    }
+    override fun flavorDescText(): MutableText{
+        return flavorTextDesc
     }
 
     override fun getFlavorItem(): CustomFlavorItem {
