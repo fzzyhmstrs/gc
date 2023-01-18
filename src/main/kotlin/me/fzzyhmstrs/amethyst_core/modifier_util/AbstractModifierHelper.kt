@@ -22,7 +22,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     abstract fun getTranslationKeyFromIdentifier(id: Identifier): String
 
-    fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
+    open fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
         val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
         val modifierList = getModifiers(stack)
         if (modifierList.isNotEmpty()){
