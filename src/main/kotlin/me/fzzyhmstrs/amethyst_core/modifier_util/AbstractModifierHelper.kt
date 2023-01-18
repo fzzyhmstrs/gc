@@ -1,10 +1,14 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import kotlin.math.max
 
@@ -15,6 +19,25 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     abstract val fallbackData: AbstractModifier<T>.CompiledModifiers
 
     abstract fun gatherActiveModifiers(stack: ItemStack)
+
+    abstract fun getTranslationKeyFromIdentifier(id: Identifier): String
+
+    fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
+        val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
+        val modifierList = getModifiers(stack)
+        if (modifierList.isNotEmpty()){
+            val modifierText = AcText.translatable("modifiers.base_text").formatted(Formatting.GOLD)
+            val itr = modifierList.asIterable().iterator()
+            while(itr.hasNext()){
+                val mod = itr.next()
+                modifierText.append(AcText.translatable(getTranslationKeyFromIdentifier(mod)).formatted(Formatting.GOLD))
+                if (itr.hasNext()){
+                    modifierText.append(commaText)
+                }
+            }
+            tooltip.add(modifierText)
+        }
+    }
 
     fun getModifiersById(itemStackId: Long): List<Identifier>{
         return modifiers[itemStackId]?: listOf()

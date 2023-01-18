@@ -3,10 +3,10 @@ package me.fzzyhmstrs.amethyst_core.item_util
 import com.google.common.collect.Multimap
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.DamageTracking
+import me.fzzyhmstrs.amethyst_core.interfaces.DamageTracking
+import me.fzzyhmstrs.amethyst_core.interfaces.HitTracking
+import me.fzzyhmstrs.amethyst_core.interfaces.KillTracking
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Flavorful
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.HitTracking
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.KillTracking
 import me.fzzyhmstrs.amethyst_core.registry.EventRegistry
 import me.fzzyhmstrs.amethyst_core.trinket_util.AugmentTasks
 import net.minecraft.client.item.TooltipContext
@@ -29,7 +29,8 @@ import java.util.*
  *
  * Notably absent from this default item is an implementation for activated abilities (abilities that might be turned on/off with use)
  */
-open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings), AugmentTasks, Flavorful<AbstractAugmentJewelryItem>, HitTracking, DamageTracking, KillTracking {
+open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings), AugmentTasks, Flavorful<AbstractAugmentJewelryItem>,
+    HitTracking, DamageTracking, KillTracking {
 
     override var glint: Boolean = false
     override var flavor: String = ""
