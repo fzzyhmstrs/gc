@@ -78,4 +78,8 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
         return "scepter.modifier.${id}"
     }
+    
+    override fun getDescTranslationKeyFromIdentifier(id: Identifier): String {
+        return "scepter.modifier.${id}.desc"
+    }
 }
