@@ -21,6 +21,8 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     abstract fun gatherActiveModifiers(stack: ItemStack)
 
     abstract fun getTranslationKeyFromIdentifier(id: Identifier): String
+    
+    abstract fun getDescTranslationKeyFromIdentifier(id: Identifier): String
 
     open fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
         val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
