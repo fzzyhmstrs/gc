@@ -27,7 +27,7 @@ class EquipmentModifier(
     val weight: Int = 10,
     val rarity: Rarity = Rarity.COMMON,
     val persistent: Boolean = false, 
-    val randomSelectable: Boolean = false): AbstractModifier<EquipmentModifier>(modifierId) {
+    val randomSelectable: Boolean = true): AbstractModifier<EquipmentModifier>(modifierId) {
     
     init{
         EquipmentModifierHelper.addToTargetMap(this)
