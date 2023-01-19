@@ -187,7 +187,7 @@ class EquipmentModifier(
             internal fun findTargetForItem(stack: ItemStack): List<EquipmentModifierTarget>{
                 val list: MutableList<EquipmentModifierTarget> = mutableListOf()
                 for (target in targets){
-                    if (target.isAcceptableItem(stack)){
+                    if (target.isStackAcceptable(stack)){
                         list.add(target)
                     }
                 }
@@ -319,8 +319,8 @@ class EquipmentModifier(
         fun isStackAcceptable(stack: ItemStack): Boolean{
             if (stack.isIn(GLOBAL_EXCLUSIONS)) return false
             if (stack.isIn(tagExlcuded)) return false
-            val bl1 = stack.isIn(tagIncluded)
-            return bl1 || isAcceptableItem(stack)
+            val bl = stack.isIn(tagIncluded)
+            return bl || isAcceptableItem(stack)
         }
                 
         abstract protected fun isAcceptableItem(stack: ItemStack): Boolean
