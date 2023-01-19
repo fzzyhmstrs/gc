@@ -1,10 +1,14 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Flavorful
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
+import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**
@@ -18,11 +22,11 @@ open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful<Cust
     override var flavor: String = ""
     override var flavorDesc: String = ""
     
-    private val flavorText: MutableText by Lazy{
+    private val flavorText: MutableText by lazy{
         makeFlavorText()
     }
     
-    private val flavorTextDesc: MutableText by Lazy{
+    private val flavorTextDesc: MutableText by lazy{
         makeFlavorTextDesc()
     }
     

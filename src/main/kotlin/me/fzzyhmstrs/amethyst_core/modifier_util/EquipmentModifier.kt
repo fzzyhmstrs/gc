@@ -1,14 +1,21 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import dev.emi.trinkets.api.TrinketItem
+import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
 import net.minecraft.block.BlockState
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
+import net.minecraft.item.*
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider
+import net.minecraft.loot.provider.number.LootNumberProvider
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -16,9 +23,9 @@ import java.util.*
 
 class EquipmentModifier(
     modifierId: Identifier = ModifierDefaults.BLANK_ID, 
-    val target: EquimentModifierTarget = EquipmentModifierTarget.ANY,
+    val target: EquipmentModifierTarget = EquipmentModifierTarget.ANY,
     val weight: Int = 10,
-    val rarity: Rarity = Rarity.COMMON
+    val rarity: Rarity = Rarity.COMMON,
     val persistent: Boolean = false, 
     val randomSelectable: Boolean = false): AbstractModifier<EquipmentModifier>(modifierId) {
     
@@ -35,7 +42,7 @@ class EquipmentModifier(
     private val tickConsumers: MutableList<ToolConsumer> = mutableListOf()
     private var durabilityModifier: PerLvlI = PerLvlI()
     
-    private var toll: LootNumberProvider = ConstantLootNumberProvider(5f)
+    internal var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
         attributeModifiers.putAll(other.attributeModifiers)
@@ -65,7 +72,7 @@ class EquipmentModifier(
     }
     
     fun modifyDurability(durability: Int): Int{
-        val dur = perLvlI(durability)
+        val dur = PerLvlI(durability)
         return dur.plus(durabilityModifier).value(0)
     }
 
@@ -177,7 +184,7 @@ class EquipmentModifier(
             internal val targets: MutableList<EquipmentModifierTarget> = mutableListOf()
             
             internal fun findTargetForItem(stack: ItemStack): EquipmentModifierTarget?{
-                for (target: targets){
+                for (target in targets){
                     if (target.isAcceptableItem(stack)){
                         return target
                     }
@@ -185,52 +192,57 @@ class EquipmentModifier(
                 return null
             }
             
-            val ANY = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"any")){
+            val ANY = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"any")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.isDamagable()
+                    return stack.item.isDamageable
                 }
             }
-            val SWORD = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"sword")){
+            val WEAPON = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"weapon")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    return SWORD.isAcceptableItem(stack) || AXE.isAcceptableItem(stack) || TRIDENT.isAcceptableItem(stack) || BOW.isAcceptableItem(stack)
+                }
+            }
+            val SWORD = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"sword")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is SwordItem
                 }
             }
-            val AXE = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"axe")){
+            val AXE = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"axe")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is AxeItem
                 }
             }
-            val TRIDENT = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"trident")){
+            val TRIDENT = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trident")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is TridentItem
                 }
             }
-            val BOW = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"bow")){
+            val BOW = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"bow")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return (stack.item is BowItem || stack.item is CrossbowItem)
                 }
             }
-            val MINING = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"mining")){
+            val MINING = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"mining")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is MiningToolItem
                 }
             }
-            val SHIELD = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"shield")){
+            val SHIELD = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"shield")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is ShieldItem
                 }
             }
-            val TOOL = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"tool")){
+            val TOOL = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"tool")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is ToolItem
                 }
             }
-            val ARMOR = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"armor")){
+            val ARMOR = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is ArmorItem
                 }
             }
-            val TRINKET = object: EquipmentModifierTarget(Identifier(Viscerae.MOD_ID,"trinket")){
+            val TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is TrinketItem
                 }
@@ -238,8 +250,14 @@ class EquipmentModifier(
         }
         
         init{
-            if (targets.containsKey(id) throw IllegalStateException("Equipment Modifier target ${} already instantiated!")
-            targets[id] = this
+            for (target in targets){
+                if (target.id == id) throw IllegalStateException("Equipment Modifier target $id already instantiated!")
+            }
+            targets.add(getTarget())
+        }
+
+        private fun getTarget(): EquipmentModifierTarget{
+            return this
         }
         
         override fun equals(other: Any?): Boolean{
@@ -248,20 +266,20 @@ class EquipmentModifier(
             return other.id == id
         }
         
-        override fun hashcode(): Int{
-            return id.hashcode() + 31 * id.hashcode()
+        override fun hashCode(): Int{
+            return id.hashCode() + 31 * id.hashCode()
         }
         
-        fun isAcceptableItem(stack: ItemStack): Boolean
+        abstract fun isAcceptableItem(stack: ItemStack): Boolean
         
     }
     
-    enum class Rarity(vararg formatting: Formatting){
+    enum class Rarity(vararg val formatting: Formatting){
         BAD(Formatting.DARK_RED),
         COMMON(Formatting.WHITE),
         UNCOMMON(Formatting.GOLD),
-        RARE(Formatting.CYAN),
-        EPIC(Formatting.BOLD, Formatting.PURPLE)
+        RARE(Formatting.AQUA),
+        EPIC(Formatting.BOLD, Formatting.LIGHT_PURPLE)
     }
     
 }

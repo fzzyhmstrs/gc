@@ -22,34 +22,6 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
         addModifierToNbt(modifier, nbt)
     }
 
-    override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound) {
-        super.initializeModifiers(stack, nbt)
-        initializeForAttunedEnchant(stack, nbt)
-    }
-
-    @Deprecated("Removing after modifiers are released for long enough. Target end of 2022.")
-    private fun initializeForAttunedEnchant(stack: ItemStack, nbt: NbtCompound){
-        if (stack.hasEnchantments()){
-            val enchants = stack.enchantments
-            var attunedLevel = 0
-            var nbtEl: NbtCompound
-            for (el in enchants) {
-                nbtEl = el as NbtCompound
-                if (EnchantmentHelper.getIdFromNbt(nbtEl) == Identifier("amethyst_imbuement","attuned")){
-                    attunedLevel = EnchantmentHelper.getLevelFromNbt(nbtEl)
-                    break
-                }
-            }
-            if (attunedLevel > 0) {
-                for (i in 1..attunedLevel) {
-                    addModifier(ModifierRegistry.LESSER_ATTUNED.modifierId, stack, nbt)
-                }
-                val newEnchants = EnchantmentHelper.fromNbt(enchants)
-                EnchantmentHelper.set(newEnchants,stack)
-            }
-        }
-    }
-
     fun isInTag(id: Identifier,tag: TagKey<Enchantment>): Boolean{
         val augment = Registry.ENCHANTMENT.get(id)?:return false
         val opt = Registry.ENCHANTMENT.getEntry(Registry.ENCHANTMENT.getRawId(augment))
@@ -81,5 +53,9 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
     
     override fun getDescTranslationKeyFromIdentifier(id: Identifier): String {
         return "scepter.modifier.${id}.desc"
+    }
+
+    override fun getModifierByType(id: Identifier): AugmentModifier? {
+        return ModifierRegistry.getByType<AugmentModifier>(id)
     }
 }
