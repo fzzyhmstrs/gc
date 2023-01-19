@@ -196,7 +196,7 @@ class EquipmentModifier(
             
             val ANY = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"any")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return true
+                    return TOOL.isAcceptableItem(stack) || ARMOR.isAcceptableItem(stack) || TRINKET.isAcceptableItem(stack)
                 }
             }
             val BREAKABLE = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"breakable")){
