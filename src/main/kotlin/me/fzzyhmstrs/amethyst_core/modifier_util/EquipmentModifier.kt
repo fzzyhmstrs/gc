@@ -183,13 +183,14 @@ class EquipmentModifier(
             
             internal val targets: MutableList<EquipmentModifierTarget> = mutableListOf()
             
-            internal fun findTargetForItem(stack: ItemStack): EquipmentModifierTarget?{
+            internal fun findTargetForItem(stack: ItemStack): List<EquipmentModifierTarget>{
+                val list: MutableList<EquipmentModifierTarget> = mutableListOf()
                 for (target in targets){
                     if (target.isAcceptableItem(stack)){
-                        return target
+                        list.add(target)
                     }
                 }
-                return null
+                return list
             }
             
             val ANY = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"any")){
