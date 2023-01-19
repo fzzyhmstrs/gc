@@ -7,7 +7,8 @@
     "PlayerEntityMixin",
     "ToolItemMixin",
     "ArmorItemMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "LivingEntityMixin"
   ],
   "client": [
     "ItemRendererMixin",

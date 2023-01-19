@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.item_util
 import com.google.common.collect.Multimap
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.interfaces.DamageTracking
 import me.fzzyhmstrs.amethyst_core.interfaces.HitTracking
 import me.fzzyhmstrs.amethyst_core.interfaces.KillTracking
@@ -16,7 +17,10 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.item.ItemStack
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
+import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import java.util.*
 
@@ -36,11 +40,11 @@ open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings)
     override var flavor: String = ""
     override var flavorDesc: String = ""
         
-    private val flavorText: MutableText by Lazy{
+    private val flavorText: MutableText by lazy{
         makeFlavorText()
     }
     
-    private val flavorTextDesc: MutableText by Lazy{
+    private val flavorTextDesc: MutableText by lazy{
         makeFlavorTextDesc()
     }
     
@@ -104,7 +108,8 @@ open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings)
         passiveEnchantmentTasks(stack,entity.world,entity)
     }
 
-    override fun onWearerDamaged(stack: ItemStack, wearer: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float){
+    override fun onWearerDamaged(stack: ItemStack, wearer: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
+        return 0f
     }
 
     override fun postWearerHit(stack: ItemStack, wearer: LivingEntity, target: LivingEntity){
