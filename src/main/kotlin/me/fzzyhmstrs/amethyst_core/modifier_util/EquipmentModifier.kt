@@ -202,6 +202,11 @@ class EquipmentModifier(
                     return SWORD.isAcceptableItem(stack) || AXE.isAcceptableItem(stack) || TRIDENT.isAcceptableItem(stack) || BOW.isAcceptableItem(stack)
                 }
             }
+            val WEAPON_AND_TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"weapon_and_trinket")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    return WEAPON.isAcceptableItem(stack) || TRINKET.isAcceptableItem(stack)
+                }
+            }
             val SWORD = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"sword")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is SwordItem
@@ -238,6 +243,11 @@ class EquipmentModifier(
                 }
             }
             val ARMOR = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    return stack.item is ArmorItem
+                }
+            }
+            val ARMOR_AND_TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_and_trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is ArmorItem
                 }
@@ -299,11 +309,13 @@ class EquipmentModifier(
     }
     
     enum class Rarity(vararg val formatting: Formatting){
+        REALLY_BAD(Formatting.BOLD, Formatting.DARK_RED),
         BAD(Formatting.DARK_RED),
         COMMON(Formatting.WHITE),
-        UNCOMMON(Formatting.GOLD),
+        UNCOMMON(Formatting.DARK_GREEN),
         RARE(Formatting.AQUA),
-        EPIC(Formatting.BOLD, Formatting.LIGHT_PURPLE)
+        EPIC(Formatting.LIGHT_PURPLE)
+        LEGENDARY(Formatting.BOLD, Formatting.GOLD)
     }
     
 }
