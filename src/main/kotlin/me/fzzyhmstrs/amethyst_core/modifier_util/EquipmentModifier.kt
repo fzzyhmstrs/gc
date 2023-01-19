@@ -242,6 +242,30 @@ class EquipmentModifier(
                     return stack.item is ArmorItem
                 }
             }
+            val ARMOR_HEAD = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_head")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    val item = stack.item
+                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.HEAD)
+                }
+            }
+            val ARMOR_CHEST = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_chest")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    val item = stack.item
+                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.CHEST)
+                }
+            }
+            val ARMOR_LEGS = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_legs")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    val item = stack.item
+                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.LEGS)
+                }
+            }
+            val ARMOR_FEET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_feet")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    val item = stack.item
+                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.FEET)
+                }
+            }
             val TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is TrinketItem
