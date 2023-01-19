@@ -181,6 +181,7 @@ class EquipmentModifier(
     
         companion object{
             
+            val GLOBAL_EXCLUSIONS = TagKey.of(Registry.ITEM_KEY,Identifier(AC.MOD_ID,"global_modifier_exclusions"))
             internal val targets: MutableList<EquipmentModifierTarget> = mutableListOf()
             
             internal fun findTargetForItem(stack: ItemStack): List<EquipmentModifierTarget>{
@@ -225,12 +226,12 @@ class EquipmentModifier(
             }
             val TRIDENT = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trident")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is TridentItem
+                    return stack.item is TridentItem || super.isAcceptableItem(stack)
                 }
             }
             val BOW = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"bow")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return (stack.item is BowItem || stack.item is CrossbowItem)
+                    return stack.item is BowItem || stack.item is CrossbowItem
                 }
             }
             val MINING = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"mining")){
@@ -284,16 +285,21 @@ class EquipmentModifier(
             }
             val TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is TrinketItem
+                    return stack.item is TrinketItem || super.isAcceptableItem(stack)
                 }
             }
         }
+        
+        val tagIncluded: TagKey<Item>
+        val tagExcluded: TagKey<Item>
         
         init{
             for (target in targets){
                 if (target.id == id) throw IllegalStateException("Equipment Modifier target $id already instantiated!")
             }
             targets.add(getTarget())
+            tagIncluded = TagKey.of(Registry.ITEM_KEY,id)
+            tagExcluded = TagKey.of(Registry.ITEM_KEY,Identifier(id.namespace,id.path + "_excluded")
         }
 
         private fun getTarget(): EquipmentModifierTarget{
@@ -310,7 +316,14 @@ class EquipmentModifier(
             return id.hashCode() + 31 * id.hashCode()
         }
         
-        abstract fun isAcceptableItem(stack: ItemStack): Boolean
+        fun isStackAcceptable(stack: ItemStack): Boolean{
+            if (stack.isIn(GLOBAL_EXCLUSIONS)) return false
+            if (stack.isIn(tagExlcuded)) return false
+            val bl1 = stack.isIn(tagIncluded)
+            return bl1 || isAcceptableItem(stack)
+        }
+                
+        abstract protected fun isAcceptableItem(stack: ItemStack): Boolean
         
     }
     
