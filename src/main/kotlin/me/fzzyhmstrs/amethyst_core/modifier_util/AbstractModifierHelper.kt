@@ -61,7 +61,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         }
         val highestModifier = checkDescendant(modifier,stack)
         if (highestModifier != null){
-            val mod = ModifierRegistry.getByType<T>(modifier)
+            val mod = getModifierByType(modifier)
             return if (mod?.hasDescendant() == true){
                 val highestDescendantPresent: Int = checkModifierLineage(mod, stack)
                 if (highestDescendantPresent < 0){
@@ -84,13 +84,12 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         modifiers[id]?.add(modifier)
         gatherActiveModifiers(stack)
         return true
-
     }
 
     protected fun checkDescendant(modifier: Identifier, stack: ItemStack): Identifier?{
         val id = Nbt.getItemStackId(stack)
         if (id == -1L) return null
-        val mod = ModifierRegistry.getByType<T>(modifier)
+        val mod = getModifierByType(modifier)
         val lineage = mod?.getModLineage() ?: return null
         var highestModifier: Identifier? = null
         lineage.forEach { identifier ->
@@ -104,7 +103,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     protected fun removeModifier(stack: ItemStack, modifier: Identifier, nbt: NbtCompound){
         val id = Nbt.getItemStackId(nbt)
         modifiers[id]?.remove(modifier)
-        gatherActiveModifiers(scepter)
+        gatherActiveModifiers(stack)
         removeModifierFromNbt(modifier,nbt)
     }
 
@@ -186,7 +185,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     }
 
     fun checkModifierLineage(modifier: Identifier, stack: ItemStack): Boolean{
-        val mod = ModifierRegistry.getByType<T>(modifier)
+        val mod = getModifierByType(modifier)
         return if (mod != null){
             checkModifierLineage(mod, stack) >= 0
         } else {
@@ -212,7 +211,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     }
 
     fun getNextInLineage(modifier: Identifier, stack: ItemStack): Identifier{
-        val mod = ModifierRegistry.getByType<T>(modifier)
+        val mod = getModifierByType(modifier)
         return if (mod != null){
             val lineage = mod.getModLineage()
             val nextInLineIndex = checkModifierLineage(mod, stack)
@@ -227,9 +226,11 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     }
 
     fun getMaxInLineage(modifier: Identifier): Identifier{
-        val mod = ModifierRegistry.getByType<T>(modifier)
+        val mod = getModifierByType(modifier)
         return mod?.getModLineage()?.last() ?: return modifier
     }
+
+    abstract fun getModifierByType(id: Identifier): T?
 
     inline fun <reified A:AbstractModifier<A>> gatherActiveAbstractModifiers(stack: ItemStack, objectToAffect: Identifier, compiler: AbstractModifier<A>.Compiler): AbstractModifier<A>.CompiledModifiers{
         val id = Nbt.getItemStackId(stack)

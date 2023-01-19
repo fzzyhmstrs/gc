@@ -1,16 +1,25 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.Multimap
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Modifiable
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
+import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import net.minecraft.item.ItemStack
+import net.minecraft.loot.context.LootContext
+import net.minecraft.loot.provider.number.BinomialLootNumberProvider
+import net.minecraft.loot.provider.number.LootNumberProvider
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
-    private val targetMap: MultiMap<EquipmentModifierTarget, EquipmentModifier> = ArrayListMultiMap.create()
+    private val targetMap: Multimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(5,0.5f)
     private val BLANK_WEAPON_MOD = EquipmentModifier(ModifierDefaults.BLANK_ID)
-    private val tooltips: Map<Long, List<Text>> = mutableMapOf()
+    private val tooltips: MutableMap<Long, List<Text>> = mutableMapOf()
     
     override val fallbackData: AbstractModifier<EquipmentModifier>.CompiledModifiers
         get() = BLANK_WEAPON_MOD.CompiledModifiers(listOf(), EquipmentModifier(ModifierDefaults.BLANK_ID))
@@ -26,10 +35,11 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 )
             val list: MutableList<Text> = mutableListOf()
             compiled.modifiers.forEach{
-                list.add(AcText.translatable(it.getTranslationKey()).formatted(it.rarity.formatting)
-                            .append(AcText.literal(" - ").formatted(it.rarity.formatting)
-                            .append(AcText.translatable(it.getDescTranslationKey()).formatted(it.rarity.formatting).formatted(Formatting.ITALIC)
-                        )
+                list.add(
+                    AcText.translatable(it.getTranslationKey()).formatted(*it.rarity.formatting)
+                            .append(AcText.literal(" - ").formatted(*it.rarity.formatting))
+                            .append(AcText.translatable(it.getDescTranslationKey()).formatted(*it.rarity.formatting).formatted(Formatting.ITALIC))
+                )
             }
             tooltips[id] = list
             setModifiersById(
@@ -48,7 +58,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
-        tooltip.addAll(tooltips)
+        val id = Nbt.makeItemStackId(stack)
+        tooltip.addAll(tooltips[id]?: listOf())
     }
     
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack){
@@ -61,33 +72,37 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (!modifier.randomSelectable) return
         val target = modifier.target
         val weight = modifier.weight
-        for (i = 1..weight){
+        for (i in 1..weight){
             targetMap.put(target,modifier)
         }
     }
     
     fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider = DEFAULT_MODIFIER_TOLL){
-        val target = EquipmentModifierTarget.findTargetForItem(stack)
-        if (target == null) return
-        val list = targetMap.get(target)
-        if (list == null) return
+        val target = EquipmentModifier.EquipmentModifierTarget.findTargetForItem(stack) ?: return
+        val list = targetMap.get(target).toList()
         var tollRemaining = toll.nextFloat(context).toInt()
         while (tollRemaining > 0){
-            val modChk = list.get(context.getRandom().nextInt(list.size))
-            EquipmentModifierHelper.addModifier
+            val modChk = list[context.random.nextInt(list.size)]
             tollRemaining -= modChk.toll.nextFloat(context).toInt()
+            if (tollRemaining >= 0) {
+                addUniqueModifier(modChk.modifierId,stack)
+            }
         }
     }
     
     fun rerollModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider = DEFAULT_MODIFIER_TOLL){
         val modifiers = getModifiers(stack)
         val nbt = stack.orCreateNbt
-        for (id: modifiers){
+        for (id in modifiers){
             val mod = ModifierRegistry.getByType<EquipmentModifier>(id)
             if (mod?.persistent == true) continue
             removeModifier(stack, id, nbt)
         }
         addRandomModifiers(stack, context, toll)
+    }
+
+    override fun getModifierByType(id: Identifier): EquipmentModifier? {
+        return ModifierRegistry.getByType<EquipmentModifier>(id)
     }
 
 }

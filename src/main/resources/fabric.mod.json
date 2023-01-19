@@ -56,7 +56,8 @@
         "me/fzzyhmstrs/amethyst_core/interfaces/HitTracking",
         "me/fzzyhmstrs/amethyst_core/interfaces/KillTracking",
         "me/fzzyhmstrs/amethyst_core/interfaces/MineTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/DamageTracking"
+        "me/fzzyhmstrs/amethyst_core/interfaces/DamageTracking",
+        "me/fzzyhmstrs/amethyst_core/interfaces/AttributeTracking"
       ]
     }
   }

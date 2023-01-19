@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 public interface DamageTracking {
 
-    default void onWearerDamaged(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount){
-
+    default float onWearerDamaged(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount){
+        return amount;
     }
 }
