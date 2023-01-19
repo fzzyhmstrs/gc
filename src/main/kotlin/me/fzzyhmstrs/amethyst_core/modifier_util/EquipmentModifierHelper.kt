@@ -84,7 +84,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         for (target in targetList){
             list.addAll(targetMap.get(target).toList()
         }
-        var tollRemaining = toll.nextFloat(context).toInt()
+        var tollRemaining = (toll.nextFloat(context) + context.getLuck()).toInt()
         while (tollRemaining > 0){
             val modChk = list[context.random.nextInt(list.size)]
             tollRemaining -= modChk.toll.nextFloat(context).toInt()
