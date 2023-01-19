@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
     private val targetMap: Multimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
-    private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(5,0.5f)
+    private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(10,0.5f)
     private val BLANK_WEAPON_MOD = EquipmentModifier(ModifierDefaults.BLANK_ID)
     private val tooltips: MutableMap<Long, List<Text>> = mutableMapOf()
     
