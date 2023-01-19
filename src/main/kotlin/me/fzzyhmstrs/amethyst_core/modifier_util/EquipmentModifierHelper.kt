@@ -78,8 +78,12 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider = DEFAULT_MODIFIER_TOLL){
-        val target = EquipmentModifier.EquipmentModifierTarget.findTargetForItem(stack) ?: return
-        val list = targetMap.get(target).toList()
+        val targetList = EquipmentModifier.EquipmentModifierTarget.findTargetForItem(stack)
+        if (targetList.isEmpty) return
+        val list: ArrayList<EquipmentModifier> = ArrayList()
+        for (target in targetList){
+            list.addAll(targetMap.get(target).toList()
+        }
         var tollRemaining = toll.nextFloat(context).toInt()
         while (tollRemaining > 0){
             val modChk = list[context.random.nextInt(list.size)]
