@@ -2,7 +2,6 @@ package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
-import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketComponent
 import dev.emi.trinkets.api.TrinketsApi
 import me.fzzyhmstrs.amethyst_core.coding_util.AcText
@@ -10,6 +9,7 @@ import me.fzzyhmstrs.amethyst_core.interfaces.AugmentTracking
 import me.fzzyhmstrs.amethyst_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
+import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
@@ -31,7 +31,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val augmentMap: MutableMap<UUID, AbstractModifier.CompiledModifiers<AugmentModifier>> = mutableMapOf()
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(10,0.5f)
     private val BLANK_WEAPON_MOD = EquipmentModifier(ModifierDefaults.BLANK_ID)
-    private val tooltips: MutableMap<Long, List<Text>> = mutableMapOf()
+    private val tooltipsAdvanced: MutableMap<Long, List<Text>> = mutableMapOf()
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(ModifierDefaults.BLANK_ID))
@@ -56,7 +56,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                         )
                 )
             }
-            tooltips[id] = list
+            tooltipsAdvanced[id] = list
             setModifiersById(
                 id,
                 compiled
@@ -83,9 +83,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return "equipment.modifier.${id}.desc"
     }
     
-    override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
+    override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
         val id = Nbt.makeItemStackId(stack)
-        tooltip.addAll(tooltips[id]?: listOf())
+        tooltip.addAll(tooltipsAdvanced[id]?: listOf())
     }
 
     fun modifyCompiledAugmentModifiers(original: AbstractModifier.CompiledModifiers<AugmentModifier>, uuid: UUID): AbstractModifier.CompiledModifiers<AugmentModifier>{
@@ -136,9 +136,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
     }
 
-    fun getAttributeModifiers(stack: ItemStack, slot: EquipmentSlot): Multimap<EntityAttribute, EntityAttributeModifier> {
+    fun getAttributeModifiers(stack: ItemStack, slot: EquipmentSlot, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
         val id = Nbt.getItemStackId(stack)
-        return attributeMap[id]?:stack.getAttributeModifiers(slot)
+        return attributeMap[id]?:original
     }
     
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack){

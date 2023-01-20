@@ -2,9 +2,11 @@ package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.AcText
+import me.fzzyhmstrs.amethyst_core.config.AcConfig
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
+import net.minecraft.client.item.TooltipContext
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import net.minecraft.tag.TagKey
@@ -36,21 +38,32 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
         return TagKey.of(Registry.ENCHANTMENT_KEY, Identifier(AC.MOD_ID,path))
     }
 
-    override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
-        val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
+    override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
         val modifierList = getModifiers(stack)
-        if (modifierList.isNotEmpty()){
-            val modifierText = AcText.translatable("modifiers.base_text").formatted(Formatting.GOLD)
-            val itr = modifierList.asIterable().iterator()
-            while(itr.hasNext()){
-                val mod = itr.next()
-                modifierText.append(AcText.translatable(getTranslationKeyFromIdentifier(mod)).formatted(Formatting.GOLD))
-                if (itr.hasNext()){
-                    modifierText.append(commaText)
-                }
+        if (modifierList.isEmpty()) return
+        if ((context.isAdvanced && AcConfig.flavors.showFlavorDescOnAdvanced) || AcConfig.flavors.showFlavorDesc){
+            modifierList.forEach {
+                tooltip.add(AcText.translatable(getTranslationKeyFromIdentifier(it)).formatted(Formatting.GOLD)
+                    .append(AcText.literal(" - ").formatted(Formatting.GOLD))
+                    .append(
+                        AcText.translatable(getDescTranslationKeyFromIdentifier(it)).formatted(Formatting.GOLD)
+                            .formatted(Formatting.ITALIC)
+                    ))
             }
-            tooltip.add(modifierText)
+            return
         }
+        val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
+        val modifierText = AcText.translatable("modifiers.base_text").formatted(Formatting.GOLD)
+        val itr = modifierList.asIterable().iterator()
+        while(itr.hasNext()){
+            val mod = itr.next()
+            modifierText.append(AcText.translatable(getTranslationKeyFromIdentifier(mod)).formatted(Formatting.GOLD))
+            if (itr.hasNext()){
+                modifierText.append(commaText)
+            }
+        }
+        tooltip.add(modifierText)
+
     }
 
     override fun gatherActiveModifiers(stack: ItemStack){
@@ -59,9 +72,12 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
             val id = Nbt.getItemStackId(nbt)
             if (!nbt.contains(NbtKeys.ACTIVE_ENCHANT.str())) return
             val activeEnchant = Identifier(Nbt.readStringNbt(NbtKeys.ACTIVE_ENCHANT.str(), nbt))
+            //println(getModifiers(stack))
+            val compiled = gatherActiveAbstractModifiers(stack, activeEnchant, ModifierDefaults.BLANK_AUG_MOD.compiler())
+            //println(compiled.modifiers)
             setModifiersById(
                 id,
-                gatherActiveAbstractModifiers(stack, activeEnchant, ModifierDefaults.BLANK_AUG_MOD.compiler())
+                compiled
             )
         }
     }

@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.interfaces;
 
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifierHelper;
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierInitializer;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -14,8 +15,8 @@ public interface Modifiable {
 
     default List<Identifier> defaultModifiers(){return Collections.emptyList();}
 
-    default void addModifierTooltip(ItemStack stack, List<Text> tooltip){
-        AbstractModifierHelper.Companion.getEmptyHelper().addModifierTooltip(stack, tooltip);
+    default void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context){
+        AbstractModifierHelper.Companion.getEmptyHelper().addModifierTooltip(stack, tooltip, context);
     }
 
     default ModifierInitializer getModifierInitializer(){

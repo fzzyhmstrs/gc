@@ -26,7 +26,7 @@ abstract public class LivingEntityMixin {
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
     @ModifyReturnValue(method = "modifyAppliedDamage", at = @At("RETURN"))
-    private float amethyst_core_invokeOnWearerDamaged(DamageSource source, float amount, float original){
+    private float amethyst_core_invokeOnWearerDamaged(float original, DamageSource source, float amount){
         if (source.isUnblockable() || original <= 0.0f) return original;
         float newAmount = original;
         Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent((LivingEntity) (Object) this);
