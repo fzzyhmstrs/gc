@@ -2,13 +2,13 @@ package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
-import dev.emi.trinkets.api.TrinketComponent
-import dev.emi.trinkets.api.TrinketsApi
 import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.interfaces.AugmentTracking
 import me.fzzyhmstrs.amethyst_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
+import me.fzzyhmstrs.amethyst_core.trinket_util.TrinketChecker
+import me.fzzyhmstrs.amethyst_core.trinket_util.TrinketUtil
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
@@ -101,13 +101,12 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (item !is AugmentTracking) return
         val uuid = entity.uuid
         val list: MutableList<AugmentModifier> = mutableListOf()
-        val optional: Optional<TrinketComponent>  = TrinketsApi.getTrinketComponent(entity)
-        if (optional.isPresent) {
-            val stacks = optional.get().allEquipped
-            for (entry in stacks) {
-                val chk = entry.right.item
+        if (TrinketChecker.trinketsLoaded) {
+            val stacks = TrinketUtil.getTrinketStacks(entity)
+            for (stack1 in stacks) {
+                val chk = stack1.item
                 if (chk is AugmentTracking) {
-                    list.addAll(chk.getModifiers(entry.right))
+                    list.addAll(chk.getModifiers(stack1))
                 }
             }
         }
