@@ -77,14 +77,14 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     }
 
     @WrapOperation(method = "getMaxDamage", at = @At(value = "INVOKE", target = "net/minecraft/item/Item.getMaxDamage ()I"))
-    private int amethyst_core_maxDamageFromNewMax(Operation<Integer> operation){
-        operation.call();
+    private int amethyst_core_maxDamageFromNewMax(Item instance, Operation<Integer> operation){
+        operation.call(instance);
         return amethyst_core_newMaxDamage;
     }
 
     @ModifyReturnValue(method = "getAttributeModifiers", at = @At("RETURN"))
     private Multimap<EntityAttribute, EntityAttributeModifier> amethyst_core_addModifierModifiersToModifiers(Multimap<EntityAttribute, EntityAttributeModifier> original, EquipmentSlot slot){
-        return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot);
+        return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
     }
 
     @Inject(method = "postHit", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
@@ -140,8 +140,8 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     }
 
     @WrapOperation(method = "use", at = @At(value = "INVOKE", target = "net/minecraft/item/Item.use (Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;"))
-    private TypedActionResult<ItemStack> amethyst_core_invokeOnWearerUse(World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> operation){
-        TypedActionResult<ItemStack> useResult = operation.call(world, user, hand);
+    private TypedActionResult<ItemStack> amethyst_core_invokeOnWearerUse(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> operation){
+        TypedActionResult<ItemStack> useResult = operation.call(instance, world, user, hand);
         if (!useResult.getResult().isAccepted()){
             Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent(user);
             if (optional.isPresent()) {
@@ -170,10 +170,10 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     }
 
     @WrapOperation(method = "getTooltip", at = @At(value = "INVOKE", target = "net/minecraft/item/Item.appendTooltip (Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Ljava/util/List;Lnet/minecraft/client/item/TooltipContext;)V"))
-    private void amethyst_core_appendModifiersToTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context, Operation<Void> operation){
-        operation.call(stack, world, tooltip,context);
+    private void amethyst_core_appendModifiersToTooltip(Item instance,ItemStack stack, World world, List<Text> tooltip, TooltipContext context, Operation<Void> operation){
+        operation.call(instance,stack, world, tooltip,context);
         if (stack.getItem() instanceof Modifiable modifiable){
-            modifiable.addModifierTooltip(stack, tooltip);
+            modifiable.addModifierTooltip(stack, tooltip, context);
         }
     }
 

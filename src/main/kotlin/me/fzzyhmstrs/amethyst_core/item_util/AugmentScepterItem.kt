@@ -121,6 +121,8 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
                           activeEnchantId: String, testEnchant: ScepterAugment, testLevel: Int): TypedActionResult<ItemStack>{
 
         val modifiers = EquipmentModifierHelper.modifyCompiledAugmentModifiers(ModifierHelper.getActiveModifiers(stack),user.uuid)
+        //val modifiers = ModifierHelper.getActiveModifiers(stack)
+        println(modifiers.modifiers)
 
         val cd : Int? = ScepterHelper.useScepter(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {
