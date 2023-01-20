@@ -2,9 +2,10 @@ package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
-import dev.emi.trinkets.api.Trinket
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
+import me.fzzyhmstrs.amethyst_core.trinket_util.TrinketUtil
+import me.fzzyhmstrs.amethyst_core.trinket_util.TrinketChecker
 import net.minecraft.block.BlockState
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
@@ -22,6 +23,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import java.util.*
+import java.util.function.Predicate
 
 class EquipmentModifier(
     modifierId: Identifier = ModifierDefaults.BLANK_ID, 
@@ -198,6 +200,13 @@ class EquipmentModifier(
             
             val GLOBAL_EXCLUSIONS = TagKey.of(Registry.ITEM_KEY,Identifier(AC.MOD_ID,"global_modifier_exclusions"))
             internal val targets: MutableList<EquipmentModifierTarget> = mutableListOf()
+            val trinketsPredicate by lazy {
+                getTrinketCheck()
+            }
+
+            fun getTrinketCheck(): Predicate<ItemStack>{
+                return TrinketUtil.trinketCheck
+            }
             
             internal fun findTargetForItem(stack: ItemStack): List<EquipmentModifierTarget>{
                 val list: MutableList<EquipmentModifierTarget> = mutableListOf()
@@ -300,7 +309,11 @@ class EquipmentModifier(
             }
             val TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is Trinket
+                    return if (TrinketChecker.trinketsLoaded) {
+                        trinketsPredicate.test(stack)
+                    } else {
+                        false
+                    }
                 }
             }
         }
