@@ -1,8 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.registry
 
-import com.google.common.collect.Lists
 import me.fzzyhmstrs.amethyst_core.AC
-import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Modifiable
+import me.fzzyhmstrs.amethyst_core.interfaces.Modifiable
 import me.fzzyhmstrs.amethyst_core.modifier_util.*
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
@@ -11,11 +10,9 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.loot.condition.LootCondition
 import net.minecraft.loot.function.LootFunction
 import net.minecraft.loot.function.SetEnchantmentsLootFunction
 import net.minecraft.loot.function.SetNbtLootFunction
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.util.Identifier
@@ -150,11 +147,11 @@ object ModifierRegistry {
      */
     fun modifiersLootFunctionBuilder(item: Item, modifiers: List<AbstractModifier<*>> = listOf(), helper: AbstractModifierHelper<*>): LootFunction.Builder{
         val modList = NbtList()
-        if (item is Modifiable<*>) {
-            if (item.defaultModifiers.isEmpty() && modifiers.isEmpty()){
+        if (item is Modifiable) {
+            if (item.defaultModifiers().isEmpty() && modifiers.isEmpty()){
                 return SetEnchantmentsLootFunction.Builder() //empty builder for placehold purposes basically
             } else {
-                item.defaultModifiers.forEach {
+                item.defaultModifiers().forEach {
                     val nbtEl = NbtCompound()
                     Nbt.writeStringNbt(NbtKeys.MODIFIER_ID.str(),it.toString(),nbtEl)
                     modList.add(nbtEl)

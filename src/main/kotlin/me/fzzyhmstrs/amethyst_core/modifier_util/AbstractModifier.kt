@@ -103,7 +103,7 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
         return mutableListOf()
     }
 
-    inner class CompiledModifiers(val modifiers: List<T>, val compiledData: T)
+    class CompiledModifiers<T: Addable<T>>(val modifiers: List<T>, val compiledData: T)
 
     inner class Compiler(private val modifiers: MutableList<T>, private val compiledData: T){
 
@@ -112,7 +112,7 @@ abstract class AbstractModifier<T: Addable<T>>(val modifierId: Identifier): Adda
             compiledData.plus(modifier)
         }
 
-        fun compile(): CompiledModifiers{
+        fun compile(): CompiledModifiers<T>{
             return CompiledModifiers(modifiers, compiledData)
         }
 

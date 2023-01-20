@@ -1,8 +1,7 @@
 package me.fzzyhmstrs.amethyst_core.item_util
 
-import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
-import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
+import me.fzzyhmstrs.amethyst_core.modifier_util.EquipmentModifierHelper
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
@@ -64,10 +63,6 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
         return this
     }
 
-    override fun getModifierHelper(): AbstractModifierHelper<AugmentModifier> {
-        return ModifierHelper
-    }
-
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         super.use(world, user, hand)
         val stack = user.getStackInHand(hand)
@@ -125,7 +120,7 @@ abstract class AugmentScepterItem(material: ScepterToolMaterial, settings: Setti
     private fun serverUse(world: World, user: PlayerEntity, hand: Hand, stack: ItemStack,
                           activeEnchantId: String, testEnchant: ScepterAugment, testLevel: Int): TypedActionResult<ItemStack>{
 
-        val modifiers = ModifierHelper.getActiveModifiers(stack)
+        val modifiers = EquipmentModifierHelper.modifyCompiledAugmentModifiers(ModifierHelper.getActiveModifiers(stack),user.uuid)
 
         val cd : Int? = ScepterHelper.useScepter(activeEnchantId, testEnchant, stack, world, modifiers.compiledData.cooldownModifier)
         return if (cd != null) {

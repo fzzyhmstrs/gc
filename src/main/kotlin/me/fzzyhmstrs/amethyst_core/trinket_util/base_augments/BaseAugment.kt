@@ -2,7 +2,6 @@ package me.fzzyhmstrs.amethyst_core.trinket_util.base_augments
 
 import me.fzzyhmstrs.amethyst_core.coding_util.AbstractConfigDisableEnchantment
 import me.fzzyhmstrs.amethyst_core.item_util.AcceptableItemStacks
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentTarget
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
