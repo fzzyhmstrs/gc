@@ -12,11 +12,11 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import kotlin.math.max
 
-abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
+abstract class AbstractModifierHelper<T: AbstractModifier<T>> : ModifierInitializer{
 
     private val modifiers: MutableMap<Long ,MutableList<Identifier>> = mutableMapOf()
-    private val activeModifiers: MutableMap<Long, AbstractModifier<T>.CompiledModifiers> = mutableMapOf()
-    abstract val fallbackData: AbstractModifier<T>.CompiledModifiers
+    private val activeModifiers: MutableMap<Long, AbstractModifier.CompiledModifiers<T>> = mutableMapOf()
+    abstract val fallbackData: AbstractModifier.CompiledModifiers<T>
 
     abstract fun gatherActiveModifiers(stack: ItemStack)
 
@@ -25,19 +25,12 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     abstract fun getDescTranslationKeyFromIdentifier(id: Identifier): String
 
     open fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
-        val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
-        val modifierList = getModifiers(stack)
-        if (modifierList.isNotEmpty()){
-            val modifierText = AcText.translatable("modifiers.base_text").formatted(Formatting.GOLD)
-            val itr = modifierList.asIterable().iterator()
-            while(itr.hasNext()){
-                val mod = itr.next()
-                modifierText.append(AcText.translatable(getTranslationKeyFromIdentifier(mod)).formatted(Formatting.GOLD))
-                if (itr.hasNext()){
-                    modifierText.append(commaText)
-                }
-            }
-            tooltip.add(modifierText)
+        val nbt = stack.nbt ?: return
+        if (!nbt.contains(NbtKeys.MODIFIERS.str())) return
+        val ids = getModifiersFromNbt(stack)
+        for (id in ids){
+            val mod = ModifierRegistry.get(id)?:continue
+            tooltip.add(AcText.translatable(mod.getTranslationKey()).append(AcText.literal(" - ")).append(AcText.translatable(mod.getDescTranslationKey())))
         }
     }
 
@@ -45,7 +38,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         return modifiers[itemStackId]?: listOf()
     }
 
-    fun setModifiersById(itemStackId: Long, compiledData: AbstractModifier<T>.CompiledModifiers){
+    fun setModifiersById(itemStackId: Long, compiledData: AbstractModifier.CompiledModifiers<T>){
         activeModifiers[itemStackId] = compiledData
     }
 
@@ -129,7 +122,15 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         }
     }
 
-    open fun initializeModifiers(stack: ItemStack, nbt: NbtCompound){
+    override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound, list: List<Identifier>){
+        if (list.isNotEmpty()){
+            if (!nbt.contains(NbtKeys.MOD_INIT.str() + stack.translationKey)){
+                list.forEach{
+                    addModifierToNbt(it,nbt)
+                }
+                nbt.putBoolean(NbtKeys.MOD_INIT.str() + stack.translationKey,true)
+            }
+        }
         if (nbt.contains(NbtKeys.MODIFIERS.str())){
             val id = Nbt.makeItemStackId(stack)
             initializeModifiers(nbt, id)
@@ -161,8 +162,8 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
     }
 
     fun getModifiersFromNbt(stack: ItemStack): List<Identifier>{
-        val nbt = stack.orCreateNbt
         val list: MutableList<Identifier> = mutableListOf()
+        val nbt = stack.nbt?:return list
         if (nbt.contains(NbtKeys.MODIFIERS.str())){
             val nbtList = Nbt.readNbtList(nbt, NbtKeys.MODIFIERS.str())
             nbtList.forEach {
@@ -175,11 +176,11 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
         return list
     }
 
-    fun getActiveModifiers(stack: ItemStack): AbstractModifier<T>.CompiledModifiers {
+    fun getActiveModifiers(stack: ItemStack): AbstractModifier.CompiledModifiers<T> {
         val id = Nbt.getItemStackId(stack)
-        if (id != -1L && !activeModifiers.containsKey(id)){
+        /*if (id != -1L && !activeModifiers.containsKey(id)){
             initializeModifiers(stack, stack.orCreateNbt)
-        }
+        }*/
         val compiledData = activeModifiers[id]
         return  compiledData ?: fallbackData
     }
@@ -232,21 +233,68 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> {
 
     abstract fun getModifierByType(id: Identifier): T?
 
-    inline fun <reified A:AbstractModifier<A>> gatherActiveAbstractModifiers(stack: ItemStack, objectToAffect: Identifier, compiler: AbstractModifier<A>.Compiler): AbstractModifier<A>.CompiledModifiers{
+    inline fun <reified A : AbstractModifier<A>> gatherActiveAbstractModifiers(
+        stack: ItemStack,
+        objectToAffect: Identifier,
+        compiler: AbstractModifier<A>.Compiler
+    ): AbstractModifier.CompiledModifiers<A> {
         val id = Nbt.getItemStackId(stack)
         getModifiersById(id).forEach { identifier ->
             val modifier = ModifierRegistry.getByType<A>(identifier)
-            if (modifier != null){
-                if (!modifier.hasObjectToAffect()){
+            if (modifier != null) {
+                if (!modifier.hasObjectToAffect()) {
                     compiler.add(modifier)
                 } else {
-                    if (modifier.checkObjectsToAffect(objectToAffect)){
+                    if (modifier.checkObjectsToAffect(objectToAffect)) {
                         compiler.add(modifier)
                     }
                 }
             }
         }
-        val compiled = compiler.compile()
-        return compiled
+        return compiler.compile()
+    }
+
+    companion object{
+
+        val EMPTY = EmptyModifier()
+
+        fun getEmptyHelper(): EmptyModifierHelper{
+            return EmptyModifierHelper
+        }
+
+        object EmptyModifierHelper: AbstractModifierHelper<EmptyModifier>() {
+            override val fallbackData: AbstractModifier.CompiledModifiers<EmptyModifier> = AbstractModifier.CompiledModifiers(listOf(),EMPTY)
+
+            override fun gatherActiveModifiers(stack: ItemStack) {
+            }
+
+            override fun getTranslationKeyFromIdentifier(id: Identifier): String {
+                return ""
+            }
+
+            override fun getDescTranslationKeyFromIdentifier(id: Identifier): String {
+                return ""
+            }
+
+            override fun getModifierByType(id: Identifier): EmptyModifier? {
+                return null
+            }
+
+        }
+
+        class EmptyModifier:AbstractModifier<EmptyModifier>(ModifierDefaults.BLANK_ID){
+            override fun plus(other: EmptyModifier): EmptyModifier {
+                return this
+            }
+
+            override fun compiler(): Compiler {
+                return Compiler(mutableListOf(), EmptyModifier())
+            }
+
+            override fun getModifierHelper(): AbstractModifierHelper<*> {
+                return EquipmentModifierHelper
+            }
+
+        }
     }
 }

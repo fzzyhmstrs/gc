@@ -12,12 +12,10 @@ import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterHelper
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
 import me.fzzyhmstrs.amethyst_core.scepter_util.SpellType
 import me.fzzyhmstrs.amethyst_core.scepter_util.augments.AugmentHelper
-import me.fzzyhmstrs.amethyst_core.scepter_util.augments.ScepterAugment
 import net.fabricmc.api.EnvType
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
-import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
@@ -31,7 +29,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**
@@ -39,7 +36,7 @@ import net.minecraft.world.World
  *
  * For the most basic implementation, extend this and set the fallback ID; that's it. Define characteristics in the [ScepterToolMaterial] as with any tool, and register! You have your very own AI style scepter fully compatible with Scepter Augments and with all the functionality AIs scepters come with.
  *
- * For more in depth implementations, this scepter is [Modifiable][me.fzzyhmstrs.amethyst_core.item_util.interfaces.Modifiable] and [ParticleEmitting], with all the functionality those interfaces offer.
+ * For more in depth implementations, this scepter is [Modifiable][me.fzzyhmstrs.amethyst_core.interfaces.Modifiable] and [ParticleEmitting], with all the functionality those interfaces offer.
  */
 
 @Suppress("SameParameterValue", "unused", "USELESS_IS_CHECK")
@@ -119,7 +116,6 @@ abstract class DefaultScepterItem(material: ScepterToolMaterial, settings: Setti
         tooltip.add(AcText.literal(graceText).formatted(SpellType.GRACE.fmt()))
         val witText = AcText.translatable("scepter.wit.lvl").string + stats[2].toString() + AcText.translatable("scepter.xp").string + ScepterHelper.xpToNextLevel(stats[5],stats[2]).toString()
         tooltip.add(AcText.literal(witText).formatted(SpellType.WIT.fmt()))
-        getModifierHelper().addModifierTooltip(stack, tooltip)
     }
 
     override fun resetCooldown(

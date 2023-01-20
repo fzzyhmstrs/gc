@@ -29,7 +29,6 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayNetworkHandler
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.text.Text
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
