@@ -16,9 +16,11 @@ import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 
 import java.util.List;
 
+@Pseudo
 @Mixin(TrinketItem.class)
 public class TrinketItemMixin implements AugmentTracking, HitTracking, KillTracking, DamageTracking {
 

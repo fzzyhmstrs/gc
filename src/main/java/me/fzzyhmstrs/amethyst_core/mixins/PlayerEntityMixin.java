@@ -1,10 +1,9 @@
 package me.fzzyhmstrs.amethyst_core.mixins;
 
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.TrinketComponent;
-import dev.emi.trinkets.api.TrinketsApi;
 import me.fzzyhmstrs.amethyst_core.interfaces.DamageTracking;
 import me.fzzyhmstrs.amethyst_core.interfaces.KillTracking;
+import me.fzzyhmstrs.amethyst_core.trinket_util.TrinketChecker;
+import me.fzzyhmstrs.amethyst_core.trinket_util.TrinketUtil;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -28,45 +27,13 @@ public abstract class PlayerEntityMixin {
     @Shadow public abstract Iterable<ItemStack> getArmorItems();
     @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
-
-    @Inject(method = "applyDamage", at = @At(value = "INVOKE", target = "net/minecraft/entity/damage/DamageTracker.onDamage (Lnet/minecraft/entity/damage/DamageSource;FF)V"))
-    private void amethyst_core_invokeOnWearerDamaged(DamageSource source, float amount, CallbackInfo ci){
-        Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent((LivingEntity) (Object) this);
-        LivingEntity livingEntity = null;
-        if (source.getSource() instanceof LivingEntity le){
-            livingEntity = le;
-        }
-        if (optional.isPresent()) {
-            List<Pair<SlotReference, ItemStack>> stacks = optional.get().getAllEquipped();
-            for (Pair<SlotReference, ItemStack> entry : stacks) {
-                if (entry.getRight().getItem() instanceof DamageTracking damageTrackingItem) {
-                    damageTrackingItem.onWearerDamaged(entry.getRight(), (LivingEntity) (Object) this, livingEntity, source, amount);
-                }
-            }
-        }
-        for(ItemStack stack : this.getArmorItems()) {
-            if (stack.getItem() instanceof DamageTracking damageTrackingItem){
-                damageTrackingItem.onWearerDamaged(stack, (LivingEntity) (Object) this, livingEntity,source,amount);
-            }
-        }
-        ItemStack mainhand = this.getEquippedStack(EquipmentSlot.MAINHAND);
-        if (mainhand.getItem() instanceof DamageTracking damageTrackingItem){
-            damageTrackingItem.onWearerDamaged(mainhand, (LivingEntity) (Object) this, livingEntity,source,amount);
-        }
-        ItemStack offhand = this.getEquippedStack(EquipmentSlot.OFFHAND);
-        if (offhand.getItem() instanceof DamageTracking damageTrackingItem){
-            damageTrackingItem.onWearerDamaged(offhand, (LivingEntity) (Object) this, livingEntity,source,amount);
-        }
-    }
-
     @Inject(method = "onKilledOther", at = @At(value = "HEAD"))
     private void amethyst_core_invokeOnWearerKilledOther(ServerWorld world, LivingEntity livingEntity, CallbackInfoReturnable<Boolean> cir){
-        Optional<TrinketComponent> optional = TrinketsApi.getTrinketComponent((LivingEntity) (Object) this);
-        if (optional.isPresent()) {
-            List<Pair<SlotReference, ItemStack>> stacks = optional.get().getAllEquipped();
-            for (Pair<SlotReference, ItemStack> entry : stacks) {
-                if (entry.getRight().getItem() instanceof KillTracking killTrackingItem) {
-                    killTrackingItem.onWearerKilledOther(entry.getRight(), (LivingEntity) (Object) this, livingEntity, world);
+        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+            List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
+            for (ItemStack stack : stacks) {
+                if (stack.getItem() instanceof KillTracking killTrackingItem) {
+                    killTrackingItem.onWearerKilledOther(stack, (LivingEntity) (Object) this, livingEntity, world);
                 }
             }
         }
