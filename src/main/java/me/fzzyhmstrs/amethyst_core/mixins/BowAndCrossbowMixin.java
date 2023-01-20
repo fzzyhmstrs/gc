@@ -7,6 +7,7 @@ import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier;
 import me.fzzyhmstrs.amethyst_core.modifier_util.EquipmentModifier;
 import me.fzzyhmstrs.amethyst_core.modifier_util.EquipmentModifierHelper;
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierInitializer;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
@@ -42,8 +43,8 @@ public class BowAndCrossbowMixin implements HitTracking, KillTracking, Modifiabl
     }
 
     @Override
-    public void addModifierTooltip(ItemStack stack, List<Text> tooltip) {
-        EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip);
+    public void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context) {
+        EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip, context);
     }
 
     @Override

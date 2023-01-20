@@ -3,10 +3,11 @@ package me.fzzyhmstrs.amethyst_core.item_util
 import me.fzzyhmstrs.amethyst_core.interfaces.Modifiable
 import me.fzzyhmstrs.amethyst_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
-import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
+import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierInitializer
 import me.fzzyhmstrs.amethyst_core.scepter_util.ScepterToolMaterial
+import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 /**
@@ -28,6 +29,14 @@ abstract class ModifiableScepterItem<T: AbstractModifier<T>>(material: ScepterTo
 
     override fun defaultModifiers(): MutableList<Identifier> {
         return defaultModifiers
+    }
+
+    override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext) {
+        ModifierHelper.addModifierTooltip(stack, tooltip, context)
+    }
+
+    override fun getModifierInitializer(): ModifierInitializer {
+        return ModifierHelper
     }
 
     /*override fun writeDefaultNbt(stack: ItemStack, scepterNbt: NbtCompound) {

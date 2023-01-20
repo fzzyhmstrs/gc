@@ -3,6 +3,7 @@ package me.fzzyhmstrs.amethyst_core.mixins;
 import me.fzzyhmstrs.amethyst_core.interfaces.*;
 import me.fzzyhmstrs.amethyst_core.modifier_util.*;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,8 +61,8 @@ public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, 
     }
 
     @Override
-    public void addModifierTooltip(ItemStack stack, List<Text> tooltip) {
-        EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip);
+    public void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context) {
+        EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip, context);
     }
 
     @Override

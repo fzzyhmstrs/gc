@@ -4,11 +4,10 @@ import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
+import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.text.MutableText
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import kotlin.math.max
 
@@ -24,7 +23,7 @@ abstract class AbstractModifierHelper<T: AbstractModifier<T>> : ModifierInitiali
     
     abstract fun getDescTranslationKeyFromIdentifier(id: Identifier): String
 
-    open fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
+    open fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
         val nbt = stack.nbt ?: return
         if (!nbt.contains(NbtKeys.MODIFIERS.str())) return
         val ids = getModifiersFromNbt(stack)
