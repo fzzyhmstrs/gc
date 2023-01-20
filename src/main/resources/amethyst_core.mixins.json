@@ -3,12 +3,15 @@
   "package": "me.fzzyhmstrs.amethyst_core.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "EnchantmentMixin",
-    "PlayerEntityMixin",
-    "ToolItemMixin",
     "ArmorItemMixin",
+    "BowAndCrossbowMixin",
+    "EnchantmentMixin",
     "ItemStackMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+    "ToolAndWeaponItemMixin",
+    "TrinketMixin",
+    "TrinketItemMixin"
   ],
   "client": [
     "ClientPlayNetworkHandlerMixin",

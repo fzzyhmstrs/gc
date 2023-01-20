@@ -1,21 +1,24 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import me.fzzyhmstrs.amethyst_core.AC
+import me.fzzyhmstrs.amethyst_core.coding_util.AcText
 import me.fzzyhmstrs.amethyst_core.nbt_util.Nbt
 import me.fzzyhmstrs.amethyst_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.amethyst_core.registry.ModifierRegistry
 import net.minecraft.enchantment.Enchantment
-import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.TagKey
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
 
-    override val fallbackData: AbstractModifier<AugmentModifier>.CompiledModifiers = ModifierDefaults.BLANK_COMPILED_DATA
+    override val fallbackData: AbstractModifier.CompiledModifiers<AugmentModifier> = ModifierDefaults.BLANK_COMPILED_DATA
 
     fun addModifierForREI(modifier: Identifier, stack: ItemStack){
         val nbt = stack.orCreateNbt
@@ -33,6 +36,23 @@ object ModifierHelper: AbstractModifierHelper<AugmentModifier>() {
 
     fun createAugmentTag(path: String): TagKey<Enchantment> {
         return TagKey.of(RegistryKeys.ENCHANTMENT, Identifier(AC.MOD_ID,path))
+    }
+
+    override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>){
+        val commaText: MutableText = AcText.literal(", ").formatted(Formatting.GOLD)
+        val modifierList = getModifiers(stack)
+        if (modifierList.isNotEmpty()){
+            val modifierText = AcText.translatable("modifiers.base_text").formatted(Formatting.GOLD)
+            val itr = modifierList.asIterable().iterator()
+            while(itr.hasNext()){
+                val mod = itr.next()
+                modifierText.append(AcText.translatable(getTranslationKeyFromIdentifier(mod)).formatted(Formatting.GOLD))
+                if (itr.hasNext()){
+                    modifierText.append(commaText)
+                }
+            }
+            tooltip.add(modifierText)
+        }
     }
 
     override fun gatherActiveModifiers(stack: ItemStack){

@@ -1,12 +1,12 @@
 package me.fzzyhmstrs.amethyst_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
-import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
-import dev.emi.trinkets.api.TrinketItem
+import dev.emi.trinkets.api.Trinket
 import me.fzzyhmstrs.amethyst_core.AC
 import me.fzzyhmstrs.amethyst_core.coding_util.PerLvlI
 import net.minecraft.block.BlockState
+import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -15,9 +15,11 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
+import net.minecraft.tag.TagKey
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import java.util.*
 
@@ -34,6 +36,7 @@ class EquipmentModifier(
     }
     
     private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+    private val augmentModifiers: MutableList<AugmentModifier> = mutableListOf()
     private val postHitConsumers: MutableList<ToolConsumer> = mutableListOf()
     private val postMineConsumers: MutableList<MiningConsumer> = mutableListOf()
     private val onUseConsumers: MutableList<ToolConsumer> = mutableListOf()
@@ -46,6 +49,7 @@ class EquipmentModifier(
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
         attributeModifiers.putAll(other.attributeModifiers)
+        augmentModifiers.addAll(other.augmentModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
         postMineConsumers.addAll(other.postMineConsumers)
         onUseConsumers.addAll(other.onUseConsumers)
@@ -64,6 +68,17 @@ class EquipmentModifier(
 
     fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifier>{
         return attributeModifiers
+    }
+
+    fun withAugmentModifiers(vararg modifier: AugmentModifier): EquipmentModifier{
+        if (modifier.isNotEmpty()) {
+            augmentModifiers.addAll(modifier)
+        }
+        return this
+    }
+
+    fun augmentModifiers(): List<AugmentModifier>{
+        return augmentModifiers
     }
     
     fun withDurabilityMod(durabilityMod: PerLvlI): EquipmentModifier{
@@ -196,7 +211,7 @@ class EquipmentModifier(
             
             val ANY = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"any")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return TOOL.isAcceptableItem(stack) || ARMOR.isAcceptableItem(stack) || TRINKET.isAcceptableItem(stack)
+                    return TOOL.isItemAcceptableOrTagged(stack) || ARMOR.isItemAcceptableOrTagged(stack) || TRINKET.isItemAcceptableOrTagged(stack)
                 }
             }
             val BREAKABLE = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"breakable")){
@@ -206,12 +221,12 @@ class EquipmentModifier(
             }
             val WEAPON = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"weapon")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return SWORD.isAcceptableItem(stack) || AXE.isAcceptableItem(stack) || TRIDENT.isAcceptableItem(stack) || BOW.isAcceptableItem(stack)
+                    return SWORD.isItemAcceptableOrTagged(stack) || AXE.isItemAcceptableOrTagged(stack) || TRIDENT.isItemAcceptableOrTagged(stack) || BOW.isItemAcceptableOrTagged(stack)
                 }
             }
             val WEAPON_AND_TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"weapon_and_trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return WEAPON.isAcceptableItem(stack) || TRINKET.isAcceptableItem(stack)
+                    return WEAPON.isItemAcceptableOrTagged(stack) || TRINKET.isItemAcceptableOrTagged(stack)
                 }
             }
             val SWORD = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"sword")){
@@ -226,7 +241,7 @@ class EquipmentModifier(
             }
             val TRIDENT = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trident")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is TridentItem || super.isAcceptableItem(stack)
+                    return stack.item is TridentItem
                 }
             }
             val BOW = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"bow")){
@@ -256,36 +271,36 @@ class EquipmentModifier(
             }
             val ARMOR_AND_TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_and_trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is ArmorItem
+                    return ARMOR.isItemAcceptableOrTagged(stack) || TRINKET.isItemAcceptableOrTagged(stack)
                 }
             }
             val ARMOR_HEAD = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_head")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     val item = stack.item
-                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.HEAD)
+                    return (item is ArmorItem && item.slotType == EquipmentSlot.HEAD)
                 }
             }
             val ARMOR_CHEST = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_chest")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     val item = stack.item
-                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.CHEST)
+                    return (item is ArmorItem && item.slotType == EquipmentSlot.CHEST)
                 }
             }
             val ARMOR_LEGS = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_legs")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     val item = stack.item
-                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.LEGS)
+                    return (item is ArmorItem && item.slotType == EquipmentSlot.LEGS)
                 }
             }
             val ARMOR_FEET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"armor_feet")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     val item = stack.item
-                    return (item is ArmorItem && item.getSlotType() == EquipmentSlots.FEET)
+                    return (item is ArmorItem && item.slotType == EquipmentSlot.FEET)
                 }
             }
             val TRINKET = object: EquipmentModifierTarget(Identifier(AC.MOD_ID,"trinket")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is TrinketItem || super.isAcceptableItem(stack)
+                    return stack.item is Trinket
                 }
             }
         }
@@ -299,7 +314,7 @@ class EquipmentModifier(
             }
             targets.add(getTarget())
             tagIncluded = TagKey.of(Registry.ITEM_KEY,id)
-            tagExcluded = TagKey.of(Registry.ITEM_KEY,Identifier(id.namespace,id.path + "_excluded")
+            tagExcluded = TagKey.of(Registry.ITEM_KEY,Identifier(id.namespace,id.path + "_excluded"))
         }
 
         private fun getTarget(): EquipmentModifierTarget{
@@ -318,12 +333,15 @@ class EquipmentModifier(
         
         fun isStackAcceptable(stack: ItemStack): Boolean{
             if (stack.isIn(GLOBAL_EXCLUSIONS)) return false
-            if (stack.isIn(tagExlcuded)) return false
-            val bl = stack.isIn(tagIncluded)
-            return bl || isAcceptableItem(stack)
+            return isItemAcceptableOrTagged(stack)
+        }
+
+        private fun isItemAcceptableOrTagged(stack: ItemStack): Boolean{
+            if (stack.isIn(tagExcluded)) return false
+            return stack.isIn(tagIncluded) || isAcceptableItem(stack)
         }
                 
-        abstract protected fun isAcceptableItem(stack: ItemStack): Boolean
+        protected abstract fun isAcceptableItem(stack: ItemStack): Boolean
         
     }
     
@@ -333,7 +351,7 @@ class EquipmentModifier(
         COMMON(Formatting.WHITE),
         UNCOMMON(Formatting.DARK_GREEN),
         RARE(Formatting.AQUA),
-        EPIC(Formatting.LIGHT_PURPLE)
+        EPIC(Formatting.LIGHT_PURPLE),
         LEGENDARY(Formatting.BOLD, Formatting.GOLD)
     }
     
