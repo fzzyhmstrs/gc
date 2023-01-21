@@ -61,6 +61,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;)V", at = @At("TAIL"))
     private void amethyst_core_initializeFromNbt(NbtCompound nbt, CallbackInfo ci){
+        if (getItem() == null) return;
         amethyst_core_newMaxDamage = getItem().getMaxDamage();
         if (getItem() instanceof Modifiable modifiableItem){
             modifiableItem.getModifierInitializer().initializeModifiers((ItemStack) (Object) this, getOrCreateNbt(), modifiableItem.defaultModifiers());
@@ -69,6 +70,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
     private void amethyst_core_initializeFromItem(ItemConvertible item, int count, CallbackInfo ci){
+        if (getItem() == null) return;
         amethyst_core_newMaxDamage = getItem().getMaxDamage();
         if (getItem() instanceof Modifiable modifiableItem){
             modifiableItem.getModifierInitializer().initializeModifiers((ItemStack) (Object) this, getOrCreateNbt(), modifiableItem.defaultModifiers());
