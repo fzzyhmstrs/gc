@@ -5,10 +5,10 @@ import me.fzzyhmstrs.amethyst_core.item_util.interfaces.Flavorful
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 /**
@@ -31,12 +31,12 @@ open class CustomFlavorItem(settings: Settings) : Item(settings), Flavorful<Cust
     }
     
     private fun makeFlavorText(): MutableText{
-        val id = Registry.ITEM.getId(this)
+        val id = Registries.ITEM.getId(this)
         return AcText.translatable("item.${id.namespace}.${id.path}.flavor").formatted(Formatting.WHITE, Formatting.ITALIC)
     }
     
     private fun makeFlavorTextDesc(): MutableText{
-        val id = Registry.ITEM.getId(this)
+        val id = Registries.ITEM.getId(this)
         return AcText.translatable("item.${id.namespace}.${id.path}.flavor.desc").formatted(Formatting.WHITE)
     }
 

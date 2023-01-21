@@ -16,11 +16,11 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.*
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
-import net.minecraft.tag.TagKey
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import java.util.*
 import java.util.function.Predicate
@@ -198,7 +198,7 @@ class EquipmentModifier(
     
         companion object{
             
-            val GLOBAL_EXCLUSIONS = TagKey.of(Registry.ITEM_KEY,Identifier(AC.MOD_ID,"global_modifier_exclusions"))
+            val GLOBAL_EXCLUSIONS = TagKey.of(RegistryKeys.ITEM,Identifier(AC.MOD_ID,"global_modifier_exclusions"))
             internal val targets: MutableList<EquipmentModifierTarget> = mutableListOf()
             val trinketsPredicate by lazy {
                 getTrinketCheck()
@@ -326,8 +326,8 @@ class EquipmentModifier(
                 if (target.id == id) throw IllegalStateException("Equipment Modifier target $id already instantiated!")
             }
             targets.add(getTarget())
-            tagIncluded = TagKey.of(Registry.ITEM_KEY,id)
-            tagExcluded = TagKey.of(Registry.ITEM_KEY,Identifier(id.namespace,id.path + "_excluded"))
+            tagIncluded = TagKey.of(RegistryKeys.ITEM,id)
+            tagExcluded = TagKey.of(RegistryKeys.ITEM,Identifier(id.namespace,id.path + "_excluded"))
         }
 
         private fun getTarget(): EquipmentModifierTarget{

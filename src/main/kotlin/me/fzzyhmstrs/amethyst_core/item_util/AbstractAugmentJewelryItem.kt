@@ -16,11 +16,11 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import java.util.*
 
@@ -49,12 +49,12 @@ open class AbstractAugmentJewelryItem(settings: Settings): TrinketItem(settings)
     }
     
     private fun makeFlavorText(): MutableText{
-        val id = Registry.ITEM.getId(this)
+        val id = Registries.ITEM.getId(this)
         return AcText.translatable("item.${id.namespace}.${id.path}.flavor").formatted(Formatting.WHITE, Formatting.ITALIC)
     }
     
     private fun makeFlavorTextDesc(): MutableText{
-        val id = Registry.ITEM.getId(this)
+        val id = Registries.ITEM.getId(this)
         return AcText.translatable("item.${id.namespace}.${id.path}.flavor.desc").formatted(Formatting.WHITE)
     }
 
