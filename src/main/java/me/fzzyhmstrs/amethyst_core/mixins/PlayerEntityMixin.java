@@ -28,7 +28,7 @@ public abstract class PlayerEntityMixin {
     @Shadow public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
     @Inject(method = "onKilledOther", at = @At(value = "HEAD"))
-    private void amethyst_core_invokeOnWearerKilledOther(ServerWorld world, LivingEntity livingEntity, CallbackInfoReturnable<Boolean> cir){
+    private void amethyst_core_invokeOnWearerKilledOther(ServerWorld world, LivingEntity livingEntity, CallbackInfo ci){
         if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
             for (ItemStack stack : stacks) {
