@@ -1,42 +1,36 @@
 {
   "schemaVersion": 1,
-  "id": "amethyst_core",
+  "id": "gear_core",
   "version": "${version}",
-  "name": "Amethyst Core",
+  "name": "Gear Core",
   "description": "Library for use with Amethyst Imbuement mods, and for general functional use.",
   "authors": [
     "fzzyhmstrs"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/amethyst-core",
-    "issues": "https://github.com/fzzyhmstrs/ac/issues",
-    "sources": "https://github.com/fzzyhmstrs/ac"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/gear-core",
+    "issues": "https://github.com/fzzyhmstrs/gc/issues",
+    "sources": "https://github.com/fzzyhmstrs/gc"
   },
   "license": "MIT License",
-  "icon": "assets/amethyst_core/icon.png",
+  "icon": "assets/gear_core/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       {
         "adapter": "kotlin",
-        "value": "me.fzzyhmstrs.amethyst_core.AC"
+        "value": "me.fzzyhmstrs.gear_core.GC"
       }
     ],
     "preLaunch": [
       {
         "adapter": "kotlin",
-        "value": "me.fzzyhmstrs.amethyst_core.ACPreLaunch"
-      }
-    ],
-    "client": [
-      {
-        "adapter": "kotlin",
-        "value": "me.fzzyhmstrs.amethyst_core.ACC"
+        "value": "me.fzzyhmstrs.gear_core_core.GCPreLaunch"
       }
     ]
   },
   "mixins": [
-    "amethyst_core.mixins.json"
+    "gear_core.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.13.3",
@@ -48,26 +42,26 @@
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/class_1831": [
-        "me/fzzyhmstrs/amethyst_core/interfaces/HitTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/KillTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/MineTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/UseTracking"
+        "me/fzzyhmstrs/gear_core/interfaces/HitTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/KillTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/MineTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/UseTracking"
       ],
       "net/minecraft/class_1835": [
-        "me/fzzyhmstrs/amethyst_core/interfaces/HitTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/KillTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/MineTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/UseTracking"
+        "me/fzzyhmstrs/gear_core/interfaces/HitTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/KillTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/MineTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/UseTracking"
       ],
       "net/minecraft/class_1738": [
-        "me/fzzyhmstrs/amethyst_core/interfaces/HitTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/KillTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/MineTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/DamageTracking",
-        "me/fzzyhmstrs/amethyst_core/interfaces/AugmentTracking"
+        "me/fzzyhmstrs/gear_core/interfaces/HitTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/KillTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/MineTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/DamageTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/ModifierTracking"
       ],
       "net/minecraft/class_1799": [
-        "me/fzzyhmstrs/amethyst_core/interfaces/DurabilityTracking"
+        "me/fzzyhmstrs/gear_core/interfaces/DurabilityTracking"
       ]
     }
   }

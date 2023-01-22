@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "me.fzzyhmstrs.gear_core.mixins",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "ArmorItemMixin",
+    "BowAndCrossbowMixin",
+    "ItemStackMixin",
+    "LivingEntityMixin",
+    "PlayerEntityMixin",
+    "ToolAndWeaponItemMixin",
+    "TrinketMixin",
+    "TrinketItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
