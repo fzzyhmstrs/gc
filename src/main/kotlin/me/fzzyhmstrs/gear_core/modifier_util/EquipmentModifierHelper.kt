@@ -30,7 +30,7 @@ import kotlin.collections.ArrayList
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
-    private val targetMap: Multimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
+    private val targetMap: ArrayListMultimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
     private val attributeMap: MutableMap<Long, Multimap<EntityAttribute, EntityAttributeModifier>> = mutableMapOf()
     private val processors: MutableList<ModifierProcessor> = mutableListOf()
 
@@ -126,7 +126,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (targetList.isEmpty()) return
         val list: ArrayList<EquipmentModifier> = ArrayList()
         for (target in targetList){
-            list.addAll(targetMap.get(target).toList())
+            list.addAll(targetMap.get(target))
         }
         var tollRemaining = (toll.nextFloat(context) + context.luck).toInt()
         while (tollRemaining > 0){
