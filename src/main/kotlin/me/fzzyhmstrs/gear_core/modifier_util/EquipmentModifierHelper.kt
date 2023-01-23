@@ -116,8 +116,12 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             targetMap.put(target,modifier)
         }
     }
+
+    fun addRandomModifiers(stack: ItemStack, context: LootContext){
+        addRandomModifiers(stack, context,DEFAULT_MODIFIER_TOLL)
+    }
     
-    fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider = DEFAULT_MODIFIER_TOLL){
+    fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider){
         val targetList = EquipmentModifier.EquipmentModifierTarget.findTargetForItem(stack)
         if (targetList.isEmpty()) return
         val list: ArrayList<EquipmentModifier> = ArrayList()
