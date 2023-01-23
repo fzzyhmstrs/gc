@@ -351,7 +351,7 @@ class EquipmentModifier(
             return isItemAcceptableOrTagged(stack)
         }
 
-        protected fun isItemAcceptableOrTagged(stack: ItemStack): Boolean{
+        fun isItemAcceptableOrTagged(stack: ItemStack): Boolean{
             if (stack.isIn(tagExcluded)) return false
             return stack.isIn(tagIncluded) || isAcceptableItem(stack)
         }
