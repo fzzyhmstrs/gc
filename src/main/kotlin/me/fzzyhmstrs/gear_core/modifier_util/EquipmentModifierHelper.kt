@@ -2,18 +2,13 @@ package me.fzzyhmstrs.gear_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
-import me.fzzyhmstrs.amethyst_core.modifier_util.AugmentModifier
-import me.fzzyhmstrs.amethyst_core.modifier_util.GcCompat
-import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierDefaults
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
+import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
-import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
-import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil
-import me.fzzyhmstrs.gear_core.interfaces.ModifierTracking
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
@@ -34,7 +29,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val attributeMap: MutableMap<Long, Multimap<EntityAttribute, EntityAttributeModifier>> = mutableMapOf()
     private val processors: MutableList<ModifierProcessor> = mutableListOf()
 
-    private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(10,0.5f)
+    private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
     private val tooltipsAdvanced: MutableMap<Long, List<Text>> = mutableMapOf()
     
@@ -54,7 +49,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             compiled.modifiers.forEach {
                 list.add(
                     AcText.translatable(it.getTranslationKey()).formatted(*it.rarity.formatting)
-                        .append(AcText.literal(" - ").formatted(*it.rarity.formatting))
+                        .append(AcText.literal(": ").formatted(*it.rarity.formatting))
                         .append(
                             AcText.translatable(it.getDescTranslationKey()).formatted(*it.rarity.formatting)
                                 .formatted(Formatting.ITALIC)
@@ -66,7 +61,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 id,
                 compiled
             )
+            println(stack.maxDamage)
             (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
+            println(stack.maxDamage)
             val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
             map.putAll(compiled.compiledData.attributeModifiers())
             for (slot in EquipmentSlot.values()){
@@ -89,7 +86,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
-        val id = Nbt.makeItemStackId(stack)
+        val id = Nbt.getItemStackId(stack)
         tooltip.addAll(tooltipsAdvanced[id]?: listOf())
     }
 
@@ -101,9 +98,15 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val id = Nbt.getItemStackId(stack)
         return attributeMap[id]?:original
     }
-    
-    fun addUniqueModifier(modifier: Identifier, stack: ItemStack){
-        if (checkDescendant(modifier,stack) == null){
+
+    fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
+        val nbt = stack.nbt
+        if (nbt == null){
+            addModifier(modifier, stack)
+            return
+        }
+        val id = Nbt.getItemStackId(nbt)
+        if (!(id != -1L && checkDescendant(modifier, stack) != null)) {
             addModifier(modifier, stack)
         }
     }
@@ -126,14 +129,20 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (targetList.isEmpty()) return
         val list: ArrayList<EquipmentModifier> = ArrayList()
         for (target in targetList){
+            println(target.id)
             list.addAll(targetMap.get(target))
         }
         var tollRemaining = (toll.nextFloat(context) + context.luck).toInt()
+        println("toll: $tollRemaining")
+        println("targets: $list")
         while (tollRemaining > 0){
             val modChk = list[context.random.nextInt(list.size)]
+            println("next try: $modChk")
             tollRemaining -= modChk.toll.nextFloat(context).toInt()
+            println("remaining toll: $tollRemaining")
             if (tollRemaining >= 0) {
                 addUniqueModifier(modChk.modifierId,stack)
+                println("Added try!")
             }
         }
     }
