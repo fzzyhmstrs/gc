@@ -25,7 +25,7 @@
     "preLaunch": [
       {
         "adapter": "kotlin",
-        "value": "me.fzzyhmstrs.gear_core_core.GCPreLaunch"
+        "value": "me.fzzyhmstrs.gear_core.GCPreLaunch"
       }
     ]
   },
