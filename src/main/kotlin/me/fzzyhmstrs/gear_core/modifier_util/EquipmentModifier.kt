@@ -29,7 +29,7 @@ import java.util.function.Predicate
 
 class EquipmentModifier(
     modifierId: Identifier = AbstractModifierHelper.BLANK,
-    val target: EquipmentModifierTarget = EquipmentModifierTarget.ANY,
+    val target: EquipmentModifierTarget = EquipmentModifierTarget.NONE,
     val weight: Int = 10,
     val rarity: Rarity = Rarity.COMMON,
     val persistent: Boolean = false,
@@ -181,6 +181,10 @@ class EquipmentModifier(
         return EquipmentModifierHelper
     }
 
+    override fun toString(): String {
+        return "{Equipment Modifier: $modifierId}"
+    }
+
     @FunctionalInterface
     fun interface ToolConsumer{
         fun apply(stack: ItemStack, user: LivingEntity, target: LivingEntity?)
@@ -219,7 +223,12 @@ class EquipmentModifier(
                 }
                 return list
             }
-            
+
+            val NONE = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"none")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    return false
+                }
+            }
             val ANY = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"any")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return TOOL.isItemAcceptableOrTagged(stack) || ARMOR.isItemAcceptableOrTagged(stack) || TRINKET.isItemAcceptableOrTagged(stack)
