@@ -29,7 +29,7 @@ abstract public class LivingEntityMixin {
 
     }
 
-    @ModifyReturnValue(method = "modifyAppliedDamage", at = @At("RETURN"))
+    @ModifyReturnValue(method = "applyEnchantmentsToDamage", at = @At("RETURN"))
     private float gear_core_invokeOnWearerDamaged(float original, DamageSource source, float amount){
         if (source.isUnblockable() || original <= 0.0f) return original;
         float newAmount = original;
