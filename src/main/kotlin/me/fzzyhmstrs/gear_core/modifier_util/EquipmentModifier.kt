@@ -92,7 +92,11 @@ class EquipmentModifier(
     
     fun modifyDurability(durability: Int): Int{
         val dur = PerLvlI(durability)
-        return dur.plus(durabilityModifier).value(0)
+        println(dur)
+        println(durabilityModifier)
+        val blh = dur.plus(durabilityModifier).value(0)
+        println(blh)
+        return blh
     }
 
     fun withPostHit(onHit: ToolConsumer): EquipmentModifier {
