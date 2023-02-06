@@ -10,7 +10,8 @@
     "PlayerEntityMixin",
     "ToolAndWeaponItemMixin",
     "TrinketMixin",
-    "TrinketItemMixin"
+    "TrinketItemMixin",
+    "CraftingScreenHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

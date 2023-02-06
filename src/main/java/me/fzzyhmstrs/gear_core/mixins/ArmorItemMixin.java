@@ -19,11 +19,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Collections;
 import java.util.List;
 
+@Debug(export = true)
 @Mixin(ArmorItem.class)
 public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, Modifiable {
 
@@ -70,6 +72,7 @@ public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, 
 
     @Override
     public ModifierInitializer getModifierInitializer() {
+        System.out.println("grabbed the initializer");
         return EquipmentModifierHelper.INSTANCE;
     }
 }

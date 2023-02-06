@@ -48,12 +48,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             val list: MutableList<Text> = mutableListOf()
             compiled.modifiers.forEach {
                 list.add(
-                    AcText.translatable(it.getTranslationKey()).formatted(*it.rarity.formatting)
-                        .append(AcText.literal(": ").formatted(*it.rarity.formatting))
-                        .append(
-                            AcText.translatable(it.getDescTranslationKey()).formatted(*it.rarity.formatting)
-                                .formatted(Formatting.ITALIC)
-                        )
+                    AcText.translatable("gear_core.modifier.colon", AcText.translatable(it.getTranslationKey()).string, AcText.translatable(it.getDescTranslationKey()).formatted(Formatting.ITALIC)).formatted(*it.rarity.formatting)
                 )
             }
             tooltipsAdvanced[id] = list
@@ -121,7 +116,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
 
     fun addRandomModifiers(stack: ItemStack, context: LootContext){
-        addRandomModifiers(stack, context,DEFAULT_MODIFIER_TOLL)
+        addRandomModifiers(stack, context, DEFAULT_MODIFIER_TOLL)
     }
     
     fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider){
