@@ -79,6 +79,9 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         if (getItem() instanceof ArmorItem ai && ai.getSlotType() != slot){
             return original;
         }
+        if (getItem() instanceof ToolItem && EquipmentSlot.MAIN_HAND != slot){
+            return original;
+        }
         return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
     }
 
