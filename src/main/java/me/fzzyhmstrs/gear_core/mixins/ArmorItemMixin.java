@@ -72,7 +72,6 @@ public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, 
 
     @Override
     public ModifierInitializer getModifierInitializer() {
-        System.out.println("grabbed the initializer");
         return EquipmentModifierHelper.INSTANCE;
     }
 }

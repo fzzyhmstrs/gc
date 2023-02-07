@@ -13,6 +13,9 @@
     "TrinketItemMixin",
     "CraftingScreenHandlerMixin"
   ],
+  "client": [
+    "ClientPlayNetworkHandlerMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

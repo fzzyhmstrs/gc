@@ -52,6 +52,7 @@ class EquipmentModifier(
     internal var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
+        println("adding modifier: $other")
         attributeModifiers.putAll(other.attributeModifiers)
         modifierModifiers.addAll(other.modifierModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
@@ -60,7 +61,10 @@ class EquipmentModifier(
         onDamagedFunctions.addAll(other.onDamagedFunctions)
         killOtherConsumers.addAll(other.killOtherConsumers)
         tickConsumers.addAll(other.tickConsumers)
-        durabilityModifier.plus(other.durabilityModifier)
+        println(durabilityModifier)
+        println(other.durabilityModifier)
+        durabilityModifier = durabilityModifier.plus(other.durabilityModifier)
+        println(durabilityModifier)
         return this
     }
 
@@ -139,9 +143,11 @@ class EquipmentModifier(
 
     fun onDamaged(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
         var newAmount = amount
+        println(newAmount)
         onDamagedFunctions.forEach {
             newAmount = it.test(stack, user, attacker, source, newAmount)
         }
+        println(newAmount)
         return newAmount
     }
 
@@ -376,7 +382,7 @@ class EquipmentModifier(
     enum class Rarity(vararg val formatting: Formatting){
         REALLY_BAD(Formatting.BOLD, Formatting.DARK_RED),
         BAD(Formatting.DARK_RED),
-        COMMON(Formatting.WHITE),
+        COMMON(Formatting.GRAY),
         UNCOMMON(Formatting.DARK_GREEN),
         RARE(Formatting.AQUA),
         EPIC(Formatting.LIGHT_PURPLE),
