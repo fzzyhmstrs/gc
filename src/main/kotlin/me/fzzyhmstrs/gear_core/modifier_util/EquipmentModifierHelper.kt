@@ -2,6 +2,7 @@ package me.fzzyhmstrs.gear_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
+import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
@@ -28,10 +29,10 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val targetMap: ArrayListMultimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
     private val attributeMap: MutableMap<Long, Multimap<EntityAttribute, EntityAttributeModifier>> = mutableMapOf()
     private val processors: MutableList<ModifierProcessor> = mutableListOf()
+    private var lastClientInit = 0L
 
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
-    private val tooltipsAdvanced: MutableMap<Long, List<Text>> = mutableMapOf()
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
@@ -45,20 +46,15 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 BLANK,
                 BLANK_EQUIPMENT_MOD.compiler()
             )
-            val list: MutableList<Text> = mutableListOf()
-            compiled.modifiers.forEach {
-                list.add(
-                    AcText.translatable("gear_core.modifier.colon", AcText.translatable(it.getTranslationKey()).string, AcText.translatable(it.getDescTranslationKey()).formatted(Formatting.ITALIC)).formatted(*it.rarity.formatting)
-                )
-            }
-            tooltipsAdvanced[id] = list
             setModifiersById(
                 id,
                 compiled
             )
+            println("modifying damage!")
             println(stack.maxDamage)
             (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
             println(stack.maxDamage)
+            attributeMap.remove(id)
             val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
             map.putAll(compiled.compiledData.attributeModifiers())
             for (slot in EquipmentSlot.values()){
@@ -81,8 +77,21 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
-        val id = Nbt.getItemStackId(stack)
-        tooltip.addAll(tooltipsAdvanced[id]?: listOf())
+        val modifierList = getModifiers(stack)
+        if (System.currentTimeMillis() - lastClientInit > 100L){
+            lastClientInit = System.currentTimeMillis()
+            val compiled = getActiveModifiers(stack)
+            (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
+        }
+        if (modifierList.isEmpty()) return
+        for (it in modifierList) {
+            val mod = getModifierByType(it) ?: continue
+            tooltip.add(
+                AcText.translatable("gear_core.modifier.colon", AcText.translatable(getTranslationKeyFromIdentifier(it)).string, AcText.translatable(
+                    getDescTranslationKeyFromIdentifier(it)
+                ).formatted(Formatting.ITALIC)).formatted(*mod.rarity.formatting)
+            )
+        }
     }
 
     override fun getModifierByType(id: Identifier): EquipmentModifier? {

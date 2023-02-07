@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
@@ -51,7 +52,8 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Override
     public void evaluateNewMaxDamage(AbstractModifier.CompiledModifiers<EquipmentModifier> compiledModifiers) {
-        if (getMaxDamage() != 0) {
+        if (getItem().getMaxDamage() != 0) {
+            System.out.println("modifying max damage");
             gear_core_newMaxDamage = Math.max(compiledModifiers.getCompiledData().modifyDurability(getItem().getMaxDamage()), 1);
         }
     }
@@ -84,6 +86,15 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         }
         return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
     }
+
+    /*@Inject(method = "setNbt", at = @At(value = "INVOKE", target = "net/minecraft/item/Item.postProcessNbt (Lnet/minecraft/nbt/NbtCompound;)V"))
+    private void gear_core_initializeAfterSetNbt(NbtCompound nbt, CallbackInfo ci){
+        if (getItem() instanceof Modifiable modifiable){
+            System.out.println("initializing from setNbt");
+            System.out.println(nbt);
+            modifiable.getModifierInitializer().initializeModifiers((ItemStack)(Object)this,nbt,modifiable.defaultModifiers());
+        }
+    }*/
 
     @Inject(method = "postHit", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void gear_core_invokePostWearerHit(LivingEntity target, PlayerEntity attacker, CallbackInfo ci){
