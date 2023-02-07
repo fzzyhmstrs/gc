@@ -251,7 +251,7 @@ class EquipmentModifier(
             }
             val WEAPON = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"weapon")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return SWORD.isItemAcceptableOrTagged(stack) || AXE.isItemAcceptableOrTagged(stack) || TRIDENT.isItemAcceptableOrTagged(stack) || BOW.isItemAcceptableOrTagged(stack)
+                    return SWORD.isItemAcceptableOrTagged(stack) || AXE.isItemAcceptableOrTagged(stack) || TRIDENT.isItemAcceptableOrTagged(stack)
                 }
             }
             val WEAPON_AND_TRINKET = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"weapon_and_trinket")){
