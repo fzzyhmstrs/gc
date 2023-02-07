@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 
 public interface MineTracking {
     default void postWearerMine(ItemStack stack, World world, BlockState state, BlockPos pos, PlayerEntity miner){
-
+        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
+        modifiers.getCompiledData().postMine(stack, world, state, pos, miner);
     }
 }
