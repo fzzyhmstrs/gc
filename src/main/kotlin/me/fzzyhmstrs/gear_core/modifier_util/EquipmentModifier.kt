@@ -27,20 +27,20 @@ import net.minecraft.world.World
 import java.util.*
 import java.util.function.Predicate
 
-class EquipmentModifier(
+open class EquipmentModifier(
     modifierId: Identifier = AbstractModifierHelper.BLANK,
     val target: EquipmentModifierTarget = EquipmentModifierTarget.NONE,
     val weight: Int = 10,
     val rarity: Rarity = Rarity.COMMON,
-    private val randomSelectable: Supplier<Boolean> = {true},
-    private val persistent: Supplier<Boolean> = {true}): AbstractModifier<EquipmentModifier>(modifierId) {
+    private val persistent: Boolean = false,
+    private val randomSelectable: Boolean = true): AbstractModifier<EquipmentModifier>(modifierId) {
     
-    fun randomlySelectable(): Boolean{
-        return randomSelectable.get()
+    open fun randomlySelectable(): Boolean{
+        return randomSelectable
     }
     
-    fun isPersistent(): Boolean{
-        return persistent.get()
+    open fun isPersistent(): Boolean{
+        return persistent
     }
     
     init{
