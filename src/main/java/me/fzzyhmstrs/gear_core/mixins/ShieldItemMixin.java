@@ -13,6 +13,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShieldItem;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -31,7 +32,7 @@ public class ShieldItemMixin implements HitTracking, KillTracking, DamageTrackin
     
     @Override
     public boolean correctSlot(EquipmentSlot slot){
-        return getSlotType() == EquipmentSlot.OFFHAND
+        return slot == EquipmentSlot.OFFHAND;
     }
 
     @NotNull

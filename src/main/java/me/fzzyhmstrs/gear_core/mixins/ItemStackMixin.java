@@ -80,7 +80,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         } else if (getItem() instanceof AttributeTracking){
             return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
         } else {
-            return original
+            return original;
         }
     }
 

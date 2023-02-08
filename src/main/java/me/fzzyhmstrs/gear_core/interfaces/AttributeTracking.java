@@ -5,6 +5,6 @@ import net.minecraft.entity.EquipmentSlot;
 public interface AttributeTracking {
   
   default boolean correctSlot(EquipmentSlot slot){
-      return true
+      return true;
   }
 }

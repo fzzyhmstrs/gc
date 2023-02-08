@@ -22,18 +22,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Collections;
 import java.util.List;
 
 @Mixin(ArmorItem.class)
-public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, AttributeTracking, Modifiable {
+public abstract class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, AttributeTracking, Modifiable {
 
-    @Shadow public EquipmentSlot getSlotType();
+    @Shadow
+    public abstract EquipmentSlot getSlotType();
     
     @Override
     public boolean correctSlot(EquipmentSlot slot){
-        return getSlotType() == slot
+        return getSlotType() == slot;
     }
     
     @Override
