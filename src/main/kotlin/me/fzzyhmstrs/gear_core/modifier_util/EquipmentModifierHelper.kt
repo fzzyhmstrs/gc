@@ -116,7 +116,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     internal fun addToTargetMap(modifier: EquipmentModifier){
-        if (!modifier.randomSelectable) return
+        if (!modifier.randomlySelectable()) return
         val target = modifier.target
         val weight = modifier.weight
         for (i in 1..weight){
@@ -151,15 +151,15 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
     }
     
-    fun rerollModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider = DEFAULT_MODIFIER_TOLL){
-        val modifiers = getModifiers(stack)
+    fun removeNonPersistentModifiers(stack: ItemStack){
         val nbt = stack.orCreateNbt
-        for (id in modifiers){
-            val mod = ModifierRegistry.getByType<EquipmentModifier>(id)
-            if (mod?.persistent == true) continue
-            removeModifier(stack, id, nbt)
+        val modList = getModifiers(stack)
+        for (id in modList){
+            val mod = getModifierByType(id)
+            if (mod == null) continue
+            if (mod.isPersistent()) continue
+            removeModifier(stack,id,nbt)
         }
-        addRandomModifiers(stack, context, toll)
     }
 
     fun processModifiers(stack: ItemStack, entity: LivingEntity){
