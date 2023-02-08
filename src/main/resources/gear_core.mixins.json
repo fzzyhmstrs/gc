@@ -10,7 +10,6 @@
     "PlayerEntityMixin",
     "ToolAndWeaponItemMixin",
     "TrinketMixin",
-    "TrinketItemMixin",
     "CraftingScreenHandlerMixin"
   ],
   "client": [

@@ -30,30 +30,6 @@ import java.util.List;
 public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, Modifiable {
 
     @Override
-    public void postWearerHit(@NotNull ItemStack stack, @NotNull LivingEntity wearer, @NotNull LivingEntity target) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().postHit(stack,wearer,target);
-    }
-
-    @Override
-    public void onWearerKilledOther(@NotNull ItemStack stack, @NotNull LivingEntity wearer, @NotNull LivingEntity victim, @NotNull ServerWorld world) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().killedOther(stack,wearer,victim);
-    }
-
-    @Override
-    public void postWearerMine(ItemStack stack, World world, BlockState state, BlockPos pos, PlayerEntity miner) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().postMine(stack, world, state, pos, miner);
-    }
-
-    @Override
-    public float onWearerDamaged(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        return modifiers.getCompiledData().onDamaged(stack,wearer, attacker,source,amount);
-    }
-
-    @Override
     public List<Identifier> getModifiers(ItemStack stack) {
         AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
         return modifiers.getCompiledData().modifiers();

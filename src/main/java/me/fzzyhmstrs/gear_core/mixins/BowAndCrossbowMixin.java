@@ -24,18 +24,6 @@ import java.util.List;
 @Mixin({BowItem.class, CrossbowItem.class})
 public class BowAndCrossbowMixin implements HitTracking, KillTracking, Modifiable {
 
-    @Override
-    public void postWearerHit(@NotNull ItemStack stack, @NotNull LivingEntity wearer, @NotNull LivingEntity target) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().postHit(stack,wearer,target);
-    }
-
-    @Override
-    public void onWearerKilledOther(@NotNull ItemStack stack, @NotNull LivingEntity wearer, @NotNull LivingEntity victim, @NotNull ServerWorld world) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().killedOther(stack,wearer,victim);
-    }
-
     @NotNull
     @Override
     public List<Identifier> defaultModifiers() {
