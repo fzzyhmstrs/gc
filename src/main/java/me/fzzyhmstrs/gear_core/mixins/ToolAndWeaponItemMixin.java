@@ -29,24 +29,6 @@ import java.util.List;
 public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTracking, UseTracking, Modifiable {
 
     @Override
-    public void postWearerHit(@NotNull ItemStack stack, @NotNull LivingEntity wearer, @NotNull LivingEntity target) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().postHit(stack,wearer,target);
-    }
-
-    @Override
-    public void onWearerKilledOther(@NotNull ItemStack stack, @NotNull LivingEntity wearer, @NotNull LivingEntity victim, @NotNull ServerWorld world) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().killedOther(stack,wearer,victim);
-    }
-
-    @Override
-    public void postWearerMine(ItemStack stack, World world, BlockState state, BlockPos pos, PlayerEntity miner) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().postMine(stack, world, state, pos, miner);
-    }
-
-    @Override
     public void onWearerUse(ItemStack stack, World world, PlayerEntity user, Hand hand) {
         AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
         modifiers.getCompiledData().onUse(stack,user,null);

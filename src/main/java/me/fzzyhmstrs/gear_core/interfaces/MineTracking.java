@@ -1,5 +1,8 @@
 package me.fzzyhmstrs.gear_core.interfaces;
 
+import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier;
+import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier;
+import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
