@@ -8,6 +8,7 @@ import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -26,7 +27,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin({ToolItem.class, TridentItem.class})
-public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTracking, UseTracking, Modifiable {
+public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTracking, UseTracking, AttributeTracking, Modifiable {
+    
+    @Override 
+    public boolean correctSlot(EquipmentSlot slot){
+        return slot == EquipmentSlot.MAINHAND
+    }
 
     @Override
     public void onWearerUse(ItemStack stack, World world, PlayerEntity user, Hand hand) {
