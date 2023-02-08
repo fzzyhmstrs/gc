@@ -31,7 +31,7 @@ public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTr
     
     @Override 
     public boolean correctSlot(EquipmentSlot slot){
-        return slot == EquipmentSlot.MAINHAND
+        return slot == EquipmentSlot.MAINHAND;
     }
 
     @Override
