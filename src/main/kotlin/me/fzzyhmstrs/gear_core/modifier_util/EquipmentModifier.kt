@@ -32,8 +32,16 @@ class EquipmentModifier(
     val target: EquipmentModifierTarget = EquipmentModifierTarget.NONE,
     val weight: Int = 10,
     val rarity: Rarity = Rarity.COMMON,
-    val persistent: Boolean = false,
-    val randomSelectable: Boolean = true): AbstractModifier<EquipmentModifier>(modifierId) {
+    private val randomSelectable: Supplier<Boolean> = {true},
+    private val persistent: Supplier<Boolean> = {true}): AbstractModifier<EquipmentModifier>(modifierId) {
+    
+    fun randomlySelectable(): Boolean{
+        return randomSelectable.get()
+    }
+    
+    fun isPersistent(): Boolean{
+        return persistent.get()
+    }
     
     init{
         EquipmentModifierHelper.addToTargetMap(this)
