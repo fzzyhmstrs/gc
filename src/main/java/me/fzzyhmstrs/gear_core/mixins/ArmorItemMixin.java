@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
@@ -25,10 +26,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import java.util.Collections;
 import java.util.List;
 
-@Debug(export = true)
 @Mixin(ArmorItem.class)
-public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, Modifiable {
+public class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, AttributeTracking, Modifiable {
 
+    @Shadow public EquipmentSlot getSlotType();
+    
+    @Override
+    public boolean correctSlot(EquipmentSlot slot){
+        return getSlotType() == slot
+    }
+    
     @Override
     public List<Identifier> getModifiers(ItemStack stack) {
         AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
