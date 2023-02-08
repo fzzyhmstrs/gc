@@ -75,13 +75,13 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @ModifyReturnValue(method = "getAttributeModifiers", at = @At("RETURN"))
     private Multimap<EntityAttribute, EntityAttributeModifier> gear_core_addModifierModifiersToModifiers(Multimap<EntityAttribute, EntityAttributeModifier> original, EquipmentSlot slot){
-        if (getItem() instanceof ArmorItem ai && ai.getSlotType() != slot){
+        if (getItem() instanceof AttributeTracking at && !at.correctSlot(slot)){
             return original;
+        } else if (getItem() instanceof AttributeTracking){
+            return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
+        } else {
+            return original
         }
-        if ((getItem() instanceof ToolItem || getItem() instanceof TridentItem) && EquipmentSlot.MAINHAND != slot){
-            return original;
-        }
-        return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
     }
 
     /*@Inject(method = "setNbt", at = @At(value = "INVOKE", target = "net/minecraft/item/Item.postProcessNbt (Lnet/minecraft/nbt/NbtCompound;)V"))
