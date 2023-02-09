@@ -60,7 +60,7 @@ open class EquipmentModifier(
     internal var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
-        println("adding modifier: $other")
+        //println("adding modifier: $other")
         attributeModifiers.putAll(other.attributeModifiers)
         modifierModifiers.addAll(other.modifierModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
@@ -69,10 +69,10 @@ open class EquipmentModifier(
         onDamagedFunctions.addAll(other.onDamagedFunctions)
         killOtherConsumers.addAll(other.killOtherConsumers)
         tickConsumers.addAll(other.tickConsumers)
-        println(durabilityModifier)
-        println(other.durabilityModifier)
+        //println(durabilityModifier)
+        //println(other.durabilityModifier)
         durabilityModifier = durabilityModifier.plus(other.durabilityModifier)
-        println(durabilityModifier)
+        //println(durabilityModifier)
         return this
     }
 
@@ -104,10 +104,10 @@ open class EquipmentModifier(
     
     fun modifyDurability(durability: Int): Int{
         val dur = PerLvlI(durability)
-        println(dur)
-        println(durabilityModifier)
+        //println(dur)
+        //println(durabilityModifier)
         val blh = dur.plus(durabilityModifier).value(0)
-        println(blh)
+        //println(blh)
         return blh
     }
 
@@ -151,11 +151,11 @@ open class EquipmentModifier(
 
     fun onDamaged(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
         var newAmount = amount
-        println(newAmount)
+        //println(newAmount)
         onDamagedFunctions.forEach {
             newAmount = it.test(stack, user, attacker, source, newAmount)
         }
-        println(newAmount)
+        //println(newAmount)
         return newAmount
     }
 

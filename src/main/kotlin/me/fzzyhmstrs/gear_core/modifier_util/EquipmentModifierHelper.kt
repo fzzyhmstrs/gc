@@ -50,10 +50,10 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 id,
                 compiled
             )
-            println("modifying damage!")
-            println(stack.maxDamage)
+            //println("modifying damage!")
+            //println(stack.maxDamage)
             (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
-            println(stack.maxDamage)
+            //println(stack.maxDamage)
             attributeMap.remove(id)
             val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
             map.putAll(compiled.compiledData.attributeModifiers())

@@ -50,7 +50,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     @Override
     public void evaluateNewMaxDamage(AbstractModifier.CompiledModifiers<EquipmentModifier> compiledModifiers) {
         if (getItem().getMaxDamage() != 0) {
-            System.out.println("modifying max damage");
+            //System.out.println("modifying max damage");
             gear_core_newMaxDamage = Math.max(compiledModifiers.getCompiledData().modifyDurability(getItem().getMaxDamage()), 1);
         }
     }
