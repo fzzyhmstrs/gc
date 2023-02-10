@@ -6,7 +6,6 @@ import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import dev.emi.trinkets.api.Trinket
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
-import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
