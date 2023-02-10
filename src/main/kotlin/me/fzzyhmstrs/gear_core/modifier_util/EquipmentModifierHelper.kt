@@ -7,17 +7,21 @@ import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
+import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.loot.context.LootContext
+import net.minecraft.loot.context.LootContextTypes
 import net.minecraft.loot.provider.number.BinomialLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
 import net.minecraft.registry.Registries
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
@@ -157,10 +161,18 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             }
         }
     }
-    
-    fun removeNonPersistentModifiers(stack: ItemStack){
+
+    fun rerollModifiers(stack: ItemStack, world: ServerWorld, player: PlayerEntity){
         val nbt = stack.orCreateNbt
-        val modList = getModifiers(stack)
+        removeNonPersistentModifiers(stack)
+        nbt.remove(NbtKeys.ITEM_STACK_ID.str())
+        val contextBuilder = LootContext.Builder(world).random(world.random).luck(player.luck)
+        addRandomModifiers(stack,contextBuilder.build(LootContextTypes.EMPTY))
+    }
+
+    private fun removeNonPersistentModifiers(stack: ItemStack){
+        val nbt = stack.orCreateNbt
+        val modList = getModifiersFromNbt(stack)
         for (id in modList){
             val mod = getModifierByType(id) ?: continue
             if (mod.isPersistent()) continue
