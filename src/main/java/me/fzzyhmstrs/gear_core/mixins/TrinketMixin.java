@@ -29,10 +29,10 @@ public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, Dam
     private void gear_core_processOnEquipForAugments(ItemStack stack, SlotReference slot, LivingEntity entity, CallbackInfo ci){
             EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);
     }
-    
+
     @ModifyReturnValue(method = "getModifiers", at = @At("RETURN"))
     private Multimap<EntityAttribute, EntityAttributeModifier> gear_core_addModifierModifiersToTrinketModifiers(Multimap<EntityAttribute, EntityAttributeModifier> original, ItemStack stack,
-                                                                                                                SlotReference slot, LivingEntity entity, UUID uuid){
+			SlotReference slot, LivingEntity entity, UUID uuid){
         if (stack.getItem() instanceof AttributeTracking){
             return EquipmentModifierHelper.INSTANCE.getAttributeModifiers(stack, original);
         } else {
