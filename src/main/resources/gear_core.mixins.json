@@ -5,13 +5,13 @@
   "mixins": [
     "ArmorItemMixin",
     "BowAndCrossbowMixin",
+    "CraftingScreenHandlerMixin",
     "ItemStackMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
+    "ShieldItemMixin",
     "ToolAndWeaponItemMixin",
-    "TrinketMixin",
-    "CraftingScreenHandlerMixin",
-    "ShieldItemMixin"
+    "TrinketMixin"
   ],
   "client": [
     "ClientPlayNetworkHandlerMixin"

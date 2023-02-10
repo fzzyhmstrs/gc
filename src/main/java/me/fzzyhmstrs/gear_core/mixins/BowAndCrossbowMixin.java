@@ -1,18 +1,14 @@
 package me.fzzyhmstrs.gear_core.mixins;
 
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
-import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.gear_core.interfaces.HitTracking;
 import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
-import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
