@@ -2,16 +2,14 @@ package me.fzzyhmstrs.gear_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
-import me.fzzyhmstrs.amethyst_core.modifier_util.ModifierHelper
-import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
+import dev.emi.trinkets.api.Trinket
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
-import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
+import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
-import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
+import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import net.minecraft.client.item.TooltipContext
-import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -22,7 +20,7 @@ import net.minecraft.loot.provider.number.LootNumberProvider
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import kotlin.collections.ArrayList
+import net.minecraft.util.registry.Registry
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
@@ -55,9 +53,21 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             //println(stack.maxDamage)
             (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
             //println(stack.maxDamage)
+
             attributeMap.remove(id)
             val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
             map.putAll(compiled.compiledData.attributeModifiers())
+            if (stack.item is Trinket){
+                println("Adding nbt to trinket")
+                nbt.remove("TrinketAttributeModifiers")
+                for (entry in map.entries()) {
+                    val attribute = entry.key
+                    val modifier = entry.value
+                    val compound = modifier.toNbt()
+                    compound.putString("AttributeName", Registry.ATTRIBUTE.getId(attribute).toString())
+                    Nbt.addNbtToList(compound,"TrinketAttributeModifiers",nbt)
+                }
+            }
             attributeMap[id] = map
         }
     }
