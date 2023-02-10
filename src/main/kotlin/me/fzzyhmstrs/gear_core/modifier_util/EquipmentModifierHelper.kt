@@ -17,10 +17,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.loot.context.LootContext
 import net.minecraft.loot.provider.number.BinomialLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
+import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
@@ -64,7 +64,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                     val attribute = entry.key
                     val modifier = entry.value
                     val compound = modifier.toNbt()
-                    compound.putString("AttributeName", Registry.ATTRIBUTE.getId(attribute).toString())
+                    compound.putString("AttributeName", Registries.ATTRIBUTE.getId(attribute).toString())
                     Nbt.addNbtToList(compound,"TrinketAttributeModifiers",nbt)
                 }
             }
