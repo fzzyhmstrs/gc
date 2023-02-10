@@ -33,6 +33,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
+    private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
@@ -57,13 +58,6 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             attributeMap.remove(id)
             val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
             map.putAll(compiled.compiledData.attributeModifiers())
-            for (slot in EquipmentSlot.values()){
-                val stackMap = stack.getAttributeModifiers(slot)
-                if (!stackMap.isEmpty){
-                    map.putAll(stackMap)
-                    break
-                }
-            }
             attributeMap[id] = map
         }
     }
@@ -98,9 +92,12 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return ModifierRegistry.getByType<EquipmentModifier>(id)
     }
 
-    fun getAttributeModifiers(stack: ItemStack, slot: EquipmentSlot, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
+    fun getAttributeModifiers(stack: ItemStack, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
+        val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        map.putAll(original)
         val id = Nbt.getItemStackId(stack)
-        return attributeMap[id]?:original
+        map.putAll(attributeMap[id]?:EMPTY_ATTRIBUTE_MAP)
+        return map
     }
 
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
@@ -133,20 +130,20 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (targetList.isEmpty()) return
         val list: ArrayList<EquipmentModifier> = ArrayList()
         for (target in targetList){
-            println(target.id)
+            //println(target.id)
             list.addAll(targetMap.get(target))
         }
         var tollRemaining = (toll.nextFloat(context) + context.luck).toInt()
-        println("toll: $tollRemaining")
-        println("targets: $list")
+        //println("toll: $tollRemaining")
+        //println("targets: $list")
         while (tollRemaining > 0){
             val modChk = list[context.random.nextInt(list.size)]
-            println("next try: $modChk")
+            //println("next try: $modChk")
             tollRemaining -= modChk.toll.nextFloat(context).toInt()
-            println("remaining toll: $tollRemaining")
+            //println("remaining toll: $tollRemaining")
             if (tollRemaining >= 0) {
                 addUniqueModifier(modChk.modifierId,stack)
-                println("Added try!")
+                //println("Added try!")
             }
         }
     }
