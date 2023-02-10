@@ -162,10 +162,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val nbt = stack.orCreateNbt
         val modList = getModifiers(stack)
         for (id in modList){
-            val mod = getModifierByType(id)
-            if (mod == null) continue
+            val mod = getModifierByType(id) ?: continue
             if (mod.isPersistent()) continue
-            removeModifier(stack,id,nbt)
+            removeModifierFromNbt(id,nbt)
         }
     }
 
