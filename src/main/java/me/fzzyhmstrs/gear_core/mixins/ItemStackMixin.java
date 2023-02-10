@@ -78,7 +78,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         if (getItem() instanceof AttributeTracking at && !at.correctSlot(slot)){
             return original;
         } else if (getItem() instanceof AttributeTracking){
-            return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, slot, original);
+            return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, original);
         } else {
             return original;
         }
