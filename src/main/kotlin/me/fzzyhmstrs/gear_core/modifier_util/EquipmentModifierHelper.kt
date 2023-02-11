@@ -20,6 +20,7 @@ import net.minecraft.loot.context.LootContext
 import net.minecraft.loot.context.LootContextTypes
 import net.minecraft.loot.provider.number.BinomialLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
@@ -53,27 +54,27 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 id,
                 compiled
             )
-            //println("modifying damage!")
-            //println(stack.maxDamage)
-            (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
-            //println(stack.maxDamage)
-
-            attributeMap.remove(id)
-            val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-            map.putAll(compiled.compiledData.attributeModifiers())
-            if (stack.item is Trinket){
-                println("Adding nbt to trinket")
-                nbt.remove("TrinketAttributeModifiers")
-                for (entry in map.entries()) {
-                    val attribute = entry.key
-                    val modifier = entry.value
-                    val compound = modifier.toNbt()
-                    compound.putString("AttributeName", Registry.ATTRIBUTE.getId(attribute).toString())
-                    Nbt.addNbtToList(compound,"TrinketAttributeModifiers",nbt)
-                }
-            }
-            attributeMap[id] = map
+            prepareActiveModifierData(stack,nbt, compiled, id)
         }
+    }
+
+    private fun prepareActiveModifierData(stack: ItemStack, nbt: NbtCompound, compiled: AbstractModifier.CompiledModifiers<EquipmentModifier>,id: Long){
+        (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
+        attributeMap.remove(id)
+        val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        map.putAll(compiled.compiledData.attributeModifiers())
+        if (stack.item is Trinket){
+            println("Adding nbt to trinket")
+            nbt.remove("TrinketAttributeModifiers")
+            for (entry in map.entries()) {
+                val attribute = entry.key
+                val modifier = entry.value
+                val compound = modifier.toNbt()
+                compound.putString("AttributeName", Registry.ATTRIBUTE.getId(attribute).toString())
+                Nbt.addNbtToList(compound,"TrinketAttributeModifiers",nbt)
+            }
+        }
+        attributeMap[id] = map
     }
 
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
@@ -89,7 +90,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (System.currentTimeMillis() - lastClientInit > 100L){
             lastClientInit = System.currentTimeMillis()
             val compiled = getActiveModifiers(stack)
-            (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
+            val nbt = stack.orCreateNbt
+            val id = Nbt.getItemStackId(nbt)
+            prepareActiveModifierData(stack,nbt, compiled, id)
         }
         if (modifierList.isEmpty()) return
         for (it in modifierList) {
@@ -169,7 +172,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val contextBuilder = LootContext.Builder(world).random(world.random).luck(player.luck)
         addRandomModifiers(stack,contextBuilder.build(LootContextTypes.EMPTY))
     }
-    
+
     private fun removeNonPersistentModifiers(stack: ItemStack){
         val nbt = stack.orCreateNbt
         val modList = getModifiersFromNbt(stack)
