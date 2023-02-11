@@ -64,7 +64,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         map.putAll(compiled.compiledData.attributeModifiers())
         if (stack.item is Trinket){
-            println("Adding nbt to trinket")
+            //println("Adding nbt to trinket")
             nbt.remove("TrinketAttributeModifiers")
             for (entry in map.entries()) {
                 val attribute = entry.key
@@ -92,7 +92,11 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             val compiled = getActiveModifiers(stack)
             val nbt = stack.orCreateNbt
             val id = Nbt.getItemStackId(nbt)
-            prepareActiveModifierData(stack,nbt, compiled, id)
+            if(getModifiersById(id).isNotEmpty() && compiled.modifiers.isEmpty()){
+                gatherActiveModifiers(stack)
+            } else {
+                prepareActiveModifierData(stack, nbt, compiled, id)
+            }
         }
         if (modifierList.isEmpty()) return
         for (it in modifierList) {
