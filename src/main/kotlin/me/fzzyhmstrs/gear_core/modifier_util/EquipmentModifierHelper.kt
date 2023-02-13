@@ -66,7 +66,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         map.putAll(compiled.compiledData.attributeModifiers())
         if (TrinketChecker.trinketsLoaded){
-            TrinketsUtil.addTrinketNbt(nbt,map)
+            TrinketsUtil.addTrinketNbt(stack,nbt,map)
         }
         attributeMap[id] = map
     }
