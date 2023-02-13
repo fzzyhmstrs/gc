@@ -9,7 +9,9 @@ import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
 import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
+import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
+import me.fzzyhmstrs.gear_core.trinkets.TrinketsUtil
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
@@ -63,16 +65,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         attributeMap.remove(id)
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         map.putAll(compiled.compiledData.attributeModifiers())
-        if (stack.item is Trinket){
-            //println("Adding nbt to trinket")
-            nbt.remove("TrinketAttributeModifiers")
-            for (entry in map.entries()) {
-                val attribute = entry.key
-                val modifier = entry.value
-                val compound = modifier.toNbt()
-                compound.putString("AttributeName", Registry.ATTRIBUTE.getId(attribute).toString())
-                Nbt.addNbtToList(compound,"TrinketAttributeModifiers",nbt)
-            }
+        if (TrinketChecker.trinketsLoaded){
+            TrinketsUtil.addTrinketNbt(nbt,map)
         }
         attributeMap[id] = map
     }
