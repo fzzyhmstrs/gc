@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
+import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
 import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
