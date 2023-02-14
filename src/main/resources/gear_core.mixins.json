@@ -13,9 +13,6 @@
     "ToolAndWeaponItemMixin",
     "TrinketMixin"
   ],
-  "client": [
-    "ClientPlayNetworkHandlerMixin"
-  ],
   "injectors": {
     "defaultRequire": 1
   }
