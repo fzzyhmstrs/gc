@@ -58,9 +58,9 @@ open class EquipmentModifier(
     private var durabilityModifier: PerLvlI = PerLvlI()
     
     internal var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
+    private val DEFAULT_UUID = UUID.fromString("cbc1d596-ac7e-11ed-afa1-0242ac120002")
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
-        //println("adding modifier: $other")
         attributeModifiers.putAll(other.attributeModifiers)
         modifierModifiers.addAll(other.modifierModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
@@ -69,15 +69,19 @@ open class EquipmentModifier(
         onDamagedFunctions.addAll(other.onDamagedFunctions)
         killOtherConsumers.addAll(other.killOtherConsumers)
         tickConsumers.addAll(other.tickConsumers)
-        //println(durabilityModifier)
-        //println(other.durabilityModifier)
         durabilityModifier = durabilityModifier.plus(other.durabilityModifier)
-        //println(durabilityModifier)
         return this
     }
 
+    @Deprecated("uuid field no longer necessary, as attributes will be rebuilt with slot-appropriate UUIDs during modifier compilation")
     fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
         val modifier = EntityAttributeModifier(UUID.fromString(uuid), this::getTranslationKey,amount,operation)
+        attributeModifiers.put(attribute,modifier)
+        return this
+    }
+    
+    fun withAttributeModifier(attribute: EntityAttribute, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
+        val modifier = EntityAttributeModifier(DEFAULT_UUID, this::getTranslationKey,amount,operation)
         attributeModifiers.put(attribute,modifier)
         return this
     }
