@@ -2,8 +2,6 @@ package me.fzzyhmstrs.gear_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
-import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
-import dev.emi.trinkets.api.Trinket
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
@@ -27,7 +25,6 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
@@ -112,6 +109,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         map.putAll(original)
         val id = Nbt.getItemStackId(stack)
         map.putAll(attributeMap[id]?:EMPTY_ATTRIBUTE_MAP)
+        //println(map)
         return map
     }
 
