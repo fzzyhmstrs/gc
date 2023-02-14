@@ -4,6 +4,7 @@ import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.gear_core.interfaces.HitTracking;
 import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
+import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.BowItem;
@@ -18,8 +19,18 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin({BowItem.class, CrossbowItem.class})
-public class BowAndCrossbowMixin implements HitTracking, KillTracking, Modifiable {
+public class BowAndCrossbowMixin implements HitTracking, KillTracking, AttributeTracking, Modifiable {
 
+    @Override 
+    public boolean correctSlot(EquipmentSlot slot){
+        return slot == EquipmentSlot.MAINHAND;
+    }
+    
+    @Override
+    public EquipmentSlot getCorrectSlot(){
+        return EquipmentSlot.MAINHAND;
+    }
+    
     @NotNull
     @Override
     public List<Identifier> defaultModifiers() {
