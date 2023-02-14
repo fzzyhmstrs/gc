@@ -10,6 +10,10 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.Registries
 
 object TrinketsUtil {
+    
+    fun isTrinket(stack: ItemStack){
+        return stack.item is Trinket
+    }
 
     fun addTrinketNbt(stack: ItemStack,nbt: NbtCompound, map: Multimap<EntityAttribute, EntityAttributeModifier>){
         if (stack.item is Trinket) {
