@@ -26,6 +26,11 @@ public class ShieldItemMixin implements HitTracking, KillTracking, DamageTrackin
     public boolean correctSlot(EquipmentSlot slot){
         return slot == EquipmentSlot.OFFHAND;
     }
+    
+    @Override
+    public EquipmentSlot getCorrectSlot(){
+        return EquipmentSlot.OFFHAND;
+    }
 
     @NotNull
     @Override
