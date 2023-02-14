@@ -7,7 +7,7 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.Registries
 
 object TrinketsUtil {
 
@@ -18,7 +18,7 @@ object TrinketsUtil {
                 val attribute = entry.key
                 val modifier = entry.value
                 val compound = modifier.toNbt()
-                compound.putString("AttributeName", Registry.ATTRIBUTE.getId(attribute).toString())
+                compound.putString("AttributeName", Registries.ATTRIBUTE.getId(attribute).toString())
                 Nbt.addNbtToList(compound, "TrinketAttributeModifiers", nbt)
             }
         }
