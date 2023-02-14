@@ -29,6 +29,11 @@ public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTr
     public boolean correctSlot(EquipmentSlot slot){
         return slot == EquipmentSlot.MAINHAND;
     }
+    
+    @Override
+    public EquipmentSlot getCorrectSlot(){
+        return EquipmentSlot.MAINHAND;
+    }
 
     @Override
     public void onWearerUse(ItemStack stack, World world, PlayerEntity user, Hand hand) {
