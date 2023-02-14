@@ -7,4 +7,9 @@ public interface AttributeTracking {
   default boolean correctSlot(EquipmentSlot slot){
       return false;
   }
+  
+  @Nullable
+  default EquipmentSlot getCorrectSlot(){
+      return null;
+  }
 }
