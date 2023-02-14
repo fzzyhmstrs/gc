@@ -37,6 +37,14 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
     private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+    private val EQUIPMENT_SLOT_UUIDS: EnumMap<EquipmentSlot,UUID> = EnumMap(mapOf(
+        EquipmentSlot.MAINHAND to UUID.fromString("cbc1d898-ac7e-11ed-afa1-0242ac120002"),
+        EquipmentSlot.OFFHAND to UUID.fromString("cbc1dcc6-ac7e-11ed-afa1-0242ac120002"),
+        EquipmentSlot.HEAD to UUID.fromString("cbc1de06-ac7e-11ed-afa1-0242ac120002"),
+        EquipmentSlot.CHEST to UUID.fromString("cbc1df3c-ac7e-11ed-afa1-0242ac120002"),
+        EquipmentSlot.LEGS to UUID.fromString("cbc1e068-ac7e-11ed-afa1-0242ac120002"),
+        EquipmentSlot.FEET to UUID.fromString("cbc1e194-ac7e-11ed-afa1-0242ac120002")
+    ))
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
@@ -64,9 +72,47 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         map.putAll(compiled.compiledData.attributeModifiers())
         if (TrinketChecker.trinketsLoaded){
+            if (TrinketsUtil.isTrinket(stack){
+                
+            }
             TrinketsUtil.addTrinketNbt(stack,nbt,map)
         }
         attributeMap[id] = map
+    }
+    
+    private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
+        val item = stack.item
+        if (item !is AttributeTracking || map.isEmpty()) return
+        val slot = item.getCorrectSlot()
+        val stackMap = if(slot == null){
+            EMPTY_ATTRIBUTE_MAP
+        } else {
+            item.getAttributeModifers(slot)
+        }
+        for (key in map.keySet()){
+            val modifiers = map.get(key)
+            val modifier = if (modifiers.isNotEmpty()){
+                modifiers.toArray()[0]
+            } else {
+                null
+            }
+            val stackModifiers = stackMap.get(key)
+            val stackModifier = if (stackModifiers.isNotEmpty()){
+                stackModifiers.toArray()[0]
+            } else {
+                null
+            }
+            if (modifier == null && stackModifier == null) continue
+            val uuid =  if(stackModifier != null){
+                stackModifier.id
+            } else if (slot == null){
+                UUID.randomUuid()
+            } else {
+                EQUIPMENT_SLOT_UUIDS[slot]?:UUID.randomUuid()
+            }
+            val list: MutableList<EntityAttributeModifier> = mutableListOf()
+            
+        }
     }
 
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
