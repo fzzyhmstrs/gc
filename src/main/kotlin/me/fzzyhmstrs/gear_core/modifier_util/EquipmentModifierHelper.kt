@@ -33,7 +33,6 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val targetMap: ArrayListMultimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
     private val attributeMap: MutableMap<Long, Multimap<EntityAttribute, EntityAttributeModifier>> = mutableMapOf()
     private val processors: MutableList<ModifierProcessor> = mutableListOf()
-    private var lastClientInit = 0L
 
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
@@ -135,18 +134,13 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
-        val modifierList = getModifiers(stack)
-        if (System.currentTimeMillis() - lastClientInit > 100L){
-            lastClientInit = System.currentTimeMillis()
-            val compiled = getActiveModifiers(stack)
-            val nbt = stack.orCreateNbt
-            val id = Nbt.getItemStackId(nbt)
-            if(getModifiersById(id).isNotEmpty() && compiled.modifiers.isEmpty()){
-                gatherActiveModifiers(stack)
-            } else {
-                prepareActiveModifierData(stack, nbt, compiled, id)
-            }
+        val compiled = getActiveModifiers(stack)
+        val nbt = stack.orCreateNbt
+        val id = Nbt.getItemStackId(nbt)
+        if(getModifiersById(id).isNotEmpty() && compiled.modifiers.isEmpty()){
+            gatherActiveModifiers(stack)
         }
+        val modifierList = getModifiers(stack)
         if (modifierList.isEmpty()) return
         for (it in modifierList) {
             val mod = getModifierByType(it) ?: continue
