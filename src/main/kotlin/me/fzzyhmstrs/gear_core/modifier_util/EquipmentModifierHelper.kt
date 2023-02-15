@@ -69,8 +69,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private fun prepareActiveModifierData(stack: ItemStack, nbt: NbtCompound, compiled: AbstractModifier.CompiledModifiers<EquipmentModifier>,id: Long){
         (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
         attributeMap.remove(id)
-        val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-        map.putAll(compiled.compiledData.attributeModifiers())
+        val map: Multimap<EntityAttribute, EntityAttributeModifier> = prepareAttributeMapForSlot(stack, ArrayListMultimap.create(compiled.compiledData.attributeModifiers()))
         if (TrinketChecker.trinketsLoaded){
             if (TrinketsUtil.isTrinket(stack){
                 
@@ -82,37 +81,48 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     
     private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val item = stack.item
-        if (item !is AttributeTracking || map.isEmpty()) return
+        if (item !is AttributeTracking) return EMPTY_ATTRIBUTE_MAP
         val slot = item.getCorrectSlot()
         val stackMap = if(slot == null){
             EMPTY_ATTRIBUTE_MAP
         } else {
             item.getAttributeModifers(slot)
         }
-        for (key in map.keySet()){
-            val modifiers = map.get(key)
-            val modifier = if (modifiers.isNotEmpty()){
-                modifiers.toArray()[0]
+        if (map.isEmpty()) return stackMap
+        val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        for (entry in stackMap.entries()){
+            if(!newMap.containsKey(entry.key){
+                newMap.put(entry.key,entry.value)
             } else {
-                null
+                collate(newMap,entry.key,entry.value)
             }
-            val stackModifiers = stackMap.get(key)
-            val stackModifier = if (stackModifiers.isNotEmpty()){
-                stackModifiers.toArray()[0]
-            } else {
-                null
-            }
-            if (modifier == null && stackModifier == null) continue
-            val uuid =  if(stackModifier != null){
-                stackModifier.id
-            } else if (slot == null){
-                UUID.randomUuid()
-            } else {
-                EQUIPMENT_SLOT_UUIDS[slot]?:UUID.randomUuid()
-            }
-            val list: MutableList<EntityAttributeModifier> = mutableListOf()
-            
         }
+        for (entry in map.entries()){
+            if(!newMap.containsKey(entry.key){
+                newMap.put(entry.key,entry.value)
+            } else {
+                collate(newMap,entry.key,entry.value)
+            }
+        }
+        return newMap
+    }
+    
+    private fun collate(map: Multimap<EntityAttribute, EntityAttributeModifier>, newAttribute: EntityAttribute, newModifier: EntityAttributeModifier){
+        val collection = map.get(newAttribute)
+        val newList: ArrayList<EntityAttributeModifier> = ArrayList<>()
+        for (mod in collection){
+            if(mod.operation != newModifier.operation){
+                newList.put(mod)
+                continue
+            }
+            val uuid = UUID.randomUuid()
+            val name = mod.name
+            val amount1 = mod.value
+            val amount2 = newModifier.value
+            val operation = mod.operation
+            newList.put(EntityAttributeModifier(uuid, name, amount1 + amount2,operation))
+        }
+        map.replaceValues(newAttribute,newList)
     }
 
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
@@ -152,12 +162,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
 
     fun getAttributeModifiers(stack: ItemStack, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
-        val map: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-        map.putAll(original)
         val id = Nbt.getItemStackId(stack)
-        map.putAll(attributeMap[id]?:EMPTY_ATTRIBUTE_MAP)
         //println(map)
-        return map
+        return attributeMap[id]?:original
     }
 
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
