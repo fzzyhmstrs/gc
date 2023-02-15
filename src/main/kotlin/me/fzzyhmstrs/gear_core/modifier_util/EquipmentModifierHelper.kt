@@ -28,6 +28,8 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
+import java.util.UUID
+
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
     private val targetMap: ArrayListMultimap<EquipmentModifier.EquipmentModifierTarget, EquipmentModifier> = ArrayListMultimap.create()
@@ -115,7 +117,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 newList.put(mod)
                 continue
             }
-            val uuid = UUID.randomUuid()
+            val uuid = UUID.randomUUID()
             val name = mod.name
             val amount1 = mod.value
             val amount2 = newModifier.value
