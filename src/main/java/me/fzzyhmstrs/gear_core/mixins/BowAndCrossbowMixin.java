@@ -7,6 +7,7 @@ import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
 import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
