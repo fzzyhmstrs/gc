@@ -11,7 +11,7 @@ import net.minecraft.util.registry.Registry
 
 object TrinketsUtil {
     
-    fun isTrinket(stack: ItemStack){
+    fun isTrinket(stack: ItemStack): Boolean{
         return stack.item is Trinket
     }
 

@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.gear_core.interfaces;
 
 import net.minecraft.entity.EquipmentSlot;
+import org.jetbrains.annotations.Nullable;
 
 public interface AttributeTracking {
   

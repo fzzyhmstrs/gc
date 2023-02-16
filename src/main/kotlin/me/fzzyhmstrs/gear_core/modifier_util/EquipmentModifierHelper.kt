@@ -9,9 +9,11 @@ import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
 import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
+import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.gear_core.trinkets.TrinketsUtil
 import net.minecraft.client.item.TooltipContext
+import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -38,14 +40,6 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
     private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-    private val EQUIPMENT_SLOT_UUIDS: EnumMap<EquipmentSlot,UUID> = EnumMap(mapOf(
-        EquipmentSlot.MAINHAND to UUID.fromString("cbc1d898-ac7e-11ed-afa1-0242ac120002"),
-        EquipmentSlot.OFFHAND to UUID.fromString("cbc1dcc6-ac7e-11ed-afa1-0242ac120002"),
-        EquipmentSlot.HEAD to UUID.fromString("cbc1de06-ac7e-11ed-afa1-0242ac120002"),
-        EquipmentSlot.CHEST to UUID.fromString("cbc1df3c-ac7e-11ed-afa1-0242ac120002"),
-        EquipmentSlot.LEGS to UUID.fromString("cbc1e068-ac7e-11ed-afa1-0242ac120002"),
-        EquipmentSlot.FEET to UUID.fromString("cbc1e194-ac7e-11ed-afa1-0242ac120002")
-    ))
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
@@ -72,9 +66,6 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         attributeMap.remove(id)
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = prepareAttributeMapForSlot(stack, ArrayListMultimap.create(compiled.compiledData.attributeModifiers()))
         if (TrinketChecker.trinketsLoaded){
-            if (TrinketsUtil.isTrinket(stack){
-                
-            }
             TrinketsUtil.addTrinketNbt(stack,nbt,map)
         }
         attributeMap[id] = map
@@ -83,23 +74,23 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val item = stack.item
         if (item !is AttributeTracking) return EMPTY_ATTRIBUTE_MAP
-        val slot = item.getCorrectSlot()
+        val slot = item.correctSlot
         val stackMap = if(slot == null){
             EMPTY_ATTRIBUTE_MAP
         } else {
-            item.getAttributeModifers(slot)
+            item.getAttributeModifiers(slot)
         }
-        if (map.isEmpty()) return stackMap
+        if (map.isEmpty) return stackMap
         val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         for (entry in stackMap.entries()){
-            if(!newMap.containsKey(entry.key){
+            if(!newMap.containsKey(entry.key)){
                 newMap.put(entry.key,entry.value)
             } else {
                 collate(newMap,entry.key,entry.value)
             }
         }
         for (entry in map.entries()){
-            if(!newMap.containsKey(entry.key){
+            if(!newMap.containsKey(entry.key)){
                 newMap.put(entry.key,entry.value)
             } else {
                 collate(newMap,entry.key,entry.value)
@@ -110,10 +101,10 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     
     private fun collate(map: Multimap<EntityAttribute, EntityAttributeModifier>, newAttribute: EntityAttribute, newModifier: EntityAttributeModifier){
         val collection = map.get(newAttribute)
-        val newList: ArrayList<EntityAttributeModifier> = ArrayList<>()
+        val newList: ArrayList<EntityAttributeModifier> = ArrayList()
         for (mod in collection){
             if(mod.operation != newModifier.operation){
-                newList.put(mod)
+                newList.add(mod)
                 continue
             }
             val uuid = UUID.randomUUID()
@@ -121,7 +112,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             val amount1 = mod.value
             val amount2 = newModifier.value
             val operation = mod.operation
-            newList.put(EntityAttributeModifier(uuid, name, amount1 + amount2,operation))
+            newList.add(EntityAttributeModifier(uuid, name, amount1 + amount2,operation))
         }
         map.replaceValues(newAttribute,newList)
     }
