@@ -210,6 +210,11 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         addRandomModifiers(stack,contextBuilder.build(LootContextTypes.EMPTY))
     }
 
+    fun removeModifier(modifier: Identifier,stack: ItemStack){
+        val nbt = stack.nbt ?: return
+        removeModifier(stack, modifier, nbt)
+    }
+
     private fun removeNonPersistentModifiers(stack: ItemStack){
         val nbt = stack.orCreateNbt
         val modList = getModifiersFromNbt(stack)
