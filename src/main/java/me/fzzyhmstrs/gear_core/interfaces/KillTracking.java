@@ -25,4 +25,14 @@ public interface KillTracking {
         }
     }
 
+    default int getKillCount(ItemStack stack){
+        NbtCompound nbt = stack.getNbt();
+        if (nbt == null) return 0;
+        if (!nbt.contains("kills")){
+            return 0;
+        } else {
+            return nbt.getInt("kills");
+        }
+    }
+
 }
