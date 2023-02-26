@@ -19,10 +19,8 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -42,17 +40,9 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Shadow public abstract Item getItem();
 
-    @Shadow public abstract int getMaxDamage();
-
-    @Shadow public @Nullable abstract NbtCompound getNbt();
-
     @Shadow public abstract NbtCompound getOrCreateNbt();
 
-    @Shadow public abstract boolean itemMatches(RegistryEntry<Item> itemEntry);
-
     @Shadow public abstract String toString();
-
-    @Shadow public abstract NbtCompound getOrCreateSubNbt(String key);
 
     @Unique
     private int gear_core_newMaxDamage;
