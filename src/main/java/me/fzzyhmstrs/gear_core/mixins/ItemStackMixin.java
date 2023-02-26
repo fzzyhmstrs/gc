@@ -4,7 +4,9 @@ import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier;
+import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.interfaces.*;
@@ -20,6 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -45,32 +48,58 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Shadow public abstract NbtCompound getOrCreateNbt();
 
+    @Shadow public abstract boolean itemMatches(RegistryEntry<Item> itemEntry);
+
+    @Shadow public abstract String toString();
+
+    @Shadow public abstract NbtCompound getOrCreateSubNbt(String key);
+
     @Unique
     private int gear_core_newMaxDamage;
 
     @Override
     public void evaluateNewMaxDamage(AbstractModifier.CompiledModifiers<EquipmentModifier> compiledModifiers) {
         if (getItem().getMaxDamage() != 0) {
-            //System.out.println("modifying max damage");
             gear_core_newMaxDamage = Math.max(compiledModifiers.getCompiledData().modifyDurability(getItem().getMaxDamage()), 1);
         }
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;)V", at = @At("TAIL"))
+   /* @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;)V", at = @At("TAIL"))
     private void gear_core_initializeFromNbt(NbtCompound nbt, CallbackInfo ci){
+        System.out.println(this.toString() + "@" + this.hashCode());
         if (getItem() == null) return;
         gear_core_newMaxDamage = getItem().getMaxDamage();
     }
 
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
     private void gear_core_initializeFromItem(ItemConvertible item, int count, CallbackInfo ci){
-        if (getItem() == null) return;
-        gear_core_newMaxDamage = getItem().getMaxDamage();
-    }
+        Item blah = getItem();
+        System.out.println(this.toString() + "@" + this.hashCode());
+        if (getItem() != null){
+            //System.out.println(getItem().getName());
+            gear_core_newMaxDamage = getItem().getMaxDamage();
+        } else if (item != null){
+            //System.out.println(item.asItem().getName());
+            gear_core_newMaxDamage = item.asItem().getMaxDamage();
+        } else {
+            System.out.println("both items were null!!");
+        }
+        System.out.println(gear_core_newMaxDamage);
+    }*/
 
     @WrapOperation(method = "getMaxDamage", at = @At(value = "INVOKE", target = "net/minecraft/item/Item.getMaxDamage ()I"))
     private int gear_core_maxDamageFromNewMax(Item instance, Operation<Integer> operation){
-        operation.call(instance);
+        int original = operation.call(instance);
+        if (original != 0 && gear_core_newMaxDamage == 0){
+            Item item = getItem();
+            if (item instanceof Modifiable modifiable){
+                ModifierInitializer modifierInitializer = modifiable.getModifierInitializer();
+                modifierInitializer.initializeModifiers((ItemStack) (Object) this,this.getOrCreateNbt(),modifiable.defaultModifiers());
+            }
+            if (gear_core_newMaxDamage == 0){
+                gear_core_newMaxDamage = getItem().getMaxDamage();
+            }
+        }
         return gear_core_newMaxDamage;
     }
 
