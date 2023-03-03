@@ -7,12 +7,10 @@ base {
     val archivesBaseName: String by project
     archivesName.set(archivesBaseName)
 }
-val log: File = file("changelog.md")
 val modVersion: String by project
 version = modVersion
 val mavenGroup: String by project
 group = mavenGroup
-println("## Changelog for Amethyst Core $modVersion \n\n" + log.readText())
 repositories {
     maven {
         name = "TerraformersMC"
