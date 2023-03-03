@@ -13,7 +13,6 @@ import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.gear_core.trinkets.TrinketsUtil
 import net.minecraft.client.item.TooltipContext
-import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -28,8 +27,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-
-import java.util.UUID
+import java.util.*
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
@@ -40,6 +38,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
     private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+    private val ATTACK_DAMAGE_MODIFIER_ID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF")
+    private val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
@@ -68,6 +68,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (TrinketChecker.trinketsLoaded){
             TrinketsUtil.addTrinketNbt(stack,nbt,map)
         }
+        println(stack.name)
+        println(map)
         attributeMap[id] = map
     }
     
@@ -81,40 +83,21 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             item.getAttributeModifiers(slot)
         }
         if (map.isEmpty) return stackMap
-        val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-        for (entry in stackMap.entries()){
-            if(!newMap.containsKey(entry.key)){
-                newMap.put(entry.key,entry.value)
-            } else {
-                collate(newMap,entry.key,entry.value)
-            }
-        }
-        for (entry in map.entries()){
-            if(!newMap.containsKey(entry.key)){
-                newMap.put(entry.key,entry.value)
-            } else {
-                collate(newMap,entry.key,entry.value)
-            }
-        }
+        val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create(stackMap)
+        newMap.putAll(randomize(map))
         return newMap
     }
-    
-    private fun collate(map: Multimap<EntityAttribute, EntityAttributeModifier>, newAttribute: EntityAttribute, newModifier: EntityAttributeModifier){
-        val collection = map.get(newAttribute)
-        val newList: ArrayList<EntityAttributeModifier> = ArrayList()
-        for (mod in collection){
-            if(mod.operation != newModifier.operation){
-                newList.add(mod)
-                continue
-            }
+
+    private fun randomize(map: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
+        val newMap : Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        for (entry in map.entries()){
             val uuid = UUID.randomUUID()
-            val name = mod.name
-            val amount1 = mod.value
-            val amount2 = newModifier.value
-            val operation = mod.operation
-            newList.add(EntityAttributeModifier(uuid, name, amount1 + amount2,operation))
+            val name = entry.value.name
+            val amount1 = entry.value.value
+            val operation = entry.value.operation
+            newMap.put(entry.key,EntityAttributeModifier(uuid, name, amount1,operation))
         }
-        map.replaceValues(newAttribute,newList)
+        return newMap
     }
 
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
