@@ -127,9 +127,10 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
-        val compiled = getActiveModifiers(stack)
-        val nbt = stack.orCreateNbt
+        val nbt = stack.nbt ?: return
         val id = Nbt.getItemStackId(nbt)
+        if (id == -1L) return
+        val compiled = getActiveModifiers(stack)
         if(getModifiersById(id).isNotEmpty() && compiled.modifiers.isEmpty()){
             gatherActiveModifiers(stack)
         }
