@@ -226,7 +226,13 @@ open class EquipmentModifier(
     
         companion object{
             
-            val GLOBAL_EXCLUSIONS = TagKey.of(RegistryKeys.ITEM,Identifier(GC.MOD_ID,"global_modifier_exclusions"))
+            val GLOBAL_EXCLUSIONS: TagKey<Item> =
+                TagKey.of(
+                    RegistryKeys.ITEM,
+                    Identifier(
+                        GC.MOD_ID,
+                        "global_modifier_exclusions")
+                )
             internal val targets: MutableList<EquipmentModifierTarget> = mutableListOf()
             val trinketsPredicate by lazy {
                 getTrinketCheck()
