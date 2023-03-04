@@ -69,8 +69,6 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (TrinketChecker.trinketsLoaded){
             TrinketsUtil.addTrinketNbt(stack,nbt,map)
         }
-        println(stack.name)
-        println(map)
         attributeMap[id] = map
     }
     
