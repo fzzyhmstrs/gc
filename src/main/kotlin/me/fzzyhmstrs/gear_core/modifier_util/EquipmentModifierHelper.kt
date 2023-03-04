@@ -13,6 +13,7 @@ import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.gear_core.trinkets.TrinketsUtil
 import net.minecraft.client.item.TooltipContext
+import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -72,29 +73,29 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         attributeMap[id] = map
     }
     
-    private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
+    private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EquipmentModifier.EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val item = stack.item
         if (item !is AttributeTracking) return EMPTY_ATTRIBUTE_MAP
         val slot = item.correctSlot
-        val stackMap = if(slot == null){
+/*        val stackMap = if(slot == null){
             EMPTY_ATTRIBUTE_MAP
         } else {
             item.getAttributeModifiers(slot)
-        }
-        if (map.isEmpty) return stackMap
-        val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create(stackMap)
-        newMap.putAll(randomize(map))
-        return newMap
+        }*/
+        if (map.isEmpty) return EMPTY_ATTRIBUTE_MAP
+        /*val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        newMap.putAll(randomize(map))*/
+        return prepareContainerMap(slot,map)
     }
 
-    private fun randomize(map: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
+    private fun prepareContainerMap(slot: EquipmentSlot?,map: Multimap<EntityAttribute, EquipmentModifier.EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val newMap : Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         for (entry in map.entries()){
-            val uuid = UUID.randomUUID()
-            val name = entry.value.name
-            val amount1 = entry.value.value
-            val operation = entry.value.operation
-            newMap.put(entry.key,EntityAttributeModifier(uuid, name, amount1,operation))
+            if (slot == null){
+                newMap.put(entry.key,entry.value.provideEntityAttributesForTrinkets())
+                continue
+            }
+            newMap.put(entry.key,entry.value.provideEntityAttribute(slot))
         }
         return newMap
     }
@@ -133,8 +134,29 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
     fun getAttributeModifiers(stack: ItemStack, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
         val id = Nbt.getItemStackId(stack)
+        if (id == -1L){
+            val nbt = stack.nbt
+            if (nbt != null){
+                if (nbt.contains(NbtKeys.MODIFIERS.str())){
+                    if (nbt.getList(NbtKeys.MODIFIERS.str(),10).isNotEmpty()){
+                        gatherActiveModifiers(stack)
+                    }
+                } else {
+                    return original
+                }
+            }else {
+                return original
+            }
+        } else if (!attributeMap.containsKey(id)){
+            gatherActiveModifiers(stack)
+        }
         //println(map)
-        return attributeMap[id]?:original
+        val modMap = attributeMap[id]?: return original
+        if (modMap.isEmpty) return original
+        val newMap:Multimap<EntityAttribute, EntityAttributeModifier>  = ArrayListMultimap.create()
+        newMap.putAll(original)
+        newMap.putAll(modMap)
+        return newMap
     }
 
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
