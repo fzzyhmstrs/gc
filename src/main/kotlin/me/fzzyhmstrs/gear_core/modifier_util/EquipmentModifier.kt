@@ -47,7 +47,7 @@ open class EquipmentModifier(
         EquipmentModifierHelper.addToTargetMap(this)
     }
     
-    private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+    private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifierContainer> = ArrayListMultimap.create()
     private val modifierModifiers: MutableList<Identifier> = mutableListOf()
     private val postHitConsumers: MutableList<ToolConsumer> = mutableListOf()
     private val postMineConsumers: MutableList<MiningConsumer> = mutableListOf()
@@ -58,7 +58,6 @@ open class EquipmentModifier(
     private var durabilityModifier: PerLvlI = PerLvlI()
     
     internal var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
-    private val DEFAULT_UUID = UUID.fromString("cbc1d596-ac7e-11ed-afa1-0242ac120002")
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
         attributeModifiers.putAll(other.attributeModifiers)
@@ -75,18 +74,18 @@ open class EquipmentModifier(
 
     @Deprecated("uuid field no longer necessary, as attributes will be rebuilt with slot-appropriate UUIDs during modifier compilation")
     fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
-        val modifier = EntityAttributeModifier(UUID.fromString(uuid), this::getTranslationKey,amount,operation)
+        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation)
         attributeModifiers.put(attribute,modifier)
         return this
     }
     
     fun withAttributeModifier(attribute: EntityAttribute, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
-        val modifier = EntityAttributeModifier(DEFAULT_UUID, this::getTranslationKey,amount,operation)
+        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation)
         attributeModifiers.put(attribute,modifier)
         return this
     }
 
-    fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifier>{
+    fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifierContainer>{
         return attributeModifiers
     }
 
@@ -220,6 +219,25 @@ open class EquipmentModifier(
     @FunctionalInterface
     fun interface DamageFunction{
         fun test(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float
+    }
+
+    class EntityAttributeModifierContainer(private val name: String, private val amount: Double, private val operation: EntityAttributeModifier.Operation){
+        private val attributes: EnumMap<EquipmentSlot,EntityAttributeModifier> = EnumMap(mapOf(
+            EquipmentSlot.MAINHAND to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
+            EquipmentSlot.OFFHAND to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
+            EquipmentSlot.HEAD to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
+            EquipmentSlot.CHEST to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
+            EquipmentSlot.LEGS to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
+            EquipmentSlot.FEET to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation)
+        ))
+
+        fun provideEntityAttribute(slot: EquipmentSlot): EntityAttributeModifier{
+            return attributes[slot]?:throw IllegalStateException("slot $slot not found in enum-map for some reason!")
+        }
+
+        fun provideEntityAttributesForTrinkets(): EntityAttributeModifier{
+            return EntityAttributeModifier(UUID.randomUUID(),name,amount,operation)
+        }
     }
     
     abstract class EquipmentModifierTarget(val id: Identifier){
