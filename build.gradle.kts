@@ -44,21 +44,24 @@ dependencies {
     val fabricKotlinVersion: String by project
     modImplementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
 
-    modImplementation("dev.emi:trinkets:3.4.0"){
+    val trinketsVersion: String by project
+    modImplementation("dev.emi:trinkets:$trinketsVersion"){
         exclude("net.fabricmc.fabric-api")
     }
 
-    modImplementation(":fzzy_core:0.1.0+1.19.3"){
+    val fcVersion: String by project
+    modImplementation(":fzzy_core:$fcVersion"){
         exclude("net.fabricmc.fabric-api")
     }
 
-    modImplementation(":amethyst_core:1.0.0+1.19.3"){
+    /*modImplementation(":amethyst_core:1.0.0+1.19.3"){
         exclude("net.fabricmc.fabric-api")
-    }
+    }*/
 
-    implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
-    include("com.github.LlamaLad7:MixinExtras:0.1.1")
+    val meVersion: String by project
+    implementation("com.github.LlamaLad7:MixinExtras:$meVersion")
+    annotationProcessor("com.github.LlamaLad7:MixinExtras:$meVersion")
+    include("com.github.LlamaLad7:MixinExtras:$meVersion")
 
 }
 tasks {

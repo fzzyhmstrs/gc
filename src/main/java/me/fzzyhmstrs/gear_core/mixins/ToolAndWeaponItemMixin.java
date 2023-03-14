@@ -2,6 +2,7 @@ package me.fzzyhmstrs.gear_core.mixins;
 
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier;
+import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.gear_core.interfaces.*;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier;
@@ -43,7 +44,7 @@ public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTr
 
     @NotNull
     @Override
-    public List<Identifier> defaultModifiers() {
+    public List<Identifier> defaultModifiers(ModifierHelperType type) {
         return Collections.emptyList();
     }
 
@@ -52,8 +53,4 @@ public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTr
         EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip, context);
     }
 
-    @Override
-    public ModifierInitializer getModifierInitializer() {
-        return EquipmentModifierHelper.INSTANCE;
-    }
 }

@@ -5,10 +5,12 @@ import com.google.common.collect.Multimap
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
+import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
 import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
+import me.fzzyhmstrs.gear_core.GC
 import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking
 import me.fzzyhmstrs.gear_core.interfaces.DurabilityTracking
 import me.fzzyhmstrs.gear_core.trinkets.TrinketsUtil
@@ -24,7 +26,7 @@ import net.minecraft.loot.context.LootContextTypes
 import net.minecraft.loot.provider.number.BinomialLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.Registries
+import net.minecraft.nbt.NbtList
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
@@ -40,11 +42,45 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
     private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
     private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-    private val ATTACK_DAMAGE_MODIFIER_ID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF")
-    private val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
+    private const val OLD_MODIFIERS_KEY = "modifiers"
+    private const val OLD_MODIFIER_ID_KEY = "modifier_id"
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
         get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
+
+    override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound, list: List<Identifier>) {
+        fixUpOldNbt(nbt)
+        super.initializeModifiers(stack, nbt, list)
+    }
+
+    // attempt to carry over modifiers stored under the now non-generic nbt keys into the new keys
+    private fun fixUpOldNbt(nbt: NbtCompound){
+        if (nbt.contains(OLD_MODIFIERS_KEY)){
+            val oldNbtList = nbt.getList(OLD_MODIFIERS_KEY,10)
+            val newNbtList = NbtList()
+            val newOldNbtList = NbtList()
+            for (el in oldNbtList){
+                val compound = el as NbtCompound
+                if (compound.contains(OLD_MODIFIER_ID_KEY)){
+                    val modifier = compound.getString(OLD_MODIFIER_ID_KEY)
+                    if (getModifierByType(Identifier(modifier)) != null){
+                        val newEl = NbtCompound()
+                        newEl.putString(getType().getModifierIdKey(),modifier)
+                        newNbtList.add(newEl)
+                    } else {
+                        newOldNbtList.add(el.copy())
+                    }
+                }
+            }
+            nbt.remove(OLD_MODIFIERS_KEY)
+            if (newOldNbtList.isNotEmpty()){
+                nbt.put(OLD_MODIFIERS_KEY,newOldNbtList)
+            }
+            if (newNbtList.isNotEmpty()){
+                nbt.put(getType().getModifiersKey(), newNbtList)
+            }
+        }
+    }
 
     override fun gatherActiveModifiers(stack: ItemStack) {
         val nbt = stack.nbt
@@ -137,8 +173,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         if (id == -1L){
             val nbt = stack.nbt
             if (nbt != null){
-                if (nbt.contains(NbtKeys.MODIFIERS.str())){
-                    if (nbt.getList(NbtKeys.MODIFIERS.str(),10).isNotEmpty()){
+                if (nbt.contains(getType().getModifiersKey())){
+                    if (nbt.getList(getType().getModifiersKey(),10).isNotEmpty()){
                         gatherActiveModifiers(stack)
                     }
                 } else {
@@ -243,5 +279,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     @FunctionalInterface
     fun interface ModifierProcessor{
         fun process(stack: ItemStack, entity: LivingEntity)
+    }
+
+    override fun getType(): ModifierHelperType {
+        return GC.EQUIPMENT_MODIFIER_TYPE
     }
 }
