@@ -3,6 +3,7 @@ package me.fzzyhmstrs.gear_core.mixins;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
+import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking;
 import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
@@ -31,30 +32,8 @@ public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, Dam
             EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);
     }
 
-    /*@Inject(method = "getModifiers", at = @At("HEAD"))
-    private void gear_core_testingTrinkets(ItemStack stack, SlotReference slot, LivingEntity entity, UUID uuid, CallbackInfoReturnable<Multimap<EntityAttribute, EntityAttributeModifier>> cir) {
-        System.out.println("Trinkets default method called");
-        System.out.println(stack.getNbt());
-    }*/
-    
-    /*@ModifyReturnValue(method = "getModifiers", at = @At("RETURN"))
-    private Multimap<EntityAttribute, EntityAttributeModifier> gear_core_addModifierModifiersToTrinketModifiers(Multimap<EntityAttribute, EntityAttributeModifier> original, ItemStack stack,
-                                                                                                                SlotReference slot, LivingEntity entity, UUID uuid){
-        System.out.println("Trying to get trinket modifiers");
-        if (stack.getItem() instanceof AttributeTracking){
-            System.out.println("Getting attributes for trinket!" + stack.getTranslationKey());
-            return EquipmentModifierHelper.INSTANCE.getAttributeModifiers(stack, original);
-        } else {
-            return original;
-        }
-    }*/
-
-    @Override default ModifierInitializer getModifierInitializer(){
-        return EquipmentModifierHelper.INSTANCE;
-    }
-
     @Override
-    default List<Identifier> defaultModifiers(){return Collections.emptyList();}
+    default List<Identifier> defaultModifiers(ModifierHelperType type){return Collections.emptyList();}
 
     @Override
     default void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context){

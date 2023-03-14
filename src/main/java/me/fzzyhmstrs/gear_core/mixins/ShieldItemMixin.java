@@ -1,6 +1,7 @@
 package me.fzzyhmstrs.gear_core.mixins;
 
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
+import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking;
 import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
@@ -34,17 +35,12 @@ public class ShieldItemMixin implements HitTracking, KillTracking, DamageTrackin
 
     @NotNull
     @Override
-    public List<Identifier> defaultModifiers() {
+    public List<Identifier> defaultModifiers(ModifierHelperType type) {
         return Collections.emptyList();
     }
 
     @Override
     public void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context) {
         EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip, context);
-    }
-
-    @Override
-    public ModifierInitializer getModifierInitializer() {
-        return EquipmentModifierHelper.INSTANCE;
     }
 }
