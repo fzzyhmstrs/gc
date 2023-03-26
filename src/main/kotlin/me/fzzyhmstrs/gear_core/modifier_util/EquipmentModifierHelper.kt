@@ -46,7 +46,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private const val OLD_MODIFIER_ID_KEY = "modifier_id"
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
-        get() = AbstractModifier.CompiledModifiers(listOf(), EquipmentModifier(BLANK))
+        get() = AbstractModifier.CompiledModifiers(arrayListOf(), EquipmentModifier(BLANK))
 
     override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound, list: List<Identifier>) {
         fixUpOldNbt(nbt)

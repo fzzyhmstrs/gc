@@ -195,7 +195,7 @@ open class EquipmentModifier(
     }
 
     override fun compiler(): Compiler {
-        return Compiler(mutableListOf(), EquipmentModifier())
+        return Compiler(arrayListOf(), EquipmentModifier())
     }
 
     override fun getModifierHelper(): AbstractModifierHelper<*> {

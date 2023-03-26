@@ -48,9 +48,4 @@ public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTr
         return Collections.emptyList();
     }
 
-    @Override
-    public void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context) {
-        EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip, context);
-    }
-
 }
