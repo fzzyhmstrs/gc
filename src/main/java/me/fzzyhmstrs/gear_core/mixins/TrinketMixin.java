@@ -34,9 +34,4 @@ public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, Dam
 
     @Override
     default List<Identifier> defaultModifiers(ModifierHelperType type){return Collections.emptyList();}
-
-    @Override
-    default void addModifierTooltip(ItemStack stack, List<Text> tooltip, TooltipContext context){
-        EquipmentModifierHelper.INSTANCE.addModifierTooltip(stack, tooltip, context);
-    }
 }
