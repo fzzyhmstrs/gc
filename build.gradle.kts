@@ -52,10 +52,6 @@ dependencies {
         exclude("net.fabricmc.fabric-api")
     }
 
-    modImplementation(":amethyst_core:1.0.0+1.19.3"){
-        exclude("net.fabricmc.fabric-api")
-    }
-
     implementation("com.github.LlamaLad7:MixinExtras:0.1.1")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
     include("com.github.LlamaLad7:MixinExtras:0.1.1")
