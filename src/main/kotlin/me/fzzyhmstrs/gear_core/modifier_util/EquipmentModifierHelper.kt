@@ -216,18 +216,24 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
     }
 
-    fun addRandomModifiers(stack: ItemStack, context: LootContext){
-        addRandomModifiers(stack, context, DEFAULT_MODIFIER_TOLL)
-    }
-    
-    fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider){
+    fun getTargetsForItem(stack: ItemStack): ArrayList<EquipmentModifier>{
         val targetList = EquipmentModifier.EquipmentModifierTarget.findTargetForItem(stack)
-        if (targetList.isEmpty()) return
+        if (targetList.isEmpty()) return arrayListOf()
         val list: ArrayList<EquipmentModifier> = ArrayList()
         for (target in targetList){
             //println(target.id)
             list.addAll(targetMap.get(target))
         }
+        return list
+    }
+
+    fun addRandomModifiers(stack: ItemStack, context: LootContext){
+        addRandomModifiers(stack, context, DEFAULT_MODIFIER_TOLL)
+    }
+    
+    fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider){
+        val list = getTargetsForItem(stack)
+        if (list.isEmpty()) return
         var tollRemaining = (toll.nextFloat(context) + context.luck).toInt()
         //println("toll: $tollRemaining")
         //println("targets: $list")
