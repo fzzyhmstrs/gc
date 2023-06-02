@@ -415,14 +415,14 @@ open class EquipmentModifier(
         
     }
     
-    enum class Rarity(vararg val formatting: Formatting){
-        REALLY_BAD(Formatting.BOLD, Formatting.DARK_RED),
-        BAD(Formatting.DARK_RED),
-        COMMON(Formatting.GRAY),
-        UNCOMMON(Formatting.DARK_GREEN),
-        RARE(Formatting.AQUA),
-        EPIC(Formatting.LIGHT_PURPLE),
-        LEGENDARY(Formatting.BOLD, Formatting.GOLD)
+    enum class Rarity(val beneficial: Boolean,vararg val formatting: Formatting){
+        REALLY_BAD(false, Formatting.BOLD, Formatting.DARK_RED),
+        BAD(false, Formatting.DARK_RED),
+        COMMON(true, Formatting.GRAY),
+        UNCOMMON(true, Formatting.DARK_GREEN),
+        RARE(true, Formatting.AQUA),
+        EPIC(true, Formatting.LIGHT_PURPLE),
+        LEGENDARY(true, Formatting.BOLD, Formatting.GOLD)
     }
     
 }
