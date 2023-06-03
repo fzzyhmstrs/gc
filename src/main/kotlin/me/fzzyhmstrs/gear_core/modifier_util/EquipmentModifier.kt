@@ -406,6 +406,7 @@ open class EquipmentModifier(
             return isItemAcceptableOrTagged(stack)
         }
 
+        @Deprecated("Use only in new target instances. Call isStackAcceptable for outside usage.")
         fun isItemAcceptableOrTagged(stack: ItemStack): Boolean{
             if (stack.isIn(tagExcluded)) return false
             return stack.isIn(tagIncluded) || isAcceptableItem(stack)
