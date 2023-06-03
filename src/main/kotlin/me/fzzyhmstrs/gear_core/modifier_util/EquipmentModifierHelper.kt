@@ -227,6 +227,12 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return list
     }
 
+    fun addModifierAsIs(modifier: Identifier, stack: ItemStack, temporary: Boolean){
+        val id = Nbt.makeItemStackId(stack)
+        val nbt = stack.orCreateNbt
+        addModifierWithoutChecking(id, modifier, stack, nbt, temporary)
+    }
+
     fun addRandomModifiers(stack: ItemStack, context: LootContext){
         addRandomModifiers(stack, context, DEFAULT_MODIFIER_TOLL)
     }
