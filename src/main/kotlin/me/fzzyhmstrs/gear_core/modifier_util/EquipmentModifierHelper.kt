@@ -227,7 +227,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return list
     }
 
-    fun addModifierAsIs(modifier: Identifier, stack: ItemStack, temporary: Boolean){
+    fun addModifierAsIs(modifier: Identifier, stack: ItemStack, temporary: Boolean = false){
         val id = Nbt.makeItemStackId(stack)
         val nbt = stack.orCreateNbt
         addModifierWithoutChecking(id, modifier, stack, nbt, temporary)
