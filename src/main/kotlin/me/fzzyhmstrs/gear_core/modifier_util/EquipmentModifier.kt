@@ -57,7 +57,7 @@ open class EquipmentModifier(
     private val tickConsumers: MutableList<ToolConsumer> = mutableListOf()
     private var durabilityModifier: PerLvlI = PerLvlI()
     
-    internal var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
+    var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
 
     override fun plus(other: EquipmentModifier): EquipmentModifier {
         attributeModifiers.putAll(other.attributeModifiers)
