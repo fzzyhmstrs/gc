@@ -22,6 +22,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.loot.context.LootContext
+import net.minecraft.loot.context.LootContextParameterSet
 import net.minecraft.loot.context.LootContextTypes
 import net.minecraft.loot.provider.number.BinomialLootNumberProvider
 import net.minecraft.loot.provider.number.LootNumberProvider
@@ -259,8 +260,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val nbt = stack.orCreateNbt
         removeNonPersistentModifiers(stack)
         nbt.remove(NbtKeys.ITEM_STACK_ID.str())
-        val contextBuilder = LootContext.Builder(world).random(world.random).luck(player.luck)
-        addRandomModifiers(stack,contextBuilder.build(LootContextTypes.EMPTY))
+        val parameters = LootContextParameterSet.Builder(world).luck(player.luck).build(LootContextTypes.EMPTY)
+        val contextBuilder = LootContext.Builder(parameters).random(world.seed)
+        addRandomModifiers(stack,contextBuilder.build(null))
     }
 
     fun removeModifier(modifier: Identifier,stack: ItemStack){
