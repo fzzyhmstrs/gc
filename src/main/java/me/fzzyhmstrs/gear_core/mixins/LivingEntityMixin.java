@@ -8,6 +8,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.DamageTypeTags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +32,7 @@ abstract public class LivingEntityMixin {
 
     @ModifyReturnValue(method = "modifyAppliedDamage", at = @At("RETURN"))
     private float gear_core_invokeOnWearerDamaged(float original, DamageSource source, float amount){
-        if (source.isUnblockable() || original <= 0.0f) return original;
+        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || original <= 0.0f) return original;
         float newAmount = original;
         LivingEntity livingEntity = null;
         if (source.getSource() instanceof LivingEntity le){
