@@ -33,6 +33,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import java.util.*
+import kotlin.math.max
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
@@ -261,7 +262,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         removeNonPersistentModifiers(stack)
         nbt.remove(NbtKeys.ITEM_STACK_ID.str())
         val parameters = LootContextParameterSet.Builder(world).luck(player.luck).build(LootContextTypes.EMPTY)
-        val contextBuilder = LootContext.Builder(parameters).random(world.seed)
+        val seed = world.random.nextLong().takeIf { it != 0L }?:1L
+        val contextBuilder = LootContext.Builder(parameters).random(seed)
         addRandomModifiers(stack,contextBuilder.build(null))
     }
 
