@@ -25,10 +25,10 @@ repositories {
         url = uri("https://jitpack.io")
     }
     flatDir {
-        dirs("F:\\Documents\\Mod Libraries\\ac\\build\\libs")
+        dirs("E:\\Documents\\Mod Libraries\\ac\\build\\libs")
     }
     flatDir {
-        dirs("F:\\Documents\\Mod Libraries\\fc\\build\\libs")
+        dirs("E:\\Documents\\Mod Libraries\\fc\\build\\libs")
     }
 
 }
