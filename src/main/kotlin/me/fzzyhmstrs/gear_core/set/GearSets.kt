@@ -25,7 +25,14 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                 e.printStackTrace()
             }
         }
-
+        cachedSets.clear()
+        for (item in Registries.ITEM){
+            for (set in gearSets){
+                if (set.test(item)){
+                    cachedSets.put(item,set)
+                }
+            }
+        }
     }
 
 
