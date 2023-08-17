@@ -74,7 +74,7 @@ open class EquipmentModifier(
 
     @Deprecated("uuid field no longer necessary, as attributes will be rebuilt with slot-appropriate UUIDs during modifier compilation")
     fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
-        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation)
+        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation,uuid)
         attributeModifiers.put(attribute,modifier)
         return this
     }
