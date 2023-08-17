@@ -25,13 +25,13 @@ abstract public class LivingEntityMixin implements ActiveGearSetTracking {
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
  
     @Unique
-    private Set<GearSet> gear_core_activeGearSets = new HashSet(4,0.75f);
+    private HashMap<GearSet,Int> gear_core_activeGearSets = new MashMap(4,0.75f);
     
     @Override
-    void setActiveSets(Set<GearSet> sets){
+    void setActiveSets(HashMap<GearSet,Int> sets){
         gear_core_activeGearSets = sets;
     }
-    Set<GearSet> getActiveSets(){
+    HashMap<GearSet,Int> getActiveSets(){
         return gear_core_activeGearSets;
     }
     
