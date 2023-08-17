@@ -18,13 +18,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(LivingEntity.class)
-abstract public class LivingEntityMixin {
+abstract public class LivingEntityMixin implements ActiveGearSetTracking {
 
     @Shadow
     public abstract Iterable<ItemStack> getArmorItems();
     @Shadow
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
-
+ 
+    @Unique
+    private Set<GearSet> gear_core_activeGearSets = new HashSet(4,0.75f);
+    
+    @Override
+    void setActiveSets(Set<GearSet> sets){
+        gear_core_activeGearSets = sets;
+    }
+    Set<GearSet> getActiveSets(){
+        return gear_core_activeGearSets;
+    }
+    
     @Inject(method = "processEquippedStack", at = @At("HEAD"))
     private void gear_core_processModifiersOnEquip(ItemStack stack, CallbackInfo ci){
 
