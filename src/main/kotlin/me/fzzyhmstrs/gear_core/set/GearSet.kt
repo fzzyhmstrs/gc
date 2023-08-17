@@ -21,6 +21,8 @@ import javax.swing.text.html.HTML.Tag.P
 class GearSet private constructor(
     private val id: Identifier,
     private val translationKey: String,
+    private val nameDecorationTranslationKey: String,
+    private val bonusDecorationTranslationKey: String,
     private val activeFormatting: Array<Formatting>,
     private val inactiveFormatting: Array<Formatting>,
     private val items: Ingredient,
@@ -75,6 +77,24 @@ class GearSet private constructor(
                 json.getAsJsonPrimitive("name").asString
             } catch (e: Exception){
                 throw IllegalStateException("Gear Set [$id] needs a 'name' member that is a string")
+            }
+            val nameDecorationKey = if (json.has("name_decoration")) {
+                try {
+                    json.getAsJsonPrimitive("name_decoration").asString
+                } catch (e: Exception){
+                    throw IllegalStateException("Gear Set [$id] has an optional 'name_decoration' member that isn't a string")
+                }
+            } else {
+                "gear_core.set.name_brackets"
+            }
+            val bonusDecorationKey = if (json.has("bonus_decoration")) {
+                try {
+                    json.getAsJsonPrimitive("bonus_decoration").asString
+                } catch (e: Exception){
+                    throw IllegalStateException("Gear Set [$id] has an optional 'bonus_decoration' member that isn't a string")
+                }
+            } else {
+                "gear_core.set.bonus_brackets"
             }
             val activeFormattingList: List<Formatting> = if (json.has("active_formatting")) {
                 try {
@@ -169,7 +189,7 @@ class GearSet private constructor(
                     throw IllegalStateException("Gear Set [$id] has an invalid 'bonuses' member. Needs to be a string or an array.")
                 }
             }
-            return GearSet(id,translationKey,activeFormattingList.toTypedArray(),inactiveFormattingList.toTypedArray(),items,attributeBonuses, modifierBonuses)
+            return GearSet(id,translationKey,nameDecorationKey,bonusDecorationKey,activeFormattingList.toTypedArray(),inactiveFormattingList.toTypedArray(),items,attributeBonuses, modifierBonuses)
         }
     }
 
