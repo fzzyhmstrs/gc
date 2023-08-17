@@ -9,6 +9,9 @@ import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.gear_core.modifier_util.EntityAttributeModifierContainer
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier
 import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.recipe.Ingredient
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
@@ -21,8 +24,12 @@ class GearSet private constructor(
     private val activeFormatting: Array<Formatting>,
     private val inactiveFormatting: Array<Formatting>,
     private val items: Ingredient,
-    private val attributeBonuses: Map<Int, Multimap<EntityAttribute,EntityAttributeModifierContainer>>,
+    private val attributeBonuses: Map<Int, Multimap<EntityAttribute,EntityAttributeModifier>>,
     private val modifierBonuses: Map<Int,List<EquipmentModifier>>) {
+
+    fun test(item: Item): Boolean{
+        return items.test(ItemStack(item))
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -73,7 +80,7 @@ class GearSet private constructor(
             if (!json.has("bonuses") || !json.get("bonuses").isJsonObject)
                 throw IllegalStateException("Gear Set [$id] needs a 'bonuses' member that is a JsonObject")
             val bonusesJsonObject = json.getAsJsonObject("bonuses")
-            val attributeBonuses: MutableMap<Int, Multimap<EntityAttribute,EntityAttributeModifierContainer>> = mutableMapOf()
+            val attributeBonuses: MutableMap<Int, Multimap<EntityAttribute,EntityAttributeModifier>> = mutableMapOf()
             val modifierBonuses: MutableMap<Int,MutableList<EquipmentModifier>> = mutableMapOf()
             for (bonus in bonusesJsonObject.entrySet()){
                 val key = try {
