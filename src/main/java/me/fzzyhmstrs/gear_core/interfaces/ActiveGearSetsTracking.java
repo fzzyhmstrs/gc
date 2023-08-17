@@ -6,6 +6,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 public interface ActiveGearSetsTracking {
-    void setActiveSets(Set<GearSet>);
+    void setActiveSets(Set<GearSet> sets);
     Set<GearSet> getActiveSets();
 }
