@@ -109,7 +109,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         attributeMap[id] = map
     }
     
-    private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EquipmentModifier.EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
+    private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val item = stack.item
         if (item !is AttributeTracking) return EMPTY_ATTRIBUTE_MAP
         val slot = item.correctSlot
@@ -124,7 +124,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return prepareContainerMap(slot,map)
     }
 
-    private fun prepareContainerMap(slot: EquipmentSlot?,map: Multimap<EntityAttribute, EquipmentModifier.EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
+    internal fun prepareContainerMap(slot: EquipmentSlot?,map: Multimap<EntityAttribute, EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val newMap : Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         for (entry in map.entries()){
             if (slot == null){
