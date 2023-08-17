@@ -24,13 +24,41 @@ class GearSet private constructor(
     private val activeFormatting: Array<Formatting>,
     private val inactiveFormatting: Array<Formatting>,
     private val items: Ingredient,
-    private val attributeBonuses: Map<Int, Multimap<EntityAttribute,EntityAttributeModifier>>,
+    private val attributeBonuses: Map<Int, ArrayListMultimap<EntityAttribute,EntityAttributeModifier>>,
     private val modifierBonuses: Map<Int,List<EquipmentModifier>>) {
 
+    init{
+        //adds all the modifier-based attribute bonuses into the actual attribute map.
+        //Modifiers in the set won't actually be applying their own modifiers like normally in the EquipmentModifierHelper, because they aren't "active"
+        for (entry in modifierBonuses){
+            if (mod.attributeModifiers().isNotEmpty()) {
+                val multiMap = attributeBonuses.computeIfAbsent(entry.key){ArrayListMultimap.create()}
+                for (mod in entry.value){
+                    val modMultiMap = EquipmentModifierHelper.prepareContainerMap(null,mod.attributeModifiers())
+                    multiMap.putAll(modMultiMap)
+                }
+            }
+        }
+    }
+    
     fun test(item: Item): Boolean{
         return items.test(ItemStack(item))
     }
 
+    fun addAttributesToEntity(entity: LivingEntity, level: Int){
+        if (level <= 0)
+            throw IllegalStateException("GearSet level can't be below 1.")
+        for (i in 1..level){
+            val map = attributeBonuses.get(i)?:continue
+            entity.getAttributes().addTemporaryModifiers(map)
+        }
+    }
+    fun removeAttributesFromEntity(entity: LivingEntity){
+        for (map in attributeBonuses.values()){
+            entity.getAttributes().removeModifiers(map)
+        }
+    }
+    
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
         if (other !is GearSet) return false
@@ -80,7 +108,7 @@ class GearSet private constructor(
             if (!json.has("bonuses") || !json.get("bonuses").isJsonObject)
                 throw IllegalStateException("Gear Set [$id] needs a 'bonuses' member that is a JsonObject")
             val bonusesJsonObject = json.getAsJsonObject("bonuses")
-            val attributeBonuses: MutableMap<Int, Multimap<EntityAttribute,EntityAttributeModifier>> = mutableMapOf()
+            val attributeBonuses: MutableMap<Int, ArrayListMultimap<EntityAttribute,EntityAttributeModifier>> = mutableMapOf()
             val modifierBonuses: MutableMap<Int,MutableList<EquipmentModifier>> = mutableMapOf()
             for (bonus in bonusesJsonObject.entrySet()){
                 val key = try {
@@ -103,15 +131,38 @@ class GearSet private constructor(
                     val bonusesJsonArray = bonusJson.asJsonArray
                     for (b in bonusesJsonArray){
                         if (b.isJsonPrimitive){
-                            val modifierJson = bonusJson.asString
-                            val modifierId = Identifier.tryParse(modifierJson)
-                                ?: throw IllegalStateException("Gear Set [$id] has a bonus with an invalid identifier value [$modifierJson]. Needs to be a valid identifier string")
+                            val modifierIdString = bonusJson.asString
+                            val modifierId = Identifier.tryParse(modifierIdString)
+                                ?: throw IllegalStateException("Gear Set [$id] has a modifier bonus with an invalid identifier value [$modifierIdString].")
                             val modifier = ModifierRegistry.getByType<EquipmentModifier>(modifierId)
-                                ?: throw IllegalStateException("Gear Set [$id] has a bonus with a modifier value [$modifierJson] that can't be found in the modifier registry.")
+                                ?: throw IllegalStateException("Gear Set [$id] has a modifier bonus with a modifier value [$modifierIdString] that can't be found in the modifier registry.")
                             modifierBonuses.computeIfAbsent(key) { mutableListOf() }.add(modifier)
                         } else if (b.isJsonObject){
                             val attributeJson = b.asJsonObject
-                            TODO()
+                            val attribute = try {
+                                val attributeIdString = attributeJson.get("attribute").asString
+                                val attributeId = Identifier.tryParse(modifierJson)
+                                    ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an invalid identifier value [$attributeIdString].")
+                                Registries.ENTITY_ATTRIBUTE.get(attributeId)
+                                    ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an attribute value [$attributeIdString] that can't be found in the attribute registry.")
+                            } catch (e: Exception){
+                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'attribute' key [$attributeJson]. Missing or needs to be a valid identifier string.")
+                            }
+                            val uuid = UUID.randomUuid()
+                            val name = translationKey + Registries.ENTITY_ATTRIBUTE.getId(attribute)
+                            val value = try {
+                               attributeJson.get("value").asDouble
+                            } catch (e: Exception){
+                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'value' key [$modifierIdString]. Missing or needs to be a valid number.")
+                            }
+                            val operation = try {
+                                val operationString = attributeJson.get("operation").asString
+                                EntityAttributeModifier.Operation.valueOf(operationString)
+                            } catch (e: Exception){
+                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'value' key [$modifierIdString]. Missing or needs to be a valid number.")
+                            }
+                            val entityAttributeModifier = EntityAttributeModifier(uuid,name,value,operation)
+                            attributeBonuses.computeIfAbsent(key){ArrayListMultimap.create()}.put(attribute,entityAttributeModifier)
                         }
                     }
                 } else {
