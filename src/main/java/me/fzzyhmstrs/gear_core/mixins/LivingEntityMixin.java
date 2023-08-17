@@ -72,4 +72,9 @@ abstract public class LivingEntityMixin implements ActiveGearSetTracking {
         return newAmount;
     }
 
+    @Inject(method = "getEquipmentChanges", at = @At(value = "RETURN"), cancellable = true)
+    private void gear_core_applyGearSetAttributeModifiers(CallbackInfoReturnable<@Nullable Map<EquipmentSlot, ItemStack>> cir){
+        Gearsets.INSTANCE.updateActiveSets((LivingEntity) (Object) this);
+    }
+    
 }
