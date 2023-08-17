@@ -33,7 +33,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import java.util.*
-import kotlin.math.max
 
 object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
@@ -130,7 +129,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val newMap : Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         for (entry in map.entries()){
             if (slot == null){
-                newMap.put(entry.key,entry.value.provideEntityAttributesForTrinkets())
+                newMap.put(entry.key,entry.value.provideNonSlotEntityAttribute())
                 continue
             }
             newMap.put(entry.key,entry.value.provideEntityAttribute(slot))
