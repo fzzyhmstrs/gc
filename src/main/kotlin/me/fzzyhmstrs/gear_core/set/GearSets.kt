@@ -10,9 +10,33 @@ import net.minecraft.util.Identifier
 
 object GearSets: SimpleSynchronousResourceReloadListener {
 
-    private var gearSets: Set<GearSet> = setOf()
-    private var cachedSets: HashMultimap<Item,GearSet> = HashMultimap.create()
+    private val gearSets: MutableSet<GearSet> = mutableSetOf()
+    private val cachedSets: HashMultimap<Item,GearSet> = HashMultimap.create()
+    private val 
 
+    private val GEAR_SET_SENDER = Identifier(GC.MOD_ID,"gear_set_sender")
+    
+    fun registerServer(){
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(this)
+    }
+
+    fun registerClient{
+        ClientPlayNetworking.registerGlobalReceiver(GEAR_SET_SENDER) {client,_,buf,_ ->
+            val jsonString = buf.readString()
+            val json = JsonParser().parse(jsonString).asJsonObject
+            if (buf.readBoolean()){
+                cachedSets.clear()
+                for (item in Registries.ITEM){
+                    for (set in gearSets){
+                        if (set.test(item)){
+                            cachedSets.put(item,set)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     override fun reload(manager: ResourceManager) {
         val gearSets: MutableSet<GearSet> = mutableSetOf()
         manager.findResources("gear_core/sets") { path -> path.path.endsWith(".json") }
@@ -21,6 +45,12 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                 val reader = resource.reader
                 val json = JsonParser.parseReader(reader).asJsonObject
                 gearSets.add(GearSet.fromJson(id, json))
+                if (FabricLoader.getInstance().environmentType == EnvType.SERVER){
+                    val buf = PacketByteBufs.create()
+                    buf.writeString(TODO())
+                    
+                    ServerPlayNetworking.send
+                }
             } catch (e: Exception){
                 e.printStackTrace()
             }
