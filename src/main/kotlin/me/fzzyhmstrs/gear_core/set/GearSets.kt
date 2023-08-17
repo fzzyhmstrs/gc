@@ -35,7 +35,37 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         }
     }
 
-
+    fun updateActiveSets(entity: LivingEntity){
+        val oldActiveMap = (entity as ActiveGearSetTracking).getActiveSets()
+        for (oldSet in oldActiveMap.keySet()){
+            oldSet.removeAttributesFromEntity(entity)
+        }
+        val newActiveMap: HashMap<GearSet,Int> = hashMapOf()
+        for (slot in EquipmentSlot.entries){
+            val stack = entity.getEquippedStack(slot)
+            if (!stack.isEmpty()){
+                val gearSets = cachedSets.get(stack.item)
+                for (gearSet in gearSets){
+                    val num = newActiveMap[gearSet] ?: 0
+                    newActiveMap[gearSet] = num + 1
+                }
+            }
+        }
+        if (TrinketChecker.getTrinketsLoaded()) {
+            val stacks = TrinketUtil.getTrinketStacks(entity)
+            for (stack in stacks) {
+                val gearSets = cachedSets.get(stack.item)
+                for (gearSet in gearSets){
+                    val num = newActiveMap[gearSet] ?: 0
+                    newActiveMap[gearSet] = num + 1
+                }
+            }
+        }
+        for (entry in newActiveMap.entrySet()){
+            entry.key.addAttributesToEntity(entity,entry.value)
+        }
+        (entity as ActiveGearSetTracking).setActiveSets(newActiveMap)
+    }
 
     override fun getFabricId(): Identifier {
         return Identifier(GC.MOD_ID,"gear_sets_loader")
