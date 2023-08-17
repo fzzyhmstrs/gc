@@ -4,7 +4,7 @@ import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import java.util.*
 
-class EntityAttributeModifierContainer(private val name: String, private val amount: Double, private val operation: EntityAttributeModifier.Operation){
+class EntityAttributeModifierContainer(private val name: String, private val amount: Double, private val operation: EntityAttributeModifier.Operation, private val uuid: UUID? = null){
     private val attributes: EnumMap<EquipmentSlot, EntityAttributeModifier> = EnumMap(mapOf(
         EquipmentSlot.MAINHAND to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
         EquipmentSlot.OFFHAND to EntityAttributeModifier(UUID.randomUUID(),name,amount,operation),
@@ -18,7 +18,7 @@ class EntityAttributeModifierContainer(private val name: String, private val amo
         return attributes[slot]?:throw IllegalStateException("slot $slot not found in enum-map for some reason!")
     }
 
-    fun provideEntityAttributesForTrinkets(): EntityAttributeModifier {
-        return EntityAttributeModifier(UUID.randomUUID(),name,amount,operation)
+    fun provideNonSlotEntityAttribute(): EntityAttributeModifier {
+        return EntityAttributeModifier(uuid?:UUID.randomUUID(),name,amount,operation)
     }
 }

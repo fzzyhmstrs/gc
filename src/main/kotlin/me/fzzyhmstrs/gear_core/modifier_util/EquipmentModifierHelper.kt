@@ -128,7 +128,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         val newMap : Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         for (entry in map.entries()){
             if (slot == null){
-                newMap.put(entry.key,entry.value.provideEntityAttributesForTrinkets())
+                newMap.put(entry.key,entry.value.provideNonSlotEntityAttribute())
                 continue
             }
             newMap.put(entry.key,entry.value.provideEntityAttribute(slot))
