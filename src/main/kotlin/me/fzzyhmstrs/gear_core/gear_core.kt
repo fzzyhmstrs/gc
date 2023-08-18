@@ -3,9 +3,15 @@ package me.fzzyhmstrs.gear_core
 import com.llamalad7.mixinextras.MixinExtrasBootstrap
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer
+import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper
+import me.fzzyhmstrs.gear_core.set.GearSets
+import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
+import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint
+import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 
@@ -27,7 +33,19 @@ object GC: ModInitializer {
     }
 
     override fun onInitialize() {
+        GearSets.registerServer()
     }
+}
+
+object GCClient: ClientModInitializer{
+    override fun onInitializeClient() {
+        GearSets.registerClient()
+        ItemTooltipCallback.EVENT.register{stack,context,tooltip ->
+            val player = MinecraftClient.getInstance().player ?: return@register
+            val sets = (player as ActiveGearSetsTracking).gear_core_getActiveSets()
+        }
+    }
+
 }
 
 object GCPreLaunch: PreLaunchEntrypoint {

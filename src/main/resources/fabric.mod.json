@@ -22,6 +22,12 @@
         "value": "me.fzzyhmstrs.gear_core.GC"
       }
     ],
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "me.fzzyhmstrs.gear_core.GCClient"
+      }
+    ],
     "preLaunch": [
       {
         "adapter": "kotlin",
