@@ -30,6 +30,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
     private val setsToSend: MutableMap<Identifier,String> = mutableMapOf()
 
     private val GEAR_SET_SENDER = Identifier(GC.MOD_ID,"gear_set_sender")
+    private val ACTIVE_SET_UPDATE = Identifier(GC.MOD_ID,"active_set_update")
     
     fun registerServer(){
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(this)
@@ -68,6 +69,12 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                 e.printStackTrace()
             }
         }
+        ClientPlayNetworking.registerGlobalReceiver(ACTIVE_SET_UPDATE) { client, _, _, _ ->
+            client.execute {
+                val player = client.player ?: return@execute
+                updateActiveSets(player)
+            }
+        }
     }
     
     override fun reload(manager: ResourceManager) {
@@ -95,8 +102,6 @@ object GearSets: SimpleSynchronousResourceReloadListener {
             }
         }
     }
-
-
 
     fun updateActiveSets(entity: LivingEntity){
         val oldActiveMap = (entity as ActiveGearSetsTracking).gear_core_getActiveSets()
@@ -128,7 +133,9 @@ object GearSets: SimpleSynchronousResourceReloadListener {
             entry.key.addAttributesToEntity(entity,entry.value)
         }
         (entity as ActiveGearSetsTracking).gear_core_setActiveSets(newActiveMap)
-
+        if (FabricLoader.getInstance().environmentType == EnvType.SERVER && entity is ServerPlayerEntity){
+            ServerPlayNetworking.send(entity,ACTIVE_SET_UPDATE,PacketByteBufs.create())
+        }
     }
 
     override fun getFabricId(): Identifier {
