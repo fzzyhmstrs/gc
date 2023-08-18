@@ -33,6 +33,8 @@ class GearSet private constructor(
     private val attributeBonuses: MutableMap<Int, ArrayListMultimap<EntityAttribute,EntityAttributeModifier>>,
     private val modifierBonuses: MutableMap<Int,out List<EquipmentModifier>>) {
 
+    private val levels: Array<Int>
+    
     init{
         //adds all the modifier-based attribute bonuses into the actual attribute map.
         //Modifiers in the set won't actually be applying their own modifiers like normally in the EquipmentModifierHelper, because they aren't "active"
@@ -45,6 +47,10 @@ class GearSet private constructor(
                 }
             }
         }
+        val ints: MutableSet<Int> = mutableSetOf()
+        ints.addAll(attributeBonuses.keys)
+        ints.addAll(modifierBonuses.keys)
+        levels = ints.toIntArray().sort()
     }
     
     fun test(item: Item): Boolean{
@@ -62,6 +68,29 @@ class GearSet private constructor(
     fun removeAttributesFromEntity(entity: LivingEntity){
         for (map in attributeBonuses.values){
             entity.attributes.removeModifiers(map)
+        }
+    }
+
+    fun appendTooltip(level: Int, stack: ItemStack, tooltipContext: TooltipContext, tooltip: MutableList<Text>){
+        tooltip.add(AcText.empty())
+        tooltip.add(AcText.translatable(nameDecorationTranslationKey,AcText.translatable(translationKey).string).formatted(*activeFormatting))
+        for (i in levels){
+            attributeBonuses[i]?.forEach{ attr, mod ->
+                TODO()
+            }
+            modifierBonuses[i]?.forEach{
+                val modNameDesc =  AcText.translatable(getTranslationKeyFromIdentifier(it.modifierId))
+                val modDescDesc = AcText.translatable(getDescTranslationKeyFromIdentifier(it.modifierId)).formatted(Formatting.ITALIC)
+                val modNameDesc = AcText.translatable("gear_core.modifier.colon",modNameDesc, modDescDesc)
+                tooltip.add(AcText.translatable(bonusDecorationTranslationKey,modNameDesc)
+                        .formatted(
+                        if (level >= i){
+                            *activeFormatting
+                        } else {
+                            *inactiveFormatting
+                        }
+                    ))
+            }
         }
     }
     
