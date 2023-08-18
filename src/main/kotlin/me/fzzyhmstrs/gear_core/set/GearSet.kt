@@ -82,7 +82,7 @@ class GearSet private constructor(
                 val modNameDesc =  AcText.translatable(getTranslationKeyFromIdentifier(it.modifierId))
                 val modDescDesc = AcText.translatable(getDescTranslationKeyFromIdentifier(it.modifierId)).formatted(Formatting.ITALIC)
                 val modNameDesc = AcText.translatable("gear_core.modifier.colon",modNameDesc, modDescDesc)
-                tooltip.add(AcText.translatable(bonusDecorationTranslationKey,modNameDesc)
+                tooltip.add(AcText.translatable(bonusDecorationTranslationKey,i,modNameDesc)
                         .formatted(
                         if (level >= i){
                             *activeFormatting
