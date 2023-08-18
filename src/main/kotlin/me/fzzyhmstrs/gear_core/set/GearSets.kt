@@ -75,6 +75,16 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                 updateActiveSets(player)
             }
         }
+        ItemTooltipCallback.EVENT.register{stack,context,tooltip ->
+            val player = MinecraftClient.getInstance().player ?: return@register
+            val displaySets = cachedSets[stack.item]
+            if (displaySets.isEmpty()) return@register
+            val activeSets = (player as ActiveGearSetsTracking).gear_core_getActiveSets()
+            for (displaySet in displaySets){
+                val lvl = activeSets[displaySet] ?: 0
+                displaySet.appendTooltip(lvl,stack,context,tooltip)
+            }
+        }
     }
     
     override fun reload(manager: ResourceManager) {
