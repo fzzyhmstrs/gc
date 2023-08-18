@@ -8,14 +8,18 @@ import com.google.gson.JsonSyntaxException
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.gear_core.modifier_util.EntityAttributeModifierContainer
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier
+import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.Ingredient
+import net.minecraft.registry.Registries
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import java.lang.IllegalStateException
+import java.util.UUID
 import javax.swing.text.html.HTML.Tag.P
 
 class GearSet private constructor(
@@ -26,17 +30,17 @@ class GearSet private constructor(
     private val activeFormatting: Array<Formatting>,
     private val inactiveFormatting: Array<Formatting>,
     private val items: Ingredient,
-    private val attributeBonuses: Map<Int, ArrayListMultimap<EntityAttribute,EntityAttributeModifier>>,
-    private val modifierBonuses: Map<Int,List<EquipmentModifier>>) {
+    private val attributeBonuses: MutableMap<Int, ArrayListMultimap<EntityAttribute,EntityAttributeModifier>>,
+    private val modifierBonuses: MutableMap<Int,out List<EquipmentModifier>>) {
 
     init{
         //adds all the modifier-based attribute bonuses into the actual attribute map.
         //Modifiers in the set won't actually be applying their own modifiers like normally in the EquipmentModifierHelper, because they aren't "active"
         for (entry in modifierBonuses){
-            if (mod.attributeModifiers().isNotEmpty()) {
-                val multiMap = attributeBonuses.computeIfAbsent(entry.key){ArrayListMultimap.create()}
-                for (mod in entry.value){
-                    val modMultiMap = EquipmentModifierHelper.prepareContainerMap(null,mod.attributeModifiers())
+            for (mod in entry.value) {
+                if (!mod.attributeModifiers().isEmpty) {
+                    val multiMap = attributeBonuses.computeIfAbsent(entry.key) { ArrayListMultimap.create() }
+                    val modMultiMap = EquipmentModifierHelper.prepareContainerMap(null, mod.attributeModifiers())
                     multiMap.putAll(modMultiMap)
                 }
             }
@@ -51,13 +55,13 @@ class GearSet private constructor(
         if (level <= 0)
             throw IllegalStateException("GearSet level can't be below 1.")
         for (i in 1..level){
-            val map = attributeBonuses.get(i)?:continue
-            entity.getAttributes().addTemporaryModifiers(map)
+            val map = attributeBonuses[i] ?:continue
+            entity.attributes.addTemporaryModifiers(map)
         }
     }
     fun removeAttributesFromEntity(entity: LivingEntity){
-        for (map in attributeBonuses.values()){
-            entity.getAttributes().removeModifiers(map)
+        for (map in attributeBonuses.values){
+            entity.attributes.removeModifiers(map)
         }
     }
     
@@ -161,25 +165,25 @@ class GearSet private constructor(
                             val attributeJson = b.asJsonObject
                             val attribute = try {
                                 val attributeIdString = attributeJson.get("attribute").asString
-                                val attributeId = Identifier.tryParse(modifierJson)
+                                val attributeId = Identifier.tryParse(attributeIdString)
                                     ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an invalid identifier value [$attributeIdString].")
-                                Registries.ENTITY_ATTRIBUTE.get(attributeId)
+                                Registries.ATTRIBUTE.get(attributeId)
                                     ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an attribute value [$attributeIdString] that can't be found in the attribute registry.")
                             } catch (e: Exception){
                                 throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'attribute' key [$attributeJson]. Missing or needs to be a valid identifier string.")
                             }
-                            val uuid = UUID.randomUuid()
-                            val name = translationKey + Registries.ENTITY_ATTRIBUTE.getId(attribute)
+                            val uuid = UUID.randomUUID()
+                            val name = translationKey + Registries.ATTRIBUTE.getId(attribute)
                             val value = try {
                                attributeJson.get("value").asDouble
                             } catch (e: Exception){
-                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'value' key [$modifierIdString]. Missing or needs to be a valid number.")
+                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with an invalid 'value' key. Missing or needs to be a valid number.")
                             }
                             val operation = try {
                                 val operationString = attributeJson.get("operation").asString
                                 EntityAttributeModifier.Operation.valueOf(operationString)
                             } catch (e: Exception){
-                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'value' key [$modifierIdString]. Missing or needs to be a valid number.")
+                                throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'operation' key. Missing or needs to be a valid number.")
                             }
                             val entityAttributeModifier = EntityAttributeModifier(uuid,name,value,operation)
                             attributeBonuses.computeIfAbsent(key){ArrayListMultimap.create()}.put(attribute,entityAttributeModifier)

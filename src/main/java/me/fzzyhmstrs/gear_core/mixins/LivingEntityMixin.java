@@ -3,22 +3,30 @@ package me.fzzyhmstrs.gear_core.mixins;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
+import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking;
 import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
+import me.fzzyhmstrs.gear_core.set.GearSet;
+import me.fzzyhmstrs.gear_core.set.GearSets;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.DamageTypeTags;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mixin(LivingEntity.class)
-abstract public class LivingEntityMixin implements ActiveGearSetTracking {
+abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
 
     @Shadow
     public abstract Iterable<ItemStack> getArmorItems();
@@ -26,13 +34,15 @@ abstract public class LivingEntityMixin implements ActiveGearSetTracking {
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
  
     @Unique
-    private HashMap<GearSet,Int> gear_core_activeGearSets = new MashMap(4,0.75f);
+    private HashMap<GearSet,Integer> gear_core_activeGearSets = new HashMap<>(4,0.75f);
     
     @Override
-    void setActiveSets(HashMap<GearSet,Int> sets){
+    public void gear_core_setActiveSets(HashMap<GearSet, Integer> sets){
         gear_core_activeGearSets = sets;
     }
-    HashMap<GearSet,Int> getActiveSets(){
+
+    @Override
+    public HashMap<GearSet,Integer> gear_core_getActiveSets(){
         return gear_core_activeGearSets;
     }
     
@@ -73,9 +83,9 @@ abstract public class LivingEntityMixin implements ActiveGearSetTracking {
         return newAmount;
     }
 
-    @Inject(method = "getEquipmentChanges", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(method = "getEquipmentChanges", at = @At(value = "RETURN"))
     private void gear_core_applyGearSetAttributeModifiers(CallbackInfoReturnable<@Nullable Map<EquipmentSlot, ItemStack>> cir){
-        Gearsets.INSTANCE.updateActiveSets((LivingEntity) (Object) this);
+        GearSets.INSTANCE.updateActiveSets((LivingEntity) (Object) this);
     }
     
 }
