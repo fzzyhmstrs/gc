@@ -40,10 +40,6 @@ object GC: ModInitializer {
 object GCClient: ClientModInitializer{
     override fun onInitializeClient() {
         GearSets.registerClient()
-        ItemTooltipCallback.EVENT.register{stack,context,tooltip ->
-            val player = MinecraftClient.getInstance().player ?: return@register
-            val sets = (player as ActiveGearSetsTracking).gear_core_getActiveSets()
-        }
     }
 
 }
