@@ -51,7 +51,25 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
 
     override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound, list: List<Identifier>) {
         fixUpOldNbt(nbt)
-        super.initializeModifiers(stack, nbt, list)
+        if (list.isNotEmpty()){
+            if (!nbt.contains("gear_mod_init_" + stack.translationKey)){
+                if (nbt.contains(getType().getModifiersKey())){
+                    list.forEach{
+                        addModifier(it,stack,nbt)
+                    }
+                } else{
+                    list.forEach{
+                        addModifierToNbt(it,nbt)
+                    }
+                }
+                nbt.putBoolean("gear_mod_init_" + stack.translationKey,true)
+            }
+        }
+        if (nbt.contains(getType().getModifiersKey())){
+            val id = Nbt.makeItemStackId(stack)
+            initializeModifiers(nbt, id)
+            gatherActiveModifiers(stack)
+        }
     }
 
     // attempt to carry over modifiers stored under the now non-generic nbt keys into the new keys
