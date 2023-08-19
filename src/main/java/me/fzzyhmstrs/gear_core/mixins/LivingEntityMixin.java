@@ -5,6 +5,7 @@ import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking;
 import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
+import me.fzzyhmstrs.gear_core.interfaces.TickTracking;
 import me.fzzyhmstrs.gear_core.set.GearSet;
 import me.fzzyhmstrs.gear_core.set.GearSets;
 import net.minecraft.entity.EquipmentSlot;
@@ -79,12 +80,40 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (offhand.getItem() instanceof DamageTracking damageTrackingItem){
             newAmount = damageTrackingItem.onWearerDamaged(offhand, (LivingEntity) (Object) this, livingEntity,source,newAmount);
         }
+        newAmount = GearSets.INSTANCE.processOnDamaged(newAmount,source,(LivingEntity) (Object) this, livingEntity);
         return newAmount;
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void gear_core_invokeTick(CallbackInfo ci){
+        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+            List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
+            for (ItemStack stack : stacks) {
+                if (stack.getItem() instanceof TickTracking tickTrackingItem) {
+                    tickTrackingItem.onTick(stack, (LivingEntity) (Object) this, null);
+                }
+            }
+        }
+        for(ItemStack stack : this.getArmorItems()) {
+            if (stack.getItem() instanceof TickTracking tickTrackingItem){
+                tickTrackingItem.onTick(stack, (LivingEntity) (Object) this, null);
+            }
+        }
+        ItemStack mainhand = this.getEquippedStack(EquipmentSlot.MAINHAND);
+        if (mainhand.getItem() instanceof TickTracking tickTrackingItem){
+            tickTrackingItem.onTick(mainhand, (LivingEntity) (Object) this, null);
+        }
+        ItemStack offhand = this.getEquippedStack(EquipmentSlot.OFFHAND);
+        if (offhand.getItem() instanceof TickTracking tickTrackingItem){
+            tickTrackingItem.onTick(offhand, (LivingEntity) (Object) this, null);
+        }
+        GearSets.INSTANCE.processTick((LivingEntity) (Object) this);
     }
 
     @Inject(method = "getEquipmentChanges", at = @At(value = "RETURN"))
     private void gear_core_applyGearSetAttributeModifiers(CallbackInfoReturnable<@Nullable Map<EquipmentSlot, ItemStack>> cir){
-        GearSets.INSTANCE.updateActiveSets((LivingEntity) (Object) this);
+        if (!(cir.getReturnValue() == null || cir.getReturnValue().isEmpty()))
+            GearSets.INSTANCE.updateActiveSets((LivingEntity) (Object) this);
     }
     
 }

@@ -33,8 +33,11 @@ open class EquipmentModifier(
     val weight: Int = 10,
     val rarity: Rarity = Rarity.COMMON,
     private val persistent: Boolean = false,
-    private val randomSelectable: Boolean = true): AbstractModifier<EquipmentModifier>(modifierId) {
-    
+    private val randomSelectable: Boolean = true): AbstractModifier<EquipmentModifier>(modifierId)
+{
+
+    private var customFormatting: Array<out Formatting> = arrayOf()
+
     open fun randomlySelectable(): Boolean{
         return randomSelectable
     }
@@ -42,7 +45,15 @@ open class EquipmentModifier(
     open fun isPersistent(): Boolean{
         return persistent
     }
-    
+
+    open fun getFormatting(): Array<out Formatting> {
+        return if (customFormatting.isEmpty()){
+            rarity.formatting
+        } else {
+            customFormatting
+        }
+    }
+
     init{
         EquipmentModifierHelper.addToTargetMap(this)
     }
@@ -72,9 +83,14 @@ open class EquipmentModifier(
         return this
     }
 
+    fun withCustomFormatting(vararg formatting: Formatting): EquipmentModifier{
+        customFormatting = formatting
+        return this
+    }
+
     @Deprecated("uuid field no longer necessary, as attributes will be rebuilt with slot-appropriate UUIDs during modifier compilation")
     fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
-        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation,uuid)
+        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation, UUID.fromString(uuid))
         attributeModifiers.put(attribute,modifier)
         return this
     }

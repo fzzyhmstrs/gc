@@ -3,6 +3,7 @@ package me.fzzyhmstrs.gear_core.mixins;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
+import me.fzzyhmstrs.gear_core.set.GearSets;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -45,6 +46,7 @@ public abstract class PlayerEntityMixin {
         if (offhand.getItem() instanceof KillTracking killTrackingItem){
             killTrackingItem.onWearerKilledOther(offhand, (LivingEntity) (Object) this, livingEntity, world);
         }
+        GearSets.INSTANCE.processOnKilledOther((PlayerEntity) (Object) this, livingEntity);
     }
 
 }
