@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin({ToolItem.class, TridentItem.class})
-public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTracking, UseTracking, AttributeTracking, Modifiable {
+public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTracking, UseTracking, AttributeTracking,TickTracking, Modifiable {
     
     @Override 
     public boolean correctSlot(EquipmentSlot slot){

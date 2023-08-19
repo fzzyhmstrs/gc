@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin(ArmorItem.class)
-public abstract class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, AttributeTracking, Modifiable {
+public abstract class ArmorItemMixin implements HitTracking, KillTracking, MineTracking, DamageTracking, ModifierTracking, AttributeTracking,TickTracking, Modifiable {
 
     @Shadow
     public abstract EquipmentSlot getSlotType();

@@ -5,10 +5,7 @@ import dev.emi.trinkets.api.Trinket;
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
-import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking;
-import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
-import me.fzzyhmstrs.gear_core.interfaces.HitTracking;
-import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
+import me.fzzyhmstrs.gear_core.interfaces.*;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -26,7 +23,7 @@ import java.util.List;
 
 @Pseudo
 @Mixin(Trinket.class)
-public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, DamageTracking, AttributeTracking {
+public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, DamageTracking, AttributeTracking, TickTracking {
     @Inject(method = "onEquip", at = @At("TAIL"))
     private void gear_core_processOnEquipForAugments(ItemStack stack, SlotReference slot, LivingEntity entity, CallbackInfo ci){
             EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);
