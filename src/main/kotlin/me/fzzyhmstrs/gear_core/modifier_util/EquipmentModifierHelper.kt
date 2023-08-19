@@ -41,7 +41,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val processors: MutableList<ModifierProcessor> = mutableListOf()
 
     private val DEFAULT_MODIFIER_TOLL = BinomialLootNumberProvider.create(25,0.24f)
-    private val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
+    internal val BLANK_EQUIPMENT_MOD = EquipmentModifier(BLANK)
     private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
     private const val OLD_MODIFIERS_KEY = "modifiers"
     private const val OLD_MODIFIER_ID_KEY = "modifier_id"
@@ -160,7 +160,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             tooltip.add(
                 AcText.translatable("gear_core.modifier.colon", AcText.translatable(getTranslationKeyFromIdentifier(it)).string, AcText.translatable(
                     getDescTranslationKeyFromIdentifier(it)
-                ).formatted(Formatting.ITALIC)).formatted(*mod.rarity.formatting)
+                ).formatted(Formatting.ITALIC)).formatted(*mod.getFormatting())
             )
         }
     }
