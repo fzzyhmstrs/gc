@@ -3,10 +3,7 @@ package me.fzzyhmstrs.gear_core.mixins;
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
-import me.fzzyhmstrs.gear_core.interfaces.AttributeTracking;
-import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
-import me.fzzyhmstrs.gear_core.interfaces.HitTracking;
-import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
+import me.fzzyhmstrs.gear_core.interfaces.*;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EquipmentSlot;
@@ -21,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Mixin(ShieldItem.class)
-public class ShieldItemMixin implements HitTracking, KillTracking, DamageTracking, AttributeTracking, Modifiable {
+public class ShieldItemMixin implements HitTracking, KillTracking, DamageTracking, AttributeTracking, TickTracking, Modifiable {
     
     @Override
     public boolean correctSlot(EquipmentSlot slot){

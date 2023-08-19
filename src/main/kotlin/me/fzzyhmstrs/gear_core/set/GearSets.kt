@@ -7,7 +7,11 @@ import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil
 import me.fzzyhmstrs.gear_core.GC
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking
+import me.fzzyhmstrs.gear_core.set.GearSets.ACTIVE_SET_UPDATE
+import me.fzzyhmstrs.gear_core.set.GearSets.cachedSets
+import me.fzzyhmstrs.gear_core.set.GearSets.setsToSend
 import net.fabricmc.api.EnvType
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -15,13 +19,21 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.block.BlockState
+import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.registry.Registries
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceType
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 
 object GearSets: SimpleSynchronousResourceReloadListener {
 
@@ -49,24 +61,27 @@ object GearSets: SimpleSynchronousResourceReloadListener {
     }
 
     fun registerClient(){
-        ClientPlayNetworking.registerGlobalReceiver(GEAR_SET_SENDER) { _, _, buf, _ ->
+        ClientPlayNetworking.registerGlobalReceiver(GEAR_SET_SENDER) { client, _, buf, _ ->
             val id = buf.readIdentifier()
             val jsonString = buf.readString()
-            try {
-                val json = JsonParser.parseString(jsonString).asJsonObject
-                gearSets[id] = (GearSet.fromJson(id, json))
-                if (buf.readBoolean()) {
-                    cachedSets.clear()
-                    for (item in Registries.ITEM) {
-                        for (set in gearSets.values) {
-                            if (set.test(item)) {
-                                cachedSets.put(item, set)
+            val bl = buf.readBoolean()
+            client.execute {
+                try {
+                    val json = JsonParser.parseString(jsonString).asJsonObject
+                    gearSets[id] = (GearSet.fromJson(id, json))
+                    if (bl) {
+                        cachedSets.clear()
+                        for (item in Registries.ITEM) {
+                            for (set in gearSets.values) {
+                                if (set.test(item)) {
+                                    cachedSets.put(item, set)
+                                }
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-            } catch (e: Exception){
-                e.printStackTrace()
             }
         }
         ClientPlayNetworking.registerGlobalReceiver(ACTIVE_SET_UPDATE) { client, _, _, _ ->
@@ -75,7 +90,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                 updateActiveSets(player)
             }
         }
-        ItemTooltipCallback.EVENT.register{stack,context,tooltip ->
+        ItemTooltipCallback.EVENT.register{ stack, context, tooltip ->
             val player = MinecraftClient.getInstance().player ?: return@register
             val displaySets = cachedSets[stack.item]
             if (displaySets.isEmpty()) return@register
@@ -89,12 +104,13 @@ object GearSets: SimpleSynchronousResourceReloadListener {
     
     override fun reload(manager: ResourceManager) {
         val gearSets: MutableSet<GearSet> = mutableSetOf()
-        val files = manager.findResources("gear_core/sets") { path -> path.path.endsWith(".json") }
+        val files = manager.findResources("gear_core_sets") { path -> path.path.endsWith(".json") }
         val gson = Gson()
         for (mutableEntry in files.entries) {
             try {
                 val reader = mutableEntry.value.reader
                 val json = JsonParser.parseReader(reader).asJsonObject
+                println("reading set: $json")
                 gearSets.add(GearSet.fromJson(mutableEntry.key, json))
                 if (FabricLoader.getInstance().environmentType == EnvType.SERVER){
                     setsToSend[mutableEntry.key] = gson.toJson(reader)
@@ -104,6 +120,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
             }
         }
         cachedSets.clear()
+        println("Caching sets")
         for (item in Registries.ITEM){
             for (set in gearSets){
                 if (set.test(item)){
@@ -143,8 +160,53 @@ object GearSets: SimpleSynchronousResourceReloadListener {
             entry.key.addAttributesToEntity(entity,entry.value)
         }
         (entity as ActiveGearSetsTracking).gear_core_setActiveSets(newActiveMap)
-        if (FabricLoader.getInstance().environmentType == EnvType.SERVER && entity is ServerPlayerEntity){
+        //println(newActiveMap)
+        if (entity is ServerPlayerEntity){
             ServerPlayNetworking.send(entity,ACTIVE_SET_UPDATE,PacketByteBufs.create())
+        }
+    }
+
+    fun processPostHit(target: LivingEntity, attacker: PlayerEntity){
+        val activeGearSets = (attacker as ActiveGearSetsTracking).gear_core_getActiveSets()
+        for (activeGearSet in activeGearSets){
+            activeGearSet.key.processPostHit(activeGearSet.value,target, attacker)
+        }
+    }
+
+    fun processPostMine(world: World, state: BlockState, pos: BlockPos, miner: PlayerEntity){
+        val activeGearSets = (miner as ActiveGearSetsTracking).gear_core_getActiveSets()
+        for (activeGearSet in activeGearSets){
+            activeGearSet.key.processPostMine(activeGearSet.value,world, state, pos, miner)
+        }
+    }
+
+    fun processOnUse(hand: Hand, user: PlayerEntity){
+        val activeGearSets = (user as ActiveGearSetsTracking).gear_core_getActiveSets()
+        for (activeGearSet in activeGearSets){
+            activeGearSet.key.processOnUse(activeGearSet.value, hand, user)
+        }
+    }
+
+    fun processOnDamaged(amount: Float, source: DamageSource, entity: LivingEntity, attacker: LivingEntity?): Float{
+        val activeGearSets = (entity as ActiveGearSetsTracking).gear_core_getActiveSets()
+        var newAmount = amount
+        for (activeGearSet in activeGearSets){
+            newAmount = activeGearSet.key.processOnDamaged(activeGearSet.value,newAmount, source, entity, attacker)
+        }
+        return newAmount
+    }
+
+    fun processOnKilledOther(playerEntity: PlayerEntity, victim: LivingEntity?){
+        val activeGearSets = (playerEntity as ActiveGearSetsTracking).gear_core_getActiveSets()
+        for (activeGearSet in activeGearSets){
+            activeGearSet.key.processOnKilledOther(activeGearSet.value,playerEntity, victim)
+        }
+    }
+
+    fun processTick(entity: LivingEntity){
+        val activeGearSets = (entity as ActiveGearSetsTracking).gear_core_getActiveSets()
+        for (activeGearSet in activeGearSets){
+            activeGearSet.key.processTick(activeGearSet.value,entity)
         }
     }
 

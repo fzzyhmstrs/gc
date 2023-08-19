@@ -65,7 +65,8 @@
         "me/fzzyhmstrs/gear_core/interfaces/KillTracking",
         "me/fzzyhmstrs/gear_core/interfaces/MineTracking",
         "me/fzzyhmstrs/gear_core/interfaces/DamageTracking",
-        "me/fzzyhmstrs/gear_core/interfaces/ModifierTracking"
+        "me/fzzyhmstrs/gear_core/interfaces/ModifierTracking",
+        "me/fzzyhmstrs/gear_core/interfaces/TickTracking"
       ],
       "net/minecraft/class_1799": [
         "me/fzzyhmstrs/gear_core/interfaces/DurabilityTracking"
