@@ -28,6 +28,12 @@
         "value": "me.fzzyhmstrs.gear_core.GCClient"
       }
     ],
+    "emi": [
+      {
+        "adapter": "kotlin",
+        "value": "me.fzzyhmstrs.gear_core.compat.emi.EmiClientPlugin"
+      }
+    ],
     "preLaunch": [
       {
         "adapter": "kotlin",
