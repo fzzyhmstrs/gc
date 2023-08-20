@@ -44,6 +44,10 @@ dependencies {
     val fabricKotlinVersion: String by project
     modImplementation("net.fabricmc:fabric-language-kotlin:$fabricKotlinVersion")
 
+    val emiVersion: String by project
+    modCompileOnly ("dev.emi:emi-fabric:${emiVersion}:api")
+    modLocalRuntime ("dev.emi:emi-fabric:${emiVersion}")
+
     val trinketsVersion: String by project
     modImplementation("dev.emi:trinkets:$trinketsVersion"){
         exclude("net.fabricmc.fabric-api")

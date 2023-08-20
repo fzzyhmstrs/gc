@@ -103,15 +103,15 @@ object GearSets: SimpleSynchronousResourceReloadListener {
     }
     
     override fun reload(manager: ResourceManager) {
-        val gearSets: MutableSet<GearSet> = mutableSetOf()
         val files = manager.findResources("gear_core_sets") { path -> path.path.endsWith(".json") }
         val gson = Gson()
         for (mutableEntry in files.entries) {
             try {
                 val reader = mutableEntry.value.reader
                 val json = JsonParser.parseReader(reader).asJsonObject
-                println("reading set: $json")
-                gearSets.add(GearSet.fromJson(mutableEntry.key, json))
+                println("reading set: ${mutableEntry.key}")
+                val gearSet = GearSet.fromJson(mutableEntry.key, json)
+                gearSets[mutableEntry.key] = gearSet
                 if (FabricLoader.getInstance().environmentType == EnvType.SERVER){
                     setsToSend[mutableEntry.key] = gson.toJson(reader)
                 }
@@ -122,12 +122,16 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         cachedSets.clear()
         println("Caching sets")
         for (item in Registries.ITEM){
-            for (set in gearSets){
+            for (set in gearSets.values){
                 if (set.test(item)){
                     cachedSets.put(item,set)
                 }
             }
         }
+    }
+
+    fun getGearSets(): Map<Identifier,GearSet>{
+        return gearSets
     }
 
     fun updateActiveSets(entity: LivingEntity){
@@ -185,6 +189,15 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         for (activeGearSet in activeGearSets){
             activeGearSet.key.processOnUse(activeGearSet.value, hand, user)
         }
+    }
+
+    fun processOnAttack(amount: Float, source: DamageSource, entity: LivingEntity, attacker: LivingEntity?): Float{
+        val activeGearSets = (entity as ActiveGearSetsTracking).gear_core_getActiveSets()
+        var newAmount = amount
+        for (activeGearSet in activeGearSets){
+            newAmount = activeGearSet.key.processOnAttack(activeGearSet.value,newAmount, source, entity, attacker)
+        }
+        return newAmount
     }
 
     fun processOnDamaged(amount: Float, source: DamageSource, entity: LivingEntity, attacker: LivingEntity?): Float{
