@@ -63,6 +63,7 @@ open class EquipmentModifier(
     private val postHitConsumers: MutableList<ToolConsumer> = mutableListOf()
     private val postMineConsumers: MutableList<MiningConsumer> = mutableListOf()
     private val onUseConsumers: MutableList<ToolConsumer> = mutableListOf()
+    private val onAttackFunctions: MutableList<DamageFunction> = mutableListOf()
     private val onDamagedFunctions: MutableList<DamageFunction> = mutableListOf()
     private val killOtherConsumers: MutableList<ToolConsumer> = mutableListOf()
     private val tickConsumers: MutableList<ToolConsumer> = mutableListOf()
@@ -76,6 +77,7 @@ open class EquipmentModifier(
         postHitConsumers.addAll(other.postHitConsumers)
         postMineConsumers.addAll(other.postMineConsumers)
         onUseConsumers.addAll(other.onUseConsumers)
+        onAttackFunctions.addAll(other.onAttackFunctions)
         onDamagedFunctions.addAll(other.onDamagedFunctions)
         killOtherConsumers.addAll(other.killOtherConsumers)
         tickConsumers.addAll(other.tickConsumers)
@@ -161,6 +163,19 @@ open class EquipmentModifier(
         onUseConsumers.forEach {
             it.apply(stack, user, target)
         }
+    }
+
+    fun withOnAttack(onAttack: DamageFunction): EquipmentModifier {
+        onAttackFunctions.add(onAttack)
+        return this
+    }
+
+    fun onAttack(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
+        var newAmount = amount
+        onAttackFunctions.forEach {
+            newAmount = it.test(stack, user, attacker, source, newAmount)
+        }
+        return newAmount
     }
 
     fun withOnDamaged(onDamaged: DamageFunction): EquipmentModifier {
