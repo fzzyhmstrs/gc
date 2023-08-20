@@ -17,8 +17,6 @@ object EmiClientPlugin: EmiPlugin {
 
         registry.addCategory(GEAR_SET_CATEGORY)
 
-        println(GearSets.getGearSets())
-
         for (entry in GearSets.getGearSets()){
             registry.addRecipe(GearSetEmiRecipe(entry.key,entry.value))
         }
