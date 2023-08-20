@@ -125,6 +125,14 @@ class GearSet private constructor(
         }
     }
 
+    fun processOnAttack(level: Int,amount: Float, source: DamageSource, entity: LivingEntity, attacker: LivingEntity?): Float{
+        var newAmount = amount
+        for (i in 1..level){
+            newAmount = modifierBonuses[i]?.compiledData?.onAttack(ItemStack.EMPTY,entity,attacker, source, newAmount) ?: newAmount
+        }
+        return newAmount
+    }
+
     fun processOnDamaged(level: Int,amount: Float, source: DamageSource, entity: LivingEntity, attacker: LivingEntity?): Float{
         var newAmount = amount
         for (i in 1..level){
@@ -144,7 +152,11 @@ class GearSet private constructor(
             modifierBonuses[i]?.compiledData?.tick(ItemStack.EMPTY, entity, null)
         }
     }
-    
+
+    fun getStacks(): Array<ItemStack>{
+        return items.matchingStacks
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
         if (other !is GearSet) return false
