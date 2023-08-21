@@ -21,7 +21,7 @@ class GearSetEmiRecipe(private val id: Identifier, set: GearSet): EmiRecipe {
 
     init{
         val list = mutableListOf<Text>()
-        set.appendTooltip(0, ItemStack.EMPTY, TooltipContext.BASIC, list)
+        set.appendTooltip(0, ItemStack.EMPTY, TooltipContext.Default.NORMAL, list)
         val list2 = mutableListOf<OrderedText>()
         for (tip in list){
             list2 .addAll(MinecraftClient.getInstance().textRenderer.wrapLines(tip,160))

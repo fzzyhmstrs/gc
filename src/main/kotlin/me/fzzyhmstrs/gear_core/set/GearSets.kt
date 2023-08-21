@@ -26,13 +26,13 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
-import net.minecraft.registry.Registries
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 
 object GearSets: SimpleSynchronousResourceReloadListener {
@@ -71,7 +71,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                     gearSets[id] = (GearSet.fromJson(id, json))
                     if (bl) {
                         cachedSets.clear()
-                        for (item in Registries.ITEM) {
+                        for (item in Registry.ITEM) {
                             for (set in gearSets.values) {
                                 if (set.test(item)) {
                                     cachedSets.put(item, set)
@@ -121,7 +121,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         }
         cachedSets.clear()
         println("Caching sets")
-        for (item in Registries.ITEM){
+        for (item in Registry.ITEM){
             for (set in gearSets.values){
                 if (set.test(item)){
                     cachedSets.put(item,set)

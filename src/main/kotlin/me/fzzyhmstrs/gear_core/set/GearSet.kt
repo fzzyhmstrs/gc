@@ -19,12 +19,12 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.Ingredient
-import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import java.util.*
 
@@ -249,13 +249,13 @@ class GearSet private constructor(
                         val attributeIdString = attributeJson.get("attribute").asString
                         val attributeId = Identifier.tryParse(attributeIdString)
                             ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an invalid identifier value [$attributeIdString].")
-                        Registries.ATTRIBUTE.get(attributeId)
+                        Registry.ATTRIBUTE.get(attributeId)
                             ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an attribute value [$attributeIdString] that can't be found in the attribute registry.")
                     } catch (e: Exception){
                         throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'attribute' key [$attributeJson]. Missing or needs to be a valid identifier string.")
                     }
                     val uuid = UUID.randomUUID()
-                    val name = translationKey + Registries.ATTRIBUTE.getId(attribute)
+                    val name = translationKey + Registry.ATTRIBUTE.getId(attribute)
                     val value = try {
                         attributeJson.get("amount").asDouble
                     } catch (e: Exception){
@@ -285,13 +285,13 @@ class GearSet private constructor(
                                 val attributeIdString = attributeJson.get("attribute").asString
                                 val attributeId = Identifier.tryParse(attributeIdString)
                                     ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an invalid identifier value [$attributeIdString].")
-                                Registries.ATTRIBUTE.get(attributeId)
+                                Registry.ATTRIBUTE.get(attributeId)
                                     ?: throw IllegalStateException("Gear Set [$id] has an attribute bonus with an attribute value [$attributeIdString] that can't be found in the attribute registry.")
                             } catch (e: Exception){
                                 throw IllegalStateException("Gear Set [$id] has an attribute bonus with aan invalid 'attribute' key [$attributeJson]. Missing or needs to be a valid identifier string.")
                             }
                             val uuid = UUID.randomUUID()
-                            val name = translationKey + Registries.ATTRIBUTE.getId(attribute)
+                            val name = translationKey + Registry.ATTRIBUTE.getId(attribute)
                             val value = try {
                                attributeJson.get("amount").asDouble
                             } catch (e: Exception){
