@@ -1,22 +1,23 @@
 package me.fzzyhmstrs.gear_core.set
 
 import com.google.common.collect.HashMultimap
+import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import dev.emi.trinkets.data.SlotLoader
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil
 import me.fzzyhmstrs.gear_core.GC
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking
-import me.fzzyhmstrs.gear_core.set.GearSets.ACTIVE_SET_UPDATE
-import me.fzzyhmstrs.gear_core.set.GearSets.cachedSets
-import me.fzzyhmstrs.gear_core.set.GearSets.setsToSend
 import net.fabricmc.api.EnvType
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.block.BlockState
@@ -26,6 +27,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
+import net.minecraft.item.Items
 import net.minecraft.registry.Registries
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceType
@@ -40,13 +42,19 @@ object GearSets: SimpleSynchronousResourceReloadListener {
     private val gearSets: MutableMap<Identifier,GearSet> = mutableMapOf()
     private val cachedSets: HashMultimap<Item,GearSet> = HashMultimap.create()
     private val setsToSend: MutableMap<Identifier,String> = mutableMapOf()
+    private val cachedSetsToSend: HashMultimap<Identifier,Identifier> = HashMultimap.create()
 
     private val GEAR_SET_SENDER = Identifier(GC.MOD_ID,"gear_set_sender")
     private val ACTIVE_SET_UPDATE = Identifier(GC.MOD_ID,"active_set_update")
-    
+
+    override fun getFabricDependencies(): Collection<Identifier?>? {
+        return Lists.newArrayList(ResourceReloadListenerKeys.TAGS)
+    }
+
     fun registerServer(){
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(this)
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register{ server,_,_->
+            getCachedSets()
             val maxIndex = setsToSend.size - 1
             for (player in server.playerManager.playerList){
                 setsToSend.entries.forEachIndexed{ index, entry ->
@@ -54,8 +62,39 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                     buf.writeIdentifier(entry.key)
                     buf.writeString(entry.value)
                     buf.writeBoolean(index == maxIndex)
+                    if (index == maxIndex){
+                        buf.writeInt(cachedSetsToSend.asMap().size)
+                        for (cachedSet in cachedSetsToSend.asMap().entries){
+                            buf.writeIdentifier(cachedSet.key)
+                            buf.writeInt(cachedSet.value.size)
+                            for (set in cachedSet.value){
+                                buf.writeIdentifier(set)
+                            }
+                        }
+                    }
                     ServerPlayNetworking.send(player, GEAR_SET_SENDER,buf)
                 }
+            }
+        }
+        ServerPlayConnectionEvents.JOIN.register{handler,_,_->
+            getCachedSets()
+            val maxIndex = setsToSend.size - 1
+            setsToSend.entries.forEachIndexed{ index, entry ->
+                val buf = PacketByteBufs.create()
+                buf.writeIdentifier(entry.key)
+                buf.writeString(entry.value)
+                buf.writeBoolean(index == maxIndex)
+                if (index == maxIndex){
+                    buf.writeInt(cachedSetsToSend.asMap().size)
+                    for (cachedSet in cachedSetsToSend.asMap().entries){
+                        buf.writeIdentifier(cachedSet.key)
+                        buf.writeInt(cachedSet.value.size)
+                        for (set in cachedSet.value){
+                            buf.writeIdentifier(set)
+                        }
+                    }
+                }
+                ServerPlayNetworking.send(handler.player, GEAR_SET_SENDER, buf)
             }
         }
     }
@@ -65,18 +104,32 @@ object GearSets: SimpleSynchronousResourceReloadListener {
             val id = buf.readIdentifier()
             val jsonString = buf.readString()
             val bl = buf.readBoolean()
+            val syncedCachedSets = if (bl){
+                val hashMap: HashMultimap<Identifier,Identifier> = HashMultimap.create()
+                val size1 = buf.readInt()
+                for (i in 1..size1){
+                    val itemId = buf.readIdentifier()
+                    val size2 = buf.readInt()
+                    for (j in 1..size2){
+                        val setId = buf.readIdentifier()
+                        hashMap.put(itemId,setId)
+                    }
+                }
+                hashMap
+            } else {
+                HashMultimap.create()
+            }
             client.execute {
                 try {
+                    println("Parsing Client set $id")
                     val json = JsonParser.parseString(jsonString).asJsonObject
                     gearSets[id] = (GearSet.fromJson(id, json))
                     if (bl) {
                         cachedSets.clear()
-                        for (item in Registries.ITEM) {
-                            for (set in gearSets.values) {
-                                if (set.test(item)) {
-                                    cachedSets.put(item, set)
-                                }
-                            }
+                        for (entry in syncedCachedSets.entries()){
+                            val set = gearSets[entry.value] ?: continue
+                            val item = Registries.ITEM.get(entry.key).takeIf { it != Items.AIR } ?: continue
+                            cachedSets.put(item,set)
                         }
                     }
                 } catch (e: Exception) {
@@ -92,7 +145,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         }
         ItemTooltipCallback.EVENT.register{ stack, context, tooltip ->
             val player = MinecraftClient.getInstance().player ?: return@register
-            val displaySets = cachedSets[stack.item]
+            val displaySets = getCachedSets()[stack.item]
             if (displaySets.isEmpty()) return@register
             val activeSets = (player as ActiveGearSetsTracking).gear_core_getActiveSets()
             for (displaySet in displaySets){
@@ -113,18 +166,33 @@ object GearSets: SimpleSynchronousResourceReloadListener {
                 val gearSet = GearSet.fromJson(mutableEntry.key, json)
                 gearSets[mutableEntry.key] = gearSet
                 if (FabricLoader.getInstance().environmentType == EnvType.SERVER){
-                    setsToSend[mutableEntry.key] = gson.toJson(reader)
+                    setsToSend[mutableEntry.key] = gson.toJson(json)
                 }
             } catch (e: Exception){
                 e.printStackTrace()
             }
         }
         cachedSets.clear()
+        cachedSetsToSend.clear()
+    }
+
+    private fun getCachedSets(): HashMultimap<Item,GearSet>{
+        if (cachedSets.isEmpty)
+            cacheSets()
+        return cachedSets
+    }
+
+    private fun cacheSets(){
+        cachedSets.clear()
+        cachedSetsToSend.clear()
         println("Caching sets")
         for (item in Registries.ITEM){
             for (set in gearSets.values){
                 if (set.test(item)){
                     cachedSets.put(item,set)
+                    if (FabricLoader.getInstance().environmentType == EnvType.SERVER){
+                        cachedSetsToSend.put(Registries.ITEM.getId(item),set.id)
+                    }
                 }
             }
         }
@@ -143,7 +211,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         for (slot in EquipmentSlot.values()){
             val stack = entity.getEquippedStack(slot)
             if (!stack.isEmpty){
-                val gearSets = cachedSets.get(stack.item)
+                val gearSets = getCachedSets().get(stack.item)
                 for (gearSet in gearSets){
                     val num = newActiveMap[gearSet] ?: 0
                     newActiveMap[gearSet] = num + 1
@@ -153,7 +221,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         if (TrinketChecker.trinketsLoaded) {
             val stacks = TrinketUtil.getTrinketStacks(entity)
             for (stack in stacks) {
-                val gearSets = cachedSets.get(stack.item)
+                val gearSets = getCachedSets().get(stack.item)
                 for (gearSet in gearSets){
                     val num = newActiveMap[gearSet] ?: 0
                     newActiveMap[gearSet] = num + 1
