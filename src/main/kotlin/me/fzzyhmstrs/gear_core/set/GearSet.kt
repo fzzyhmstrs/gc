@@ -35,7 +35,7 @@ class GearSet private constructor(
     private val bonusDecorationTranslationKey: String,
     private val activeFormatting: Array<Formatting>,
     private val inactiveFormatting: Array<Formatting>,
-    private val items: Ingredient,
+    private val items: SetIngredient,
     private val attributeBonuses: MutableMap<Int, ArrayListMultimap<EntityAttribute,EntityAttributeModifier>>,
     private val modifierBonuses: MutableMap<Int,AbstractModifier.CompiledModifiers<EquipmentModifier>>) {
 
@@ -217,7 +217,7 @@ class GearSet private constructor(
                 listOf(Formatting.DARK_GRAY)
             }
             val items = try {
-                Ingredient.fromJson(json.get("items"))
+                SetIngredient.fromJson(json.get("items"))
             } catch (e: JsonSyntaxException){
                 throw IllegalStateException("Gear Set [$id] has an 'items' member that isn't a properly formatted Ingredient: [${e.localizedMessage}].")
             }
