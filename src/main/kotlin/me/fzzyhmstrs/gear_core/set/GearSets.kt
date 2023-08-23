@@ -1,10 +1,8 @@
 package me.fzzyhmstrs.gear_core.set
 
 import com.google.common.collect.HashMultimap
-import com.google.common.collect.Lists
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import dev.emi.trinkets.data.SlotLoader
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil
 import me.fzzyhmstrs.gear_core.GC
@@ -17,7 +15,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.block.BlockState
@@ -46,10 +43,6 @@ object GearSets: SimpleSynchronousResourceReloadListener {
 
     private val GEAR_SET_SENDER = Identifier(GC.MOD_ID,"gear_set_sender")
     private val ACTIVE_SET_UPDATE = Identifier(GC.MOD_ID,"active_set_update")
-
-    override fun getFabricDependencies(): Collection<Identifier?>? {
-        return Lists.newArrayList(ResourceReloadListenerKeys.TAGS)
-    }
 
     fun registerServer(){
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(this)
@@ -145,7 +138,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         }
         ItemTooltipCallback.EVENT.register{ stack, context, tooltip ->
             val player = MinecraftClient.getInstance().player ?: return@register
-            val displaySets = getCachedSets()[stack.item]
+            val displaySets = cachedSets[stack.item]
             if (displaySets.isEmpty()) return@register
             val activeSets = (player as ActiveGearSetsTracking).gear_core_getActiveSets()
             for (displaySet in displaySets){
