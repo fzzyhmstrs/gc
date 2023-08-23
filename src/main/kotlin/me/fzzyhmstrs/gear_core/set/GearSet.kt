@@ -29,7 +29,7 @@ import net.minecraft.world.World
 import java.util.*
 
 class GearSet private constructor(
-    private val id: Identifier,
+    val id: Identifier,
     private val translationKey: String,
     private val nameDecorationTranslationKey: String,
     private val bonusDecorationTranslationKey: String,
