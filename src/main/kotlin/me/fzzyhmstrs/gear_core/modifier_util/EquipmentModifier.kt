@@ -55,7 +55,8 @@ open class EquipmentModifier(
     }
 
     init{
-        EquipmentModifierHelper.addToTargetMap(this)
+        if (modifierId != AbstractModifierHelper.BLANK)
+            EquipmentModifierHelper.addToTargetMap(this)
     }
     
     private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifierContainer> = ArrayListMultimap.create()
