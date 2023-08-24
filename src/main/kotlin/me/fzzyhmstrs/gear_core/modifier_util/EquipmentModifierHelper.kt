@@ -227,6 +227,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     
     internal fun addToTargetMap(modifier: EquipmentModifier){
         if (!modifier.randomlySelectable()) return
+        if (modifier.target == EquipmentModifier.EquipmentModifierTarget.NONE) return
         val target = modifier.target
         val weight = modifier.weight
         for (i in 1..weight){
