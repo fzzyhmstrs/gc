@@ -170,7 +170,7 @@ object GearSets: SimpleSynchronousResourceReloadListener {
     }
 
     private fun getCachedSets(): HashMultimap<Item,GearSet>{
-        if (cachedSets.isEmpty)
+        if (cachedSets.isEmpty && gearSets.isNotEmpty())
             cacheSets()
         return cachedSets
     }
