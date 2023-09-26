@@ -114,6 +114,8 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         if (offhand.getItem() instanceof HitTracking hitTrackingItem){
             hitTrackingItem.postWearerHit(offhand, attacker, target);
         }
+        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
+        innateModifiers.getCompiledData().postHit(ItemStack.EMPTY, attacker, target);
         GearSets.INSTANCE.processPostHit(target, attacker);
     }
 
@@ -123,23 +125,25 @@ public abstract class ItemStackMixin implements DurabilityTracking {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks(miner);
             for (ItemStack stack : stacks) {
                 if (stack.getItem() instanceof MineTracking mineTrackingItem) {
-                    mineTrackingItem.postWearerMine(stack, world,state,pos,miner);
+                    mineTrackingItem.postWearerMine(stack, world, state, pos, miner);
                 }
             }
         }
         miner.getArmorItems().forEach(stack -> {
             if (stack.getItem() instanceof MineTracking mineTrackingItem) {
-                mineTrackingItem.postWearerMine(stack, world,state,pos,miner);
+                mineTrackingItem.postWearerMine(stack, world, state, pos, miner);
             }
         });
         ItemStack mainhand = miner.getEquippedStack(EquipmentSlot.MAINHAND);
         if (mainhand.getItem() instanceof MineTracking mineTrackingItem) {
-            mineTrackingItem.postWearerMine(mainhand, world,state,pos,miner);
+            mineTrackingItem.postWearerMine(mainhand, world, state, pos, miner);
         }
         ItemStack offhand = miner.getEquippedStack(EquipmentSlot.OFFHAND);
         if (offhand.getItem() instanceof MineTracking mineTrackingItem) {
-            mineTrackingItem.postWearerMine(offhand, world,state,pos,miner);
+            mineTrackingItem.postWearerMine(offhand, world, state, pos, miner);
         }
+        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
+        innateModifiers.getCompiledData().postMine(ItemStack.EMPTY, world, state, pos, miner);
         GearSets.INSTANCE.processPostMine(world, state, pos, miner);
     }
 
