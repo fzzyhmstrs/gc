@@ -52,6 +52,8 @@ public abstract class PlayerEntityMixin {
         if (offhand.getItem() instanceof KillTracking killTrackingItem){
             killTrackingItem.onWearerKilledOther(offhand, (LivingEntity) (Object) this, livingEntity, world);
         }
+        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
+        innateModifiers.getCompiledData().killedOther(ItemStack.EMPTY, (LivingEntity) (Object) this, livingEntity);
         GearSets.INSTANCE.processOnKilledOther((PlayerEntity) (Object) this, livingEntity);
     }
 
@@ -69,17 +71,19 @@ public abstract class PlayerEntityMixin {
         }
         for(ItemStack stack : this.getArmorItems()) {
             if (stack.getItem() instanceof DamageTracking damageTracking) {
-                newAmount = damageTracking.onAttack(stack, (LivingEntity) (Object) this, (LivingEntity) instance,source,newAmount);
+                newAmount = damageTracking.onAttack(stack, (LivingEntity) (Object) this, (LivingEntity) instance, source, newAmount);
             }
         }
         ItemStack mainhand = this.getEquippedStack(EquipmentSlot.MAINHAND);
         if (mainhand.getItem() instanceof DamageTracking damageTracking){
-            newAmount = damageTracking.onAttack(mainhand, (LivingEntity) (Object) this, (LivingEntity) instance,source,newAmount);
+            newAmount = damageTracking.onAttack(mainhand, (LivingEntity) (Object) this, (LivingEntity) instance, source, newAmount);
         }
         ItemStack offhand = this.getEquippedStack(EquipmentSlot.OFFHAND);
         if (offhand.getItem() instanceof DamageTracking damageTracking){
-            newAmount = damageTracking.onAttack(offhand, (LivingEntity) (Object) this, (LivingEntity) instance,source,newAmount);
+            newAmount = damageTracking.onAttack(offhand, (LivingEntity) (Object) this, (LivingEntity) instance, source, newAmount);
         }
+        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
+        newAmount = innateModifiers.getCompiledData().onAttack(ItemStack.EMPTY, (LivingEntity) (Object) this, (LivingEntity) instance, source, newAmount);
         newAmount = GearSets.INSTANCE.processOnAttack(newAmount,source,(LivingEntity) (Object) this,(LivingEntity) instance);
         return operation.call(instance,source,newAmount);
     }
