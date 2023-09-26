@@ -81,6 +81,8 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (offhand.getItem() instanceof DamageTracking damageTrackingItem){
             newAmount = damageTrackingItem.onWearerDamaged(offhand, (LivingEntity) (Object) this, livingEntity,source,newAmount);
         }
+        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
+        newAmount = innateModifiers.getCompiledData().onDamaged(ItemStack.EMPTY, (LivingEntity) (Object) this, livingEntity, source, newAmount);
         newAmount = GearSets.INSTANCE.processOnDamaged(newAmount,source,(LivingEntity) (Object) this, livingEntity);
         return newAmount;
     }
@@ -108,6 +110,8 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (offhand.getItem() instanceof TickTracking tickTrackingItem){
             tickTrackingItem.onTick(offhand, (LivingEntity) (Object) this, null);
         }
+        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
+        innateModifiers.getCompiledData().tick(ItemStack.EMPTY, (LivingEntity) (Object) this, null);
         GearSets.INSTANCE.processTick((LivingEntity) (Object) this);
     }
 
