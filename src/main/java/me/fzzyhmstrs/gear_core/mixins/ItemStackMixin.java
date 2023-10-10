@@ -58,7 +58,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     private int gear_core_newMaxDamage;
 
     @Override
-    public void evaluateNewMaxDamage(AbstractModifier.CompiledModifiers<EquipmentModifier> compiledModifiers) {
+    public void gear_core_evaluateNewMaxDamage(AbstractModifier.CompiledModifiers<EquipmentModifier> compiledModifiers) {
         if (getItem().getMaxDamage() != 0) {
             gear_core_newMaxDamage = Math.max(compiledModifiers.getCompiledData().modifyDurability(getItem().getMaxDamage()), 1);
         }
@@ -71,7 +71,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
             Item item = getItem();
             if (item instanceof Modifiable modifiable){
                 if (modifiable.canBeModifiedBy(GC.INSTANCE.getEQUIPMENT_MODIFIER_TYPE()))
-                    GC.INSTANCE.getEQUIPMENT_MODIFIER_TYPE().getModifierInitializer().initializeModifiers((ItemStack) (Object) this,this.getOrCreateNbt(),modifiable.defaultModifiers(GC.INSTANCE.getEQUIPMENT_MODIFIER_TYPE()));
+                    GC.INSTANCE.getEQUIPMENT_MODIFIER_TYPE().getModifierInitializer().initializeModifiers((ItemStack) (Object) this);
             }
             if (gear_core_newMaxDamage == 0){
                 gear_core_newMaxDamage = original;
@@ -93,7 +93,8 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Inject(method = "postHit", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void gear_core_invokePostWearerHit(LivingEntity target, PlayerEntity attacker, CallbackInfo ci){
-        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+        EquipmentModifierHelper.INSTANCE.getActiveModifiers(attacker).getCompiledData().postHit(attacker.getEquippedStack(EquipmentSlot.MAINHAND),attacker,target);
+        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks(attacker);
             for (ItemStack stack : stacks) {
                 if (stack.getItem() instanceof HitTracking hitTrackingItem) {
@@ -114,8 +115,10 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         if (offhand.getItem() instanceof HitTracking hitTrackingItem){
             hitTrackingItem.postWearerHit(offhand, attacker, target);
         }
-        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
-        innateModifiers.getCompiledData().postHit(ItemStack.EMPTY, attacker, target);
+        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) attacker).fzzy_core_getStack())) {
+            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(attacker);
+            innateModifiers.getCompiledData().postHit(ItemStack.EMPTY, attacker, target);
+        }*/
         GearSets.INSTANCE.processPostHit(target, attacker);
     }
 
@@ -142,8 +145,10 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         if (offhand.getItem() instanceof MineTracking mineTrackingItem) {
             mineTrackingItem.postWearerMine(offhand, world, state, pos, miner);
         }
-        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
-        innateModifiers.getCompiledData().postMine(ItemStack.EMPTY, world, state, pos, miner);
+        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding)miner).fzzy_core_getStack())) {
+            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(miner);
+            innateModifiers.getCompiledData().postMine(ItemStack.EMPTY, world, state, pos, miner);
+        }
         GearSets.INSTANCE.processPostMine(world, state, pos, miner);
     }
 

@@ -28,7 +28,4 @@ public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, Dam
     private void gear_core_processOnEquipForAugments(ItemStack stack, SlotReference slot, LivingEntity entity, CallbackInfo ci){
             EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);
     }
-
-    @Override
-    default List<Identifier> defaultModifiers(ModifierHelperType type){return Collections.emptyList();}
 }

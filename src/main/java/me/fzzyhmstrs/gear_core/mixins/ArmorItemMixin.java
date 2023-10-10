@@ -39,8 +39,12 @@ public abstract class ArmorItemMixin implements HitTracking, KillTracking, MineT
     
     @Override
     public List<Identifier> getModifiers(ItemStack stack, ModifierHelperType type) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        return modifiers.getCompiledData().modifiers();
+        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
+            AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
+            return modifiers.getCompiledData().modifiers();
+        } else {
+            return List.of();
+        }
     }
 
     @NotNull

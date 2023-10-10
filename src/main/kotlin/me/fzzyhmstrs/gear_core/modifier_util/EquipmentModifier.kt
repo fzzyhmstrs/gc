@@ -230,7 +230,7 @@ open class EquipmentModifier(
         return Compiler(arrayListOf(), EquipmentModifier())
     }
 
-    override fun getModifierHelper(): AbstractModifierHelper<*> {
+    override fun getModifierHelper(): AbstractModifierHelper<EquipmentModifier> {
         return EquipmentModifierHelper
     }
 

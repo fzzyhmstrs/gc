@@ -1,11 +1,13 @@
 package me.fzzyhmstrs.gear_core.mixins;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import me.fzzyhmstrs.fzzy_core.interfaces.StackHolding;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking;
 import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
 import me.fzzyhmstrs.gear_core.interfaces.TickTracking;
+import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import me.fzzyhmstrs.gear_core.set.GearSet;
 import me.fzzyhmstrs.gear_core.set.GearSets;
 import net.minecraft.entity.EquipmentSlot;
@@ -81,8 +83,10 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (offhand.getItem() instanceof DamageTracking damageTrackingItem){
             newAmount = damageTrackingItem.onWearerDamaged(offhand, (LivingEntity) (Object) this, livingEntity,source,newAmount);
         }
-        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
-        newAmount = innateModifiers.getCompiledData().onDamaged(ItemStack.EMPTY, (LivingEntity) (Object) this, livingEntity, source, newAmount);
+        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) this).fzzy_core_getStack())) {
+            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this);
+            newAmount = innateModifiers.getCompiledData().onDamaged(ItemStack.EMPTY, (LivingEntity) (Object) this, livingEntity, source, newAmount);
+        }
         newAmount = GearSets.INSTANCE.processOnDamaged(newAmount,source,(LivingEntity) (Object) this, livingEntity);
         return newAmount;
     }
@@ -110,8 +114,10 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (offhand.getItem() instanceof TickTracking tickTrackingItem){
             tickTrackingItem.onTick(offhand, (LivingEntity) (Object) this, null);
         }
-        var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity)(Object)this)
-        innateModifiers.getCompiledData().tick(ItemStack.EMPTY, (LivingEntity) (Object) this, null);
+        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) this).fzzy_core_getStack())) {
+            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this);
+            innateModifiers.getCompiledData().tick(ItemStack.EMPTY, (LivingEntity) (Object) this, null);
+        }
         GearSets.INSTANCE.processTick((LivingEntity) (Object) this);
     }
 

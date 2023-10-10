@@ -36,12 +36,6 @@ public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTr
         return EquipmentSlot.MAINHAND;
     }
 
-    @Override
-    public void onWearerUse(ItemStack stack, World world, PlayerEntity user, Hand hand) {
-        AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
-        modifiers.getCompiledData().onUse(stack,user,null);
-    }
-
     @NotNull
     @Override
     public List<Identifier> defaultModifiers(ModifierHelperType type) {

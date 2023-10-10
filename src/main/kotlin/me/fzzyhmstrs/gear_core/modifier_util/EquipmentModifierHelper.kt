@@ -3,6 +3,7 @@ package me.fzzyhmstrs.gear_core.modifier_util
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
+import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType
@@ -47,29 +48,36 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private const val OLD_MODIFIER_ID_KEY = "modifier_id"
     
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
-        get() = AbstractModifier.CompiledModifiers(arrayListOf(), EquipmentModifier(BLANK))
+        get() = AbstractModifier.CompiledModifiers(arrayListOf(), EquipmentModifier(BLANK)).also { println("building a gear core fallback!") }
 
-    override fun initializeModifiers(stack: ItemStack, nbt: NbtCompound, list: List<Identifier>) {
-        fixUpOldNbt(nbt)
-        if (list.isNotEmpty()){
-            if (!nbt.contains("gear_mod_init_" + stack.translationKey)){
-                if (nbt.contains(getType().getModifiersKey())){
-                    list.forEach{
-                        addModifier(it,stack,nbt)
-                    }
-                } else{
-                    list.forEach{
-                        addModifierToNbt(it,nbt)
-                    }
-                }
-                nbt.putBoolean("gear_mod_init_" + stack.translationKey,true)
-            }
+    override fun initializeModifiers(stack: ItemStack): List<Identifier> {
+        val nbt = stack.nbt
+        if (nbt != null)
+            fixUpOldNbt(nbt)
+        val item = stack.item
+        val list = if(item is Modifiable){
+            item.defaultModifiers(getType())
+        } else {
+            listOf()
         }
-        if (nbt.contains(getType().getModifiersKey())){
+        if (list.isNotEmpty()){
+            val nbt2 = stack.orCreateNbt
+            if (!nbt2.contains("gear_mod_init_" + stack.translationKey)){
+                for (mod in list) {
+                    addModifierToNbt(mod,nbt2)
+                }
+                nbt2.putBoolean("gear_mod_init_" + stack.translationKey,true)
+            }
+            val id = Nbt.makeItemStackId(stack)
+            val compiled = this.compile(getModifiersFromNbt(stack))
+            prepareActiveModifierData(stack, nbt2, compiled, id)
+        }
+        return list
+        /*if (nbt.contains(getType().getModifiersKey())){
             val id = Nbt.makeItemStackId(stack)
             initializeModifiers(nbt, id)
             gatherActiveModifiers(stack)
-        }
+        }*/
     }
 
     // attempt to carry over modifiers stored under the now non-generic nbt keys into the new keys
@@ -101,7 +109,27 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
     }
 
-    override fun gatherActiveModifiers(stack: ItemStack) {
+    private fun addModifierToNbt(modifier: Identifier, nbt: NbtCompound) {
+        val newEl = NbtCompound()
+        newEl.putString(getType().getModifierIdKey(),modifier.toString())
+        Nbt.addNbtToList(newEl, getType().getModifiersKey(),nbt)
+    }
+
+    override fun addModifierToNbt(stack: ItemStack, modifier: Identifier, nbt: NbtCompound) {
+        super.addModifierToNbt(stack, modifier, nbt)
+        val id = Nbt.makeItemStackId(stack)
+        val compiled = this.compile(getModifiersFromNbt(stack))
+        prepareActiveModifierData(stack, nbt, compiled, id)
+    }
+
+    override fun removeModifierFromNbt(stack: ItemStack, modifier: Identifier, nbt: NbtCompound) {
+        super.removeModifierFromNbt(stack, modifier, nbt)
+        val id = Nbt.makeItemStackId(stack)
+        val compiled = this.compile(getModifiersFromNbt(stack))
+        prepareActiveModifierData(stack, nbt, compiled, id)
+    }
+
+    /*override fun gatherActiveModifiers(stack: ItemStack) {
         val nbt = stack.nbt
         if (nbt != null) {
             val id = Nbt.getItemStackId(nbt)
@@ -116,10 +144,10 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             )
             prepareActiveModifierData(stack,nbt, compiled, id)
         }
-    }
+    }*/
 
     private fun prepareActiveModifierData(stack: ItemStack, nbt: NbtCompound, compiled: AbstractModifier.CompiledModifiers<EquipmentModifier>,id: Long){
-        (stack as DurabilityTracking).evaluateNewMaxDamage(compiled)
+        (stack as DurabilityTracking).gear_core_evaluateNewMaxDamage(compiled)
         attributeMap.remove(id)
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = prepareAttributeMapForSlot(stack, ArrayListMultimap.create(compiled.compiledData.attributeModifiers()))
         if (TrinketChecker.trinketsLoaded){
@@ -164,15 +192,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
     
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
-        val nbt = stack.nbt ?: return
-        val id = Nbt.getItemStackId(nbt)
-        if (id == -1L) return
-        val compiled = getActiveModifiers(stack)
-        if(getModifiersById(id).isNotEmpty() && compiled.modifiers.isEmpty()){
-            gatherActiveModifiers(stack)
-        }
         val modifierList = getModifiers(stack)
-        if (modifierList.isEmpty()) return
         for (it in modifierList) {
             val mod = getModifierByType(it) ?: continue
             tooltip.add(
@@ -181,6 +201,10 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 ).formatted(Formatting.ITALIC)).formatted(*mod.getFormatting())
             )
         }
+    }
+
+    override fun compiler(): AbstractModifier<EquipmentModifier>.Compiler {
+        return BLANK_EQUIPMENT_MOD.compiler()
     }
 
     override fun getModifierByType(id: Identifier): EquipmentModifier? {
@@ -194,7 +218,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             if (nbt != null){
                 if (nbt.contains(getType().getModifiersKey())){
                     if (nbt.getList(getType().getModifiersKey(),10).isNotEmpty()){
-                        gatherActiveModifiers(stack)
+                        initializeModifiers(stack)
                     }
                 } else {
                     return original
@@ -203,7 +227,8 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 return original
             }
         } else if (!attributeMap.containsKey(id)){
-            gatherActiveModifiers(stack)
+            val compiled = this.compile(getModifiersFromNbt(stack))
+            prepareActiveModifierData(stack, stack.orCreateNbt, compiled, id)
         }
         //println(map)
         val modMap = attributeMap[id]?: return original
@@ -215,15 +240,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     }
 
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
-        val nbt = stack.nbt
-        if (nbt == null){
-            addModifier(modifier, stack)
-            return
-        }
-        val id = Nbt.getItemStackId(nbt)
-        if (!(id != -1L && checkDescendant(modifier, stack) != null)) {
-            addModifier(modifier, stack)
-        }
+        addModifier(modifier, stack, true)
     }
     
     internal fun addToTargetMap(modifier: EquipmentModifier){
@@ -247,10 +264,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return list
     }
 
-    fun addModifierAsIs(modifier: Identifier, stack: ItemStack, temporary: Boolean = false){
-        val id = Nbt.makeItemStackId(stack)
+    fun addModifierAsIs(modifier: Identifier, stack: ItemStack){
         val nbt = stack.orCreateNbt
-        addModifierWithoutChecking(id, modifier, stack, nbt, temporary)
+        addModifierWithoutChecking(modifier, stack, nbt)
     }
 
     fun addRandomModifiers(stack: ItemStack, context: LootContext){
@@ -296,7 +312,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         for (id in modList){
             val mod = getModifierByType(id) ?: continue
             if (mod.isPersistent()) continue
-            removeModifierFromNbt(id,nbt)
+            removeModifierWithoutCheck(stack,id,nbt)
         }
     }
 
@@ -315,7 +331,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         fun process(stack: ItemStack, entity: LivingEntity)
     }
 
-    override fun getType(): ModifierHelperType {
+    override fun getType(): ModifierHelperType<EquipmentModifier> {
         return GC.EQUIPMENT_MODIFIER_TYPE
     }
 }

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.MixinExtrasBootstrap
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking
+import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper
 import me.fzzyhmstrs.gear_core.set.GearSets
 import net.fabricmc.api.ClientModInitializer
@@ -18,9 +19,9 @@ import net.minecraft.util.Identifier
 
 object GC: ModInitializer {
     const val MOD_ID = "gear_core"
-    val EQUIPMENT_MODIFIER_TYPE = Registry.register(ModifierHelperType.REGISTRY, EquipmentModifierType.id,EquipmentModifierType)
+    val EQUIPMENT_MODIFIER_TYPE =  ModifierHelperType.register(EquipmentModifierType)
 
-    object EquipmentModifierType: ModifierHelperType(Identifier(MOD_ID,"gear_modifier_helper")){
+    object EquipmentModifierType: ModifierHelperType<EquipmentModifier>(Identifier(MOD_ID,"gear_modifier_helper"), EquipmentModifierHelper){
         override fun getModifierIdKey(): String {
             return "gear_modifier_id"
         }
