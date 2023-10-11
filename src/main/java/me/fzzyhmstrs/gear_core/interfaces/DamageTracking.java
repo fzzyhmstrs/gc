@@ -11,20 +11,22 @@ import org.jetbrains.annotations.Nullable;
 public interface DamageTracking {
 
     default float onAttack(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount){
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
+        /*if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
             AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
             return modifiers.getCompiledData().onAttack(stack, wearer, attacker, source, amount);
         } else {
             return amount;
-        }
+        }*/
+        return amount;
     }
 
     default float onWearerDamaged(ItemStack stack, LivingEntity wearer, @Nullable LivingEntity attacker, DamageSource source, Float amount){
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
+        /*if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
             AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
             return modifiers.getCompiledData().onDamaged(stack, wearer, attacker, source, amount);
         } else {
             return amount;
-        }
+        }*/
+        return amount;
     }
 }

@@ -11,9 +11,9 @@ import net.minecraft.world.World;
 public interface UseTracking {
 
     default void onWearerUse(ItemStack stack, World world, PlayerEntity user, Hand hand){
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
+        /*if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
             AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
             modifiers.getCompiledData().onUse(stack, user, null);
-        }
+        }*/
     }
 }

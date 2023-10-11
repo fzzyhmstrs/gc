@@ -1,12 +1,7 @@
 package me.fzzyhmstrs.gear_core.mixins;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import me.fzzyhmstrs.fzzy_core.interfaces.StackHolding;
-import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
-import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking;
-import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
-import me.fzzyhmstrs.gear_core.interfaces.TickTracking;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import me.fzzyhmstrs.gear_core.set.GearSet;
 import me.fzzyhmstrs.gear_core.set.GearSets;
@@ -25,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Mixin(LivingEntity.class)
@@ -62,7 +56,8 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (source.getSource() instanceof LivingEntity le){
             livingEntity = le;
         }
-        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+        EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().onDamaged(ItemStack.EMPTY,(LivingEntity) (Object) this, livingEntity, source, newAmount);
+        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
             for (ItemStack stack : stacks) {
                 if (stack.getItem() instanceof DamageTracking damageTrackingItem) {
@@ -86,14 +81,15 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) this).fzzy_core_getStack())) {
             var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this);
             newAmount = innateModifiers.getCompiledData().onDamaged(ItemStack.EMPTY, (LivingEntity) (Object) this, livingEntity, source, newAmount);
-        }
+        }*/
         newAmount = GearSets.INSTANCE.processOnDamaged(newAmount,source,(LivingEntity) (Object) this, livingEntity);
         return newAmount;
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void gear_core_invokeTick(CallbackInfo ci){
-        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+        EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().tick(ItemStack.EMPTY,(LivingEntity) (Object) this, null);
+        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
             for (ItemStack stack : stacks) {
                 if (stack.getItem() instanceof TickTracking tickTrackingItem) {
@@ -117,7 +113,7 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) this).fzzy_core_getStack())) {
             var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this);
             innateModifiers.getCompiledData().tick(ItemStack.EMPTY, (LivingEntity) (Object) this, null);
-        }
+        }*/
         GearSets.INSTANCE.processTick((LivingEntity) (Object) this);
     }
 

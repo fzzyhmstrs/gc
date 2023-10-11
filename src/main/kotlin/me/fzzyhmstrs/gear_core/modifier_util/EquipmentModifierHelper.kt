@@ -159,7 +159,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val item = stack.item
         if (item !is AttributeTracking) return EMPTY_ATTRIBUTE_MAP
-        val slot = item.correctSlot
+        val slot = item.fzzy_core_getCorrectSlot()
 /*        val stackMap = if(slot == null){
             EMPTY_ATTRIBUTE_MAP
         } else {

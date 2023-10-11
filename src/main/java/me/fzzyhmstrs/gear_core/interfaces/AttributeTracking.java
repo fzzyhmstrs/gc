@@ -5,12 +5,12 @@ import org.jetbrains.annotations.Nullable;
 
 public interface AttributeTracking {
   
-  default boolean correctSlot(EquipmentSlot slot){
+  default boolean fzzy_core_correctSlot(EquipmentSlot slot){
       return false;
   }
   
   @Nullable
-  default EquipmentSlot getCorrectSlot(){
+  default EquipmentSlot fzzy_core_getCorrectSlot(){
       return null;
   }
 }

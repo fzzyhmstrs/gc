@@ -27,12 +27,12 @@ import java.util.List;
 public class ToolAndWeaponItemMixin implements HitTracking, KillTracking, MineTracking, UseTracking, AttributeTracking,TickTracking, Modifiable {
     
     @Override 
-    public boolean correctSlot(EquipmentSlot slot){
+    public boolean fzzy_core_correctSlot(EquipmentSlot slot){
         return slot == EquipmentSlot.MAINHAND;
     }
     
     @Override
-    public EquipmentSlot getCorrectSlot(){
+    public EquipmentSlot fzzy_core_getCorrectSlot(){
         return EquipmentSlot.MAINHAND;
     }
 

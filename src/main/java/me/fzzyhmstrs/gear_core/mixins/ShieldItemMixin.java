@@ -21,12 +21,12 @@ import java.util.List;
 public class ShieldItemMixin implements HitTracking, KillTracking, DamageTracking, AttributeTracking, TickTracking, Modifiable {
     
     @Override
-    public boolean correctSlot(EquipmentSlot slot){
+    public boolean fzzy_core_correctSlot(EquipmentSlot slot){
         return slot == EquipmentSlot.OFFHAND;
     }
     
     @Override
-    public EquipmentSlot getCorrectSlot(){
+    public EquipmentSlot fzzy_core_getCorrectSlot(){
         return EquipmentSlot.OFFHAND;
     }
 

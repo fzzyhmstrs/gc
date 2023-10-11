@@ -24,6 +24,7 @@ import java.util.List;
 @Pseudo
 @Mixin(Trinket.class)
 public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, DamageTracking, AttributeTracking, TickTracking {
+
     @Inject(method = "onEquip", at = @At("TAIL"))
     private void gear_core_processOnEquipForAugments(ItemStack stack, SlotReference slot, LivingEntity entity, CallbackInfo ci){
             EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);

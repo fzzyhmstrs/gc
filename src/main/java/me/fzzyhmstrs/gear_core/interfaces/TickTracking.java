@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 public interface TickTracking {
 
     default void onTick(ItemStack stack, LivingEntity wearer, LivingEntity target){
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
+        /*if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
             AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
             modifiers.getCompiledData().tick(stack, wearer, target);
-        }
+        }*/
     }
 }

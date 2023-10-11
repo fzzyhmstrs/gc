@@ -6,8 +6,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable;
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier;
-import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
-import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.GC;
 import me.fzzyhmstrs.gear_core.interfaces.*;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier;
@@ -34,8 +32,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements DurabilityTracking {
@@ -82,7 +78,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @ModifyReturnValue(method = "getAttributeModifiers", at = @At("RETURN"))
     private Multimap<EntityAttribute, EntityAttributeModifier> gear_core_addModifierModifiersToModifiers(Multimap<EntityAttribute, EntityAttributeModifier> original, EquipmentSlot slot){
-        if (getItem() instanceof AttributeTracking at && !at.correctSlot(slot)){
+        if (getItem() instanceof AttributeTracking at && !at.fzzy_core_correctSlot(slot)){
             return original;
         } else if (getItem() instanceof AttributeTracking){
             return EquipmentModifierHelper.INSTANCE.getAttributeModifiers((ItemStack) (Object) this, original);
@@ -124,7 +120,8 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Inject(method = "postMine", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void gear_core_invokePostWearerMine(World world, BlockState state, BlockPos pos, PlayerEntity miner, CallbackInfo ci){
-        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+        EquipmentModifierHelper.INSTANCE.getActiveModifiers(miner).getCompiledData().postMine(miner.getEquippedStack(EquipmentSlot.MAINHAND), world, state, pos, miner);
+        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks(miner);
             for (ItemStack stack : stacks) {
                 if (stack.getItem() instanceof MineTracking mineTrackingItem) {
@@ -148,7 +145,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding)miner).fzzy_core_getStack())) {
             var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(miner);
             innateModifiers.getCompiledData().postMine(ItemStack.EMPTY, world, state, pos, miner);
-        }
+        }*/
         GearSets.INSTANCE.processPostMine(world, state, pos, miner);
     }
 
@@ -156,10 +153,11 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     private TypedActionResult<ItemStack> gear_core_invokeOnWearerUse(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> operation){
         TypedActionResult<ItemStack> useResult = operation.call(instance, world, user, hand);
         if (!useResult.getResult().isAccepted()){
-            ItemStack stack = user.getStackInHand(hand);
-            if (stack.getItem() instanceof UseTracking useTrackingItem) {
+            //ItemStack stack = user.getStackInHand(hand);
+            EquipmentModifierHelper.INSTANCE.getActiveModifiers(user).getCompiledData().onUse(user.getStackInHand(hand),user,null);
+            /*if (stack.getItem() instanceof UseTracking useTrackingItem) {
                 useTrackingItem.onWearerUse(user.getStackInHand(hand), world, user, hand);
-            }
+            }*/
             GearSets.INSTANCE.processOnUse(hand, user);
         }
         return useResult;

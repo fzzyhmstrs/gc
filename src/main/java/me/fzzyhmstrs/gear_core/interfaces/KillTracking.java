@@ -11,10 +11,10 @@ import net.minecraft.server.world.ServerWorld;
 public interface KillTracking {
 
     default void onWearerKilledOther(ItemStack stack, LivingEntity wearer, LivingEntity victim, ServerWorld world){
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
+        /*if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(stack)) {
             AbstractModifier.CompiledModifiers<EquipmentModifier> modifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(stack);
             modifiers.getCompiledData().killedOther(stack, wearer, victim);
-        }
+        }*/
     }
 
     default void incrementKillCount(ItemStack stack){

@@ -24,12 +24,12 @@ import java.util.List;
 public class BowAndCrossbowMixin implements HitTracking, KillTracking, AttributeTracking, Modifiable {
 
     @Override 
-    public boolean correctSlot(EquipmentSlot slot){
+    public boolean fzzy_core_correctSlot(EquipmentSlot slot){
         return slot == EquipmentSlot.MAINHAND;
     }
     
     @Override
-    public EquipmentSlot getCorrectSlot(){
+    public EquipmentSlot fzzy_core_getCorrectSlot(){
         return EquipmentSlot.MAINHAND;
     }
     

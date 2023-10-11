@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface ModifierTracking {
 
-    default List<Identifier> getModifiers(ItemStack stack, ModifierHelperType type){return List.of();}
+    default List<Identifier> getModifiers(ItemStack stack, ModifierHelperType<?> type){return List.of();}
 
 }
