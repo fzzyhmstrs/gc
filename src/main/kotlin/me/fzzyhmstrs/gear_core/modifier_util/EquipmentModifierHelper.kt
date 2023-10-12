@@ -47,8 +47,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private const val OLD_MODIFIERS_KEY = "modifiers"
     private const val OLD_MODIFIER_ID_KEY = "modifier_id"
     
-    override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier>
-        get() = AbstractModifier.CompiledModifiers(arrayListOf(), EquipmentModifier(BLANK)).also { println("building a gear core fallback!") }
+    override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier> = AbstractModifier.CompiledModifiers(arrayListOf(), EquipmentModifier(BLANK))
 
     override fun initializeModifiers(stack: ItemStack): List<Identifier> {
         val nbt = stack.nbt
@@ -69,7 +68,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 nbt2.putBoolean("gear_mod_init_" + stack.translationKey,true)
             }
             val id = Nbt.makeItemStackId(stack)
-            val compiled = this.compile(getModifiersFromNbt(stack))
+            val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core initialize: $it") }
             prepareActiveModifierData(stack, nbt2, compiled, id)
         }
         return list
@@ -118,14 +117,14 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     override fun addModifierToNbt(stack: ItemStack, modifier: Identifier, nbt: NbtCompound) {
         super.addModifierToNbt(stack, modifier, nbt)
         val id = Nbt.makeItemStackId(stack)
-        val compiled = this.compile(getModifiersFromNbt(stack))
+        val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core add: $it") }
         prepareActiveModifierData(stack, nbt, compiled, id)
     }
 
     override fun removeModifierFromNbt(stack: ItemStack, modifier: Identifier, nbt: NbtCompound) {
         super.removeModifierFromNbt(stack, modifier, nbt)
         val id = Nbt.makeItemStackId(stack)
-        val compiled = this.compile(getModifiersFromNbt(stack))
+        val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core remove: $it") }
         prepareActiveModifierData(stack, nbt, compiled, id)
     }
 
@@ -227,7 +226,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
                 return original
             }
         } else if (!attributeMap.containsKey(id)){
-            val compiled = this.compile(getModifiersFromNbt(stack))
+            val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core attribute: $it") }
             prepareActiveModifierData(stack, stack.orCreateNbt, compiled, id)
         }
         //println(map)
@@ -262,6 +261,12 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             list.addAll(targetMap.get(target))
         }
         return list
+    }
+
+    //api compat
+    fun addModifierAsIs(modifier: Identifier, stack: ItemStack, bl: Boolean){
+        val nbt = stack.orCreateNbt
+        addModifierWithoutChecking(modifier, stack, nbt)
     }
 
     fun addModifierAsIs(modifier: Identifier, stack: ItemStack){
