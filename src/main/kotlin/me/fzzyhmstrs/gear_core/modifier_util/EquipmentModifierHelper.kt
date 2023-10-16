@@ -61,17 +61,17 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
         if (list.isNotEmpty()){
             val nbt2 = stack.orCreateNbt
-            if (!nbt2.contains("gear_mod_init_" + stack.translationKey)){
+            if (!nbt2.contains(getType().getModifierInitKey() + stack.translationKey)){
                 for (mod in list) {
                     addModifierToNbt(mod,nbt2)
                 }
-                nbt2.putBoolean("gear_mod_init_" + stack.translationKey,true)
+                nbt2.putBoolean(getType().getModifierInitKey() + stack.translationKey,true)
             }
             val id = Nbt.makeItemStackId(stack)
             val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core initialize: $it") }
             prepareActiveModifierData(stack, nbt2, compiled, id)
         }
-        return list
+        return getModifiersFromNbt(stack)
         /*if (nbt.contains(getType().getModifiersKey())){
             val id = Nbt.makeItemStackId(stack)
             initializeModifiers(nbt, id)
@@ -189,7 +189,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     override fun getDescTranslationKeyFromIdentifier(id: Identifier): String {
         return "equipment.modifier.${id}.desc"
     }
-    
+
     override fun addModifierTooltip(stack: ItemStack, tooltip: MutableList<Text>, context: TooltipContext){
         val modifierList = getModifiers(stack)
         for (it in modifierList) {

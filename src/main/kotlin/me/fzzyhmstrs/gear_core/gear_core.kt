@@ -28,6 +28,9 @@ object GC: ModInitializer {
         override fun getModifiersKey(): String {
             return "gear_modifiers"
         }
+        override fun getModifierInitKey(): String {
+            return "gc_"
+        }
         override fun getModifierInitializer(): ModifierInitializer {
             return EquipmentModifierHelper
         }
