@@ -298,6 +298,11 @@ open class EquipmentModifier(
                     return stack.item.isDamageable
                 }
             }
+            val ANY_WEAPON = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"any_weapon")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    return WEAPON.isItemAcceptableOrTagged(stack) || RANGED.isItemAcceptableOrTagged(stack)
+                }
+            }
             val WEAPON = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"weapon")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return SWORD.isItemAcceptableOrTagged(stack) || AXE.isItemAcceptableOrTagged(stack) || TRIDENT.isItemAcceptableOrTagged(stack)
@@ -318,6 +323,11 @@ open class EquipmentModifier(
                     return stack.item is AxeItem
                 }
             }
+            val RANGED = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"ranged")){
+                override fun isAcceptableItem(stack: ItemStack): Boolean{
+                    return TRIDENT.isItemAcceptableOrTagged(stack) || BOW.isItemAcceptableOrTagged(stack)
+                }
+            }
             val TRIDENT = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"trident")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
                     return stack.item is TridentItem
@@ -325,7 +335,7 @@ open class EquipmentModifier(
             }
             val BOW = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"bow")){
                 override fun isAcceptableItem(stack: ItemStack): Boolean{
-                    return stack.item is BowItem || stack.item is CrossbowItem
+                    return stack.item is RangedWeaponItem
                 }
             }
             val MINING = object: EquipmentModifierTarget(Identifier(GC.MOD_ID,"mining")){
