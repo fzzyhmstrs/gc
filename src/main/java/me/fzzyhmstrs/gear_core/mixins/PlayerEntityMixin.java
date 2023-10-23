@@ -63,7 +63,7 @@ public abstract class PlayerEntityMixin {
     private boolean gear_core_modifyAttackDamage(Entity instance, DamageSource source, float damage, Operation<Boolean> operation){
         if (!(instance instanceof LivingEntity)) return operation.call(instance,source,damage);
         float newAmount = damage;
-        EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().onAttack(((LivingEntity) (Object) this).getEquippedStack(EquipmentSlot.MAINHAND),(LivingEntity) (Object) this,(LivingEntity) instance, source, newAmount);
+        newAmount = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().onAttack(((LivingEntity) (Object) this).getEquippedStack(EquipmentSlot.MAINHAND),(LivingEntity) (Object) this,(LivingEntity) instance, source, newAmount);
         /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
             for (ItemStack stack : stacks) {

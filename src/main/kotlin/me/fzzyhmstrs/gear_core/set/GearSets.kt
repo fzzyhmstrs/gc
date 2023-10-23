@@ -191,6 +191,10 @@ object GearSets: SimpleSynchronousResourceReloadListener {
         }
     }
 
+    fun getGearSet(id: Identifier): GearSet?{
+        return gearSets[id]
+    }
+
     fun getGearSets(): Map<Identifier,GearSet>{
         return gearSets
     }

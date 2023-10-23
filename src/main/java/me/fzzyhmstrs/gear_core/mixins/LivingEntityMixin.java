@@ -8,6 +8,7 @@ import me.fzzyhmstrs.gear_core.set.GearSets;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.DamageTypeTags;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +57,13 @@ abstract public class LivingEntityMixin implements ActiveGearSetsTracking {
         if (source.getSource() instanceof LivingEntity le){
             livingEntity = le;
         }
-        EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().onDamaged(ItemStack.EMPTY,(LivingEntity) (Object) this, livingEntity, source, newAmount);
+        if (source.getSource() instanceof ProjectileEntity){
+            if (source.getAttacker() instanceof LivingEntity living){
+                newAmount = EquipmentModifierHelper.INSTANCE.getActiveModifiers(living).getCompiledData().onAttack(living.getEquippedStack(EquipmentSlot.MAINHAND),living, (LivingEntity) (Object) this, source, newAmount);
+                newAmount = GearSets.INSTANCE.processOnAttack(newAmount,source,living,(LivingEntity) (Object) this);
+            }
+        }
+        newAmount = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().onDamaged(ItemStack.EMPTY,(LivingEntity) (Object) this, livingEntity, source, newAmount);
         /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
             for (ItemStack stack : stacks) {
