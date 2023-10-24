@@ -104,7 +104,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifierContainer>{
+    open fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifierContainer>{
         return attributeModifiers
     }
 
@@ -115,7 +115,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun modifiers(): List<Identifier>{
+    open fun modifiers(): List<Identifier>{
         return modifierModifiers
     }
     
@@ -124,7 +124,7 @@ open class EquipmentModifier(
         return this
     }
     
-    fun modifyDurability(durability: Int): Int{
+    open fun modifyDurability(durability: Int): Int{
         val dur = PerLvlI(durability)
         //println(dur)
         //println(durabilityModifier)
@@ -138,7 +138,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun postHit(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
+    open fun postHit(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
         postHitConsumers.forEach {
             it.apply(stack, user, target)
         }
@@ -149,7 +149,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun postMine(stack: ItemStack, world: World, state: BlockState, pos: BlockPos, miner: PlayerEntity){
+    open fun postMine(stack: ItemStack, world: World, state: BlockState, pos: BlockPos, miner: PlayerEntity){
         postMineConsumers.forEach {
             it.apply(stack, world, state, pos, miner)
         }
@@ -160,7 +160,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun onUse(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
+    open fun onUse(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
         onUseConsumers.forEach {
             it.apply(stack, user, target)
         }
@@ -171,7 +171,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun onAttack(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
+    open fun onAttack(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
         var newAmount = amount
         onAttackFunctions.forEach {
             newAmount = it.test(stack, user, attacker, source, newAmount)
@@ -184,7 +184,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun onDamaged(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
+    open fun onDamaged(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float{
         var newAmount = amount
         //println(newAmount)
         onDamagedFunctions.forEach {
@@ -199,7 +199,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun killedOther(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
+    open fun killedOther(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
         killOtherConsumers.forEach {
             it.apply(stack, user, target)
         }
@@ -210,7 +210,7 @@ open class EquipmentModifier(
         return this
     }
 
-    fun tick(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
+    open fun tick(stack: ItemStack, user: LivingEntity, target: LivingEntity?){
         tickConsumers.forEach {
             it.apply(stack, user, target)
         }
