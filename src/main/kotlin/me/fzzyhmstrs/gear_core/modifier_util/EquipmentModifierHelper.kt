@@ -69,7 +69,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             }
             val id = Nbt.makeItemStackId(stack)
             val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core initialize: $it") }
-            prepareActiveModifierData(stack, nbt2, compiled, id)
+            //prepareActiveModifierData(stack, nbt2, compiled, id)
         }
         return getModifiersFromNbt(stack)
         /*if (nbt.contains(getType().getModifiersKey())){
@@ -128,6 +128,19 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         prepareActiveModifierData(stack, nbt, compiled, id)
     }
 
+    fun prepareContainerMap(slot: SlotId?, list: List<Identifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
+        if (list.isEmptry()) return ArrayListMultimap.create()
+        val mods = getReleventModifiers(list,null)
+        val repeats: MutableMap<Identifier, Int> = mutableMapOf()
+        val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        for (mod in mods){
+            val offset = repeats.computeIfAbsent(mod.modifierId) {0} + 1
+            repeats[mod.modifierId] = offset
+            mod.prepareContainerMap(slot, offset, newMap)
+        }
+        return newMap
+    }
+
     /*override fun gatherActiveModifiers(stack: ItemStack) {
         val nbt = stack.nbt
         if (nbt != null) {
@@ -145,7 +158,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
     }*/
 
-    private fun prepareActiveModifierData(stack: ItemStack, nbt: NbtCompound, compiled: AbstractModifier.CompiledModifiers<EquipmentModifier>,id: Long){
+    /*private fun prepareActiveModifierData(stack: ItemStack, nbt: NbtCompound, compiled: AbstractModifier.CompiledModifiers<EquipmentModifier>,id: Long){
         (stack as DurabilityTracking).gear_core_evaluateNewMaxDamage(compiled)
         attributeMap.remove(id)
         val map: Multimap<EntityAttribute, EntityAttributeModifier> = prepareAttributeMapForSlot(stack, ArrayListMultimap.create(compiled.compiledData.attributeModifiers()))
@@ -168,19 +181,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         /*val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         newMap.putAll(randomize(map))*/
         return prepareContainerMap(slot,map)
-    }
-
-    internal fun prepareContainerMap(slot: EquipmentSlot?,map: Multimap<EntityAttribute, EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
-        val newMap : Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
-        for (entry in map.entries()){
-            if (slot == null){
-                newMap.put(entry.key,entry.value.provideNonSlotEntityAttribute())
-                continue
-            }
-            newMap.put(entry.key,entry.value.provideEntityAttribute(slot))
-        }
-        return newMap
-    }
+    }*/
 
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
         return "equipment.modifier.${id}"
@@ -210,7 +211,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return ModifierRegistry.getByType<EquipmentModifier>(id)
     }
 
-    fun getAttributeModifiers(stack: ItemStack, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
+    /*fun getAttributeModifiers(stack: ItemStack, original: Multimap<EntityAttribute, EntityAttributeModifier>): Multimap<EntityAttribute, EntityAttributeModifier> {
         val id = Nbt.getItemStackId(stack)
         if (id == -1L){
             val nbt = stack.nbt
@@ -236,7 +237,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         newMap.putAll(original)
         newMap.putAll(modMap)
         return newMap
-    }
+    }*/
 
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
         addModifier(modifier, stack, true)
