@@ -99,19 +99,29 @@ open class EquipmentModifier(
 
     @Deprecated("uuid field no longer necessary, as attributes will be rebuilt with slot-appropriate UUIDs during modifier compilation")
     fun withAttributeModifier(attribute: EntityAttribute, uuid: String, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
-        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation, UUID.fromString(uuid))
+        val modifier = EntityAttributeModifierContainer(this.getTranslationKey() + "/" + attribute.translationKey,amount,operation, UUID.fromString(uuid))
         attributeModifiers.put(attribute,modifier)
         return this
     }
     
     fun withAttributeModifier(attribute: EntityAttribute, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
-        val modifier = EntityAttributeModifierContainer(this.getTranslationKey(),amount,operation)
+        val modifier = EntityAttributeModifierContainer(this.getTranslationKey() + "/" + attribute.translationKey,amount,operation)
         attributeModifiers.put(attribute,modifier)
         return this
     }
 
     open fun attributeModifiers(): Multimap<EntityAttribute, EntityAttributeModifierContainer>{
         return attributeModifiers
+    }
+
+    internal fun prepareContainerMap(slot: SlotId?, offset: Int = 0, newMap : Multimap<EntityAttribute, EntityAttributeModifier>){
+        for (entry in attributeModifiers().entries()){
+            if (slot == null){
+                newMap.put(entry.key,entry.value.provideNonSlotEntityAttribute())
+                continue
+            }
+            newMap.put(entry.key,entry.value.provideEntityAttribute(slot, offset))
+        }
     }
 
     fun withModifiers(vararg modifier: Identifier): EquipmentModifier{
