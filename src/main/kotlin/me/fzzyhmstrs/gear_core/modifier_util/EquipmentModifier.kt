@@ -72,7 +72,13 @@ open class EquipmentModifier(
     
     var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
 
+
+    open fun isEnabled(): Boolean{
+        return true
+    }
+
     override fun plus(other: EquipmentModifier): EquipmentModifier {
+        if (!other.isEnabled()) return this
         attributeModifiers.putAll(other.attributeModifiers)
         modifierModifiers.addAll(other.modifierModifiers)
         postHitConsumers.addAll(other.postHitConsumers)
