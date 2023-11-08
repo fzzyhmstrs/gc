@@ -141,6 +141,17 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         return newMap
     }
 
+    fun prepareContainerMap(slot: SlotId?, compiled: AbstractModifier.CompiledModifiers<EquipmentModifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
+        val repeats: MutableMap<Identifier, Int> = mutableMapOf()
+        val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
+        for (mod in compiled.modifiers){
+            val offset = repeats.computeIfAbsent(mod.modifierId) {0} + 1
+            repeats[mod.modifierId] = offset
+            mod.prepareContainerMap(slot, offset, newMap)
+        }
+        return newMap
+    }
+
     /*override fun gatherActiveModifiers(stack: ItemStack) {
         val nbt = stack.nbt
         if (nbt != null) {
