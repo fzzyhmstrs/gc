@@ -34,6 +34,22 @@ object GC: ModInitializer {
         override fun getModifierInitializer(): ModifierInitializer {
             return EquipmentModifierHelper
         }
+        override fun add(stack: ItemStack, id: SlotId, modifierContainer: ModifierContainer){
+            val mods = helper.modifiersFromNbt(stack)
+            modifierContainer.livingEntity.getAttributes().addTemporaryModifiers(helper.prepareContainerMap(id,mods))
+            //println("Adding modifiers to ${modifierContainer.livingEntity} from stack $stack")
+            for (mod in mods) {
+                modifierContainer.addModifier(mod, this)
+            }
+        }
+    
+        override fun remove(stack: ItemStack, id: SlotId, modifierContainer: ModifierContainer){
+            val mods = helper.modifiersFromNbt(stack)
+            modifierContainer.livingEntity.getAttributes().removeModifiers(helper.prepareContainerMap(id,mods))
+            for (mod in mods) {
+                modifierContainer.removeModifier(mod, this)
+            }
+        }
     }
 
     override fun onInitialize() {
