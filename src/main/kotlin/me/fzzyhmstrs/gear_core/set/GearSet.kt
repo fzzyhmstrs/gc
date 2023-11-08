@@ -40,6 +40,8 @@ class GearSet private constructor(
     private val modifierBonuses: MutableMap<Int,AbstractModifier.CompiledModifiers<EquipmentModifier>>) {
 
     private val levels: IntArray
+    private val slotId = SlotId(id.toString())
+
     
     init{
         //adds all the modifier-based attribute bonuses into the actual attribute map.
@@ -47,7 +49,7 @@ class GearSet private constructor(
         for (entry in modifierBonuses){
             if (!entry.value.compiledData.attributeModifiers().isEmpty) {
                 val multiMap = attributeBonuses.computeIfAbsent(entry.key) { ArrayListMultimap.create() }
-                val modMultiMap = EquipmentModifierHelper.prepareContainerMap(null, entry.value.compiledData.attributeModifiers())
+                val modMultiMap = EquipmentModifierHelper.prepareContainerMap(slotId, entry.value.compiledData.attributeModifiers())
                 multiMap.putAll(modMultiMap)
             }
 
