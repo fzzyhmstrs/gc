@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import me.fzzyhmstrs.fzzy_core.coding_util.AcText
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
+import me.fzzyhmstrs.fzzy_core.modifier_util.SlotId
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper
@@ -49,7 +50,7 @@ class GearSet private constructor(
         for (entry in modifierBonuses){
             if (!entry.value.compiledData.attributeModifiers().isEmpty) {
                 val multiMap = attributeBonuses.computeIfAbsent(entry.key) { ArrayListMultimap.create() }
-                val modMultiMap = EquipmentModifierHelper.prepareContainerMap(slotId, entry.value.compiledData.attributeModifiers())
+                val modMultiMap = EquipmentModifierHelper.prepareContainerMap(slotId, entry.value)
                 multiMap.putAll(modMultiMap)
             }
 

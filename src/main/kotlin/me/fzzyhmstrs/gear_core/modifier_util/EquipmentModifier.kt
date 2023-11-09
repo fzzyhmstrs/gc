@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap
 import me.fzzyhmstrs.fzzy_core.coding_util.PerLvlI
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
+import me.fzzyhmstrs.fzzy_core.modifier_util.SlotId
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil
 import me.fzzyhmstrs.gear_core.GC

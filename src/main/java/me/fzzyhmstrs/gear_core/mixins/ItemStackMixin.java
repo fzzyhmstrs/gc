@@ -38,17 +38,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
 
     @Shadow public abstract Item getItem();
 
-    @Shadow public abstract int getMaxDamage();
-
-    @Shadow public @Nullable abstract NbtCompound getNbt();
-
-    @Shadow public abstract NbtCompound getOrCreateNbt();
-
-    @Shadow public abstract boolean itemMatches(RegistryEntry<Item> itemEntry);
-
     @Shadow public abstract String toString();
-
-    @Shadow public abstract NbtCompound getOrCreateSubNbt(String key);
 
     @Unique
     private int gear_core_newMaxDamage;
@@ -76,7 +66,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         return gear_core_newMaxDamage;
     }
 
-    @ModifyReturnValue(method = "getAttributeModifiers", at = @At("RETURN"))
+    /*@ModifyReturnValue(method = "getAttributeModifiers", at = @At("RETURN"))
     private Multimap<EntityAttribute, EntityAttributeModifier> gear_core_addModifierModifiersToModifiers(Multimap<EntityAttribute, EntityAttributeModifier> original, EquipmentSlot slot){
         if (getItem() instanceof AttributeTracking at && !at.fzzy_core_correctSlot(slot)){
             return original;
@@ -85,67 +75,17 @@ public abstract class ItemStackMixin implements DurabilityTracking {
         } else {
             return original;
         }
-    }
+    }*/
 
     @Inject(method = "postHit", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void gear_core_invokePostWearerHit(LivingEntity target, PlayerEntity attacker, CallbackInfo ci){
         EquipmentModifierHelper.INSTANCE.getActiveModifiers(attacker).getCompiledData().postHit(attacker.getEquippedStack(EquipmentSlot.MAINHAND),attacker,target);
-        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
-            List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks(attacker);
-            for (ItemStack stack : stacks) {
-                if (stack.getItem() instanceof HitTracking hitTrackingItem) {
-                    hitTrackingItem.postWearerHit(stack, attacker, target);
-                }
-            }
-        }
-        attacker.getArmorItems().forEach(stack -> {
-            if (stack.getItem() instanceof HitTracking hitTrackingItem){
-                hitTrackingItem.postWearerHit(stack, attacker, target);
-            }
-        });
-        ItemStack mainhand = attacker.getEquippedStack(EquipmentSlot.MAINHAND);
-        if (mainhand.getItem() instanceof HitTracking hitTrackingItem){
-            hitTrackingItem.postWearerHit(mainhand, attacker, target);
-        }
-        ItemStack offhand = attacker.getEquippedStack(EquipmentSlot.OFFHAND);
-        if (offhand.getItem() instanceof HitTracking hitTrackingItem){
-            hitTrackingItem.postWearerHit(offhand, attacker, target);
-        }
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) attacker).fzzy_core_getStack())) {
-            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(attacker);
-            innateModifiers.getCompiledData().postHit(ItemStack.EMPTY, attacker, target);
-        }*/
         GearSets.INSTANCE.processPostHit(target, attacker);
     }
 
     @Inject(method = "postMine", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void gear_core_invokePostWearerMine(World world, BlockState state, BlockPos pos, PlayerEntity miner, CallbackInfo ci){
         EquipmentModifierHelper.INSTANCE.getActiveModifiers(miner).getCompiledData().postMine(miner.getEquippedStack(EquipmentSlot.MAINHAND), world, state, pos, miner);
-        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
-            List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks(miner);
-            for (ItemStack stack : stacks) {
-                if (stack.getItem() instanceof MineTracking mineTrackingItem) {
-                    mineTrackingItem.postWearerMine(stack, world, state, pos, miner);
-                }
-            }
-        }
-        miner.getArmorItems().forEach(stack -> {
-            if (stack.getItem() instanceof MineTracking mineTrackingItem) {
-                mineTrackingItem.postWearerMine(stack, world, state, pos, miner);
-            }
-        });
-        ItemStack mainhand = miner.getEquippedStack(EquipmentSlot.MAINHAND);
-        if (mainhand.getItem() instanceof MineTracking mineTrackingItem) {
-            mineTrackingItem.postWearerMine(mainhand, world, state, pos, miner);
-        }
-        ItemStack offhand = miner.getEquippedStack(EquipmentSlot.OFFHAND);
-        if (offhand.getItem() instanceof MineTracking mineTrackingItem) {
-            mineTrackingItem.postWearerMine(offhand, world, state, pos, miner);
-        }
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding)miner).fzzy_core_getStack())) {
-            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers(miner);
-            innateModifiers.getCompiledData().postMine(ItemStack.EMPTY, world, state, pos, miner);
-        }*/
         GearSets.INSTANCE.processPostMine(world, state, pos, miner);
     }
 
@@ -153,11 +93,7 @@ public abstract class ItemStackMixin implements DurabilityTracking {
     private TypedActionResult<ItemStack> gear_core_invokeOnWearerUse(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> operation){
         TypedActionResult<ItemStack> useResult = operation.call(instance, world, user, hand);
         if (!useResult.getResult().isAccepted()){
-            //ItemStack stack = user.getStackInHand(hand);
             EquipmentModifierHelper.INSTANCE.getActiveModifiers(user).getCompiledData().onUse(user.getStackInHand(hand),user,null);
-            /*if (stack.getItem() instanceof UseTracking useTrackingItem) {
-                useTrackingItem.onWearerUse(user.getStackInHand(hand), world, user, hand);
-            }*/
             GearSets.INSTANCE.processOnUse(hand, user);
         }
         return useResult;

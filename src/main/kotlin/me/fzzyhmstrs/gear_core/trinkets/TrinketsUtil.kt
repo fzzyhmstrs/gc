@@ -57,4 +57,20 @@ object TrinketsUtil {
             nbt.put("TrinketAttributeModifiers",nbtList)
         }
     }
+
+    fun removeTrinketNbt(stack: ItemStack){
+        val nbt = stack.nbt ?: return
+        if (stack.item is Trinket) {
+            val existingAttributeList = nbt.getList("TrinketAttributeModifiers",10)
+            val nbtList = NbtList()
+
+            for (attribute in existingAttributeList){
+                if (attribute !is NbtCompound) continue
+                if (attribute.contains("GearCoreModifier")) continue
+                nbtList.add(attribute)
+            }
+
+            nbt.put("TrinketAttributeModifiers",nbtList)
+        }
+    }
 }

@@ -7,6 +7,7 @@ import me.fzzyhmstrs.fzzy_core.interfaces.Modifiable
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType
+import me.fzzyhmstrs.fzzy_core.modifier_util.SlotId
 import me.fzzyhmstrs.fzzy_core.nbt_util.Nbt
 import me.fzzyhmstrs.fzzy_core.nbt_util.NbtKeys
 import me.fzzyhmstrs.fzzy_core.registry.ModifierRegistry
@@ -114,23 +115,9 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         Nbt.addNbtToList(newEl, getType().getModifiersKey(),nbt)
     }
 
-    override fun addModifierToNbt(stack: ItemStack, modifier: Identifier, nbt: NbtCompound) {
-        super.addModifierToNbt(stack, modifier, nbt)
-        val id = Nbt.makeItemStackId(stack)
-        val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core add: $it") }
-        prepareActiveModifierData(stack, nbt, compiled, id)
-    }
-
-    override fun removeModifierFromNbt(stack: ItemStack, modifier: Identifier, nbt: NbtCompound) {
-        super.removeModifierFromNbt(stack, modifier, nbt)
-        val id = Nbt.makeItemStackId(stack)
-        val compiled = this.compile(getModifiersFromNbt(stack))//.also { println("Compiling for Gear Core remove: $it") }
-        prepareActiveModifierData(stack, nbt, compiled, id)
-    }
-
     fun prepareContainerMap(slot: SlotId?, list: List<Identifier>): Multimap<EntityAttribute, EntityAttributeModifier>{
-        if (list.isEmptry()) return ArrayListMultimap.create()
-        val mods = getReleventModifiers(list,null)
+        if (list.isEmpty()) return ArrayListMultimap.create()
+        val mods = getRelevantModifiers(list,null)
         val repeats: MutableMap<Identifier, Int> = mutableMapOf()
         val newMap: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
         for (mod in mods){

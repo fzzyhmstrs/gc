@@ -7,6 +7,7 @@ import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierHelperType;
 import me.fzzyhmstrs.fzzy_core.modifier_util.ModifierInitializer;
 import me.fzzyhmstrs.gear_core.interfaces.*;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
+import me.fzzyhmstrs.gear_core.trinkets.TrinketsUtil;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,7 @@ public interface TrinketMixin extends Modifiable, HitTracking, KillTracking, Dam
 
     @Inject(method = "onEquip", at = @At("TAIL"))
     private void gear_core_processOnEquipForAugments(ItemStack stack, SlotReference slot, LivingEntity entity, CallbackInfo ci){
-            EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);
+        TrinketsUtil.INSTANCE.removeTrinketNbt(stack);
+        EquipmentModifierHelper.INSTANCE.processModifiers(stack, entity);
     }
 }
