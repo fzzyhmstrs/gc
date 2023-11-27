@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker;
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil;
 import me.fzzyhmstrs.gear_core.interfaces.DamageTracking;
+import me.fzzyhmstrs.gear_core.interfaces.KillTracking;
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper;
 import me.fzzyhmstrs.gear_core.set.GearSets;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,7 @@ public abstract class PlayerEntityMixin {
     @Inject(method = "onKilledOther", at = @At(value = "HEAD"))
     private void gear_core_invokeOnWearerKilledOther(ServerWorld world, LivingEntity livingEntity, CallbackInfoReturnable<Boolean> cir){
         EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this).getCompiledData().killedOther(((LivingEntity) (Object) this).getEquippedStack(EquipmentSlot.MAINHAND),(LivingEntity) (Object) this,livingEntity);
-        /*if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
+        if (TrinketChecker.INSTANCE.getTrinketsLoaded()) {
             List<ItemStack> stacks = TrinketUtil.INSTANCE.getTrinketStacks((LivingEntity) (Object) this);
             for (ItemStack stack : stacks) {
                 if (stack.getItem() instanceof KillTracking killTrackingItem) {
@@ -52,10 +53,6 @@ public abstract class PlayerEntityMixin {
         if (offhand.getItem() instanceof KillTracking killTrackingItem){
             killTrackingItem.onWearerKilledOther(offhand, (LivingEntity) (Object) this, livingEntity, world);
         }
-        if (EquipmentModifierHelper.INSTANCE.hasActiveModifiers(((StackHolding) this).fzzy_core_getStack())) {
-            var innateModifiers = EquipmentModifierHelper.INSTANCE.getActiveModifiers((LivingEntity) (Object) this);
-            innateModifiers.getCompiledData().killedOther(ItemStack.EMPTY, (LivingEntity) (Object) this, livingEntity);
-        }*/
         GearSets.INSTANCE.processOnKilledOther((PlayerEntity) (Object) this, livingEntity);
     }
 
