@@ -18,7 +18,7 @@ repositories {
     }
     maven {
         name = "Ladysnake Libs"
-        url = uri("https://ladysnake.jfrog.io/artifactory/mods")
+        url = uri("https://maven.ladysnake.org/releases")
     }
     maven {
         name = "Jitpack"
@@ -82,8 +82,21 @@ tasks {
     }
     jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
     processResources {
+        val loaderVersion: String by project
+        val fabricKotlinVersion: String by project
+        val fcVersion: String by project
+        inputs.property("loaderVersion", loaderVersion)
+        inputs.property("fabricKotlinVersion", fabricKotlinVersion)
+        inputs.property("fcVersion", fcVersion)
         inputs.property("version", project.version)
-        filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to project.version)) }
+        filesMatching("fabric.mod.json") {
+            expand(
+                mutableMapOf(
+                    "loaderVersion" to loaderVersion,
+                    "fabricKotlinVersion" to fabricKotlinVersion,
+                    "fcVersion" to fcVersion,
+                    "version" to project.version))
+        }
     }
     java {
         toolchain { languageVersion.set(JavaLanguageVersion.of(javaVersion.toString())) }

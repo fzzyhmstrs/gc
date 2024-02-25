@@ -45,12 +45,12 @@
     "gear_core.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.21",
+    "fabricloader": ">=${loaderVersion}",
     "fabric": "*",
-    "fabric-language-kotlin": ">=1.7.4+kotlin.1.6.21",
+    "fabric-language-kotlin": ">=${fabricKotlinVersion}",
     "minecraft": ">=1.20",
     "java": ">=17",
-    "fzzy_core": ">=0.3.1+1.20.1"
+    "fzzy_core": ">=${fcVersion}"
   },
   "custom": {
     "loom:injected_interfaces": {

@@ -47,7 +47,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     private val EMPTY_ATTRIBUTE_MAP: Multimap<EntityAttribute, EntityAttributeModifier> = ArrayListMultimap.create()
     private const val OLD_MODIFIERS_KEY = "modifiers"
     private const val OLD_MODIFIER_ID_KEY = "modifier_id"
-    
+
     override val fallbackData: AbstractModifier.CompiledModifiers<EquipmentModifier> = AbstractModifier.CompiledModifiers(arrayListOf(), EquipmentModifier(BLANK))
 
     override fun initializeModifiers(stack: ItemStack): List<Identifier> {
@@ -56,7 +56,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
             fixUpOldNbt(nbt)
         val item = stack.item
         val list = if(item is Modifiable){
-            item.defaultModifiers(getType())
+            ModifierRegistry.getDefaultModifiers(item, getType())
         } else {
             listOf()
         }
@@ -165,7 +165,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
         }
         attributeMap[id] = map
     }
-    
+
     private fun prepareAttributeMapForSlot(stack: ItemStack, map: Multimap<EntityAttribute, EntityAttributeModifierContainer>): Multimap<EntityAttribute, EntityAttributeModifier>{
         val item = stack.item
         if (item !is AttributeTracking) return EMPTY_ATTRIBUTE_MAP
@@ -184,7 +184,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     override fun getTranslationKeyFromIdentifier(id: Identifier): String {
         return "equipment.modifier.${id}"
     }
-    
+
     override fun getDescTranslationKeyFromIdentifier(id: Identifier): String {
         return "equipment.modifier.${id}.desc"
     }
@@ -240,7 +240,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     fun addUniqueModifier(modifier: Identifier, stack: ItemStack) {
         addModifier(modifier, stack, true)
     }
-    
+
     internal fun addToTargetMap(modifier: EquipmentModifier){
         if (!modifier.randomlySelectable()) return
         if (modifier.target == EquipmentModifier.EquipmentModifierTarget.NONE) return
@@ -276,7 +276,7 @@ object EquipmentModifierHelper: AbstractModifierHelper<EquipmentModifier>() {
     fun addRandomModifiers(stack: ItemStack, context: LootContext){
         addRandomModifiers(stack, context, DEFAULT_MODIFIER_TOLL)
     }
-    
+
     fun addRandomModifiers(stack: ItemStack, context: LootContext, toll: LootNumberProvider){
         val list = getTargetsForItem(stack)
         if (list.isEmpty()) return
