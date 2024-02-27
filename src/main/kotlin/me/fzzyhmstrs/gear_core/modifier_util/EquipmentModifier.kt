@@ -2,10 +2,13 @@ package me.fzzyhmstrs.gear_core.modifier_util
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Multimap
+import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
 import me.fzzyhmstrs.fzzy_core.coding_util.PerLvlI
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifier
 import me.fzzyhmstrs.fzzy_core.modifier_util.AbstractModifierHelper
 import me.fzzyhmstrs.fzzy_core.modifier_util.SlotId
+import me.fzzyhmstrs.fzzy_core.modifier_util.serialization.ModifierConsumer
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketChecker
 import me.fzzyhmstrs.fzzy_core.trinket_util.TrinketUtil
 import me.fzzyhmstrs.gear_core.GC
@@ -23,6 +26,7 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import net.minecraft.util.StringIdentifiable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import java.util.*
@@ -42,7 +46,7 @@ open class EquipmentModifier(
     open fun randomlySelectable(): Boolean{
         return randomSelectable
     }
-    
+
     open fun isPersistent(): Boolean{
         return persistent
     }
@@ -59,18 +63,18 @@ open class EquipmentModifier(
         if (modifierId != AbstractModifierHelper.BLANK)
             EquipmentModifierHelper.addToTargetMap(this)
     }
-    
+
     private val attributeModifiers: Multimap<EntityAttribute, EntityAttributeModifierContainer> = ArrayListMultimap.create()
     private val modifierModifiers: MutableList<Identifier> = mutableListOf()
-    private val postHitConsumers: MutableList<ToolConsumer> = mutableListOf()
+    private val postHitConsumers: MutableList<ModifierConsumer> = mutableListOf()
     private val postMineConsumers: MutableList<MiningConsumer> = mutableListOf()
-    private val onUseConsumers: MutableList<ToolConsumer> = mutableListOf()
+    private val onUseConsumers: MutableList<ModifierConsumer> = mutableListOf()
     private val onAttackFunctions: MutableList<DamageFunction> = mutableListOf()
     private val onDamagedFunctions: MutableList<DamageFunction> = mutableListOf()
-    private val killOtherConsumers: MutableList<ToolConsumer> = mutableListOf()
-    private val tickConsumers: MutableList<ToolConsumer> = mutableListOf()
+    private val killOtherConsumers: MutableList<ModifierConsumer> = mutableListOf()
+    private val tickConsumers: MutableList<ModifierConsumer> = mutableListOf()
     private var durabilityModifier: PerLvlI = PerLvlI()
-    
+
     var toll: LootNumberProvider = ConstantLootNumberProvider.create(5f)
 
 
@@ -104,7 +108,7 @@ open class EquipmentModifier(
         attributeModifiers.put(attribute,modifier)
         return this
     }
-    
+
     fun withAttributeModifier(attribute: EntityAttribute, amount: Double, operation: EntityAttributeModifier.Operation): EquipmentModifier {
         val modifier = EntityAttributeModifierContainer(this.getTranslationKey() + "/" + attribute.translationKey,amount,operation)
         attributeModifiers.put(attribute,modifier)
@@ -135,12 +139,12 @@ open class EquipmentModifier(
     open fun modifiers(): List<Identifier>{
         return modifierModifiers
     }
-    
+
     fun withDurabilityMod(durabilityMod: PerLvlI): EquipmentModifier{
         this.durabilityModifier = durabilityMod
         return this
     }
-    
+
     open fun modifyDurability(durability: Int): Int{
         val dur = PerLvlI(durability)
         //println(dur)
@@ -150,7 +154,7 @@ open class EquipmentModifier(
         return blh
     }
 
-    fun withPostHit(onHit: ToolConsumer): EquipmentModifier {
+    fun withPostHit(onHit: ModifierConsumer): EquipmentModifier {
         postHitConsumers.add(onHit)
         return this
     }
@@ -172,7 +176,7 @@ open class EquipmentModifier(
         }
     }
 
-    fun withOnUse(onUse: ToolConsumer): EquipmentModifier {
+    fun withOnUse(onUse: ModifierConsumer): EquipmentModifier {
         onUseConsumers.add(onUse)
         return this
     }
@@ -211,7 +215,7 @@ open class EquipmentModifier(
         return newAmount
     }
 
-    fun withKilledOther(killOther: ToolConsumer): EquipmentModifier {
+    fun withKilledOther(killOther: ModifierConsumer): EquipmentModifier {
         killOtherConsumers.add(killOther)
         return this
     }
@@ -222,7 +226,7 @@ open class EquipmentModifier(
         }
     }
 
-    fun withTick(tick: ToolConsumer): EquipmentModifier {
+    fun withTick(tick: ModifierConsumer): EquipmentModifier {
         tickConsumers.add(tick)
         return this
     }
@@ -232,12 +236,12 @@ open class EquipmentModifier(
             it.apply(stack, user, target)
         }
     }
-    
+
     fun withDescendant(modifier: EquipmentModifier): EquipmentModifier {
         addDescendant(modifier)
         return this
     }
-    
+
     fun withToll(toll: LootNumberProvider): EquipmentModifier{
         this.toll = toll
         return this
@@ -256,11 +260,6 @@ open class EquipmentModifier(
     }
 
     @FunctionalInterface
-    fun interface ToolConsumer{
-        fun apply(stack: ItemStack, user: LivingEntity, target: LivingEntity?)
-    }
-
-    @FunctionalInterface
     fun interface MiningConsumer{
         fun apply(stack: ItemStack, world: World, state: BlockState, pos: BlockPos, miner: PlayerEntity)
     }
@@ -269,11 +268,22 @@ open class EquipmentModifier(
     fun interface DamageFunction{
         fun test(stack: ItemStack, user: LivingEntity, attacker: LivingEntity?, source: DamageSource, amount: Float): Float
     }
-    
+
     abstract class EquipmentModifierTarget(val id: Identifier){
-    
+
         companion object{
-            
+
+            val CODEC: Codec<EquipmentModifierTarget> = Identifier.CODEC.comapFlatMap(
+                {id ->
+                    for (target in targets){
+                        if (target.id == id)
+                            DataResult.success(target)
+                    }
+                    DataResult.error { "EquipmentModifierTarget $id not found in instantiated Targets list" }
+                },
+                {t: EquipmentModifierTarget -> t.id }
+            )
+
             val GLOBAL_EXCLUSIONS: TagKey<Item> =
                 TagKey.of(
                     RegistryKeys.ITEM,
@@ -289,7 +299,7 @@ open class EquipmentModifier(
             fun getTrinketCheck(): Predicate<ItemStack>{
                 return TrinketUtil.trinketCheck
             }
-            
+
             internal fun findTargetForItem(stack: ItemStack): List<EquipmentModifierTarget>{
                 val list: MutableList<EquipmentModifierTarget> = mutableListOf()
                 for (target in targets){
@@ -414,10 +424,10 @@ open class EquipmentModifier(
                 }
             }
         }
-        
+
         val tagIncluded: TagKey<Item>
         val tagExcluded: TagKey<Item>
-        
+
         init{
             for (target in targets){
                 if (target.id == id) throw IllegalStateException("Equipment Modifier target $id already instantiated!")
@@ -430,17 +440,17 @@ open class EquipmentModifier(
         private fun getTarget(): EquipmentModifierTarget{
             return this
         }
-        
+
         override fun equals(other: Any?): Boolean{
             if (other == null) return false
             if (other !is EquipmentModifierTarget) return false
             return other.id == id
         }
-        
+
         override fun hashCode(): Int{
             return id.hashCode() + 31 * id.hashCode()
         }
-        
+
         fun isStackAcceptable(stack: ItemStack): Boolean{
             if (stack.isIn(GLOBAL_EXCLUSIONS)) return false
             return isItemAcceptableOrTagged(stack)
@@ -451,19 +461,27 @@ open class EquipmentModifier(
             if (stack.isIn(tagExcluded)) return false
             return stack.isIn(tagIncluded) || isAcceptableItem(stack)
         }
-                
+
         protected abstract fun isAcceptableItem(stack: ItemStack): Boolean
-        
+
     }
-    
-    enum class Rarity(val beneficial: Boolean,vararg val formatting: Formatting){
+
+    enum class Rarity(val beneficial: Boolean,vararg val formatting: Formatting): StringIdentifiable{
         REALLY_BAD(false, Formatting.BOLD, Formatting.DARK_RED),
         BAD(false, Formatting.DARK_RED),
         COMMON(true, Formatting.GRAY),
         UNCOMMON(true, Formatting.DARK_GREEN),
         RARE(true, Formatting.AQUA),
         EPIC(true, Formatting.LIGHT_PURPLE),
-        LEGENDARY(true, Formatting.BOLD, Formatting.GOLD)
+        LEGENDARY(true, Formatting.BOLD, Formatting.GOLD);
+
+        override fun asString(): String {
+            return name
+        }
+
+        companion object{
+            val CODEC = StringIdentifiable.createCodec{ Rarity.values() }
+        }
     }
-    
+
 }

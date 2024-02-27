@@ -8,6 +8,9 @@ import me.fzzyhmstrs.fzzy_core.modifier_util.SlotId
 import me.fzzyhmstrs.gear_core.interfaces.ActiveGearSetsTracking
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifier
 import me.fzzyhmstrs.gear_core.modifier_util.EquipmentModifierHelper
+import me.fzzyhmstrs.gear_core.modifier_util.serialization.DamageTransformerType
+import me.fzzyhmstrs.gear_core.modifier_util.serialization.MiningModifierConsumer
+import me.fzzyhmstrs.gear_core.modifier_util.serialization.MiningModifierConsumerType
 import me.fzzyhmstrs.gear_core.set.GearSets
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.ModInitializer
@@ -45,7 +48,7 @@ object GC: ModInitializer {
                 modifierContainer.addModifier(mod, this)
             }
         }
-    
+
         override fun remove(stack: ItemStack, id: SlotId, modifierContainer: ModifierContainer){
             val mods = helper().getModifiersFromNbt(stack)
             modifierContainer.livingEntity.attributes.removeModifiers(EquipmentModifierHelper.prepareContainerMap(id,mods))
@@ -57,6 +60,8 @@ object GC: ModInitializer {
 
     override fun onInitialize() {
         GearSets.registerServer()
+        DamageTransformerType.Types.init()
+        MiningModifierConsumerType.Types.init()
     }
 }
 
