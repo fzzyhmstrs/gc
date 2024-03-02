@@ -20,6 +20,12 @@ class EntityAttributeContainer(private val name: String, private val amount: Dou
     }
 
     companion object {
-        val CODEC 
+        val CODEC: Codec<EntityAttributeModifier> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<EntityAttributeModifier> ->
+            Codec.STRING.fieldOf("name").forGetter { e -> e.name },
+            Codec.DOUBLE.fieldOf("value").forGetter { e -> e.value },
+            CustomCodecs.OPERATION.fieldOf("operation").forGetter { e -> e.operation }
+            Expression.CODEC.fieldOf("math").forGetter { e -> e.tierToMultiplier}
+        ).apply(instance){n,v,o,t -> EntityAttributeContainer(n,v,o,t)}
+    }
     }
 }
